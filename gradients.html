@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Gradients | The Living Ocean</title>
+    <meta name="description" content="An interactive, immersive educational experience exploring the different gradients and layers of the ocean.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Poppins:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                        mono: ['VT323', 'monospace'] // For gauges
+                    },
+                    colors: {
+                        'ocean-surface': '#4ea8de',
+                        'ocean-sunlight': '#0077b6',
+                        'ocean-twilight': '#03045e',
+                        'ocean-midnight': '#01012b',
+                        'ocean-abyssal': '#000010',
+                        'ocean-hadal': '#000000'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Dynamic Scroll Background spanning the whole document (12-stop gradient) */
+        body {
+            background: linear-gradient(to bottom,
+                #00aadd 0%, #0088c0 5%, #0077b6 10%, #005fa3 18%,
+                #023e8a 28%, #02296b 38%, #03045e 48%,
+                #020448 58%, #010330 68%, #000c1c 80%,
+                #000510 90%, #000000 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .anim-float { animation: float 3s ease-in-out infinite; }
+        
+        @keyframes pulse-red { 0%, 100% { background-color: rgba(220, 38, 38, 0.2); } 50% { background-color: rgba(220, 38, 38, 0.5); } }
+        .bg-alarm { animation: pulse-red 2s infinite; }
+
+        @keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .anim-pop { animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes swim {
+            0% { transform: translateX(0) scaleX(-1); }
+            49% { transform: translateX(100px) scaleX(-1); }
+            50% { transform: translateX(100px) scaleX(1); }
+            100% { transform: translateX(0) scaleX(1); }
+        }
+        .anim-swim { animation: swim 8s linear infinite; }
+
+        /* Organic Bubbles System */
+        @keyframes bub-rise {
+            0%   { transform:translateY(0) translateX(0); opacity:0; }
+            8%   { opacity:1; }
+            92%  { opacity:.45; }
+            100% { transform:translateY(-115vh) translateX(var(--drift,22px)); opacity:0; }
+        }
+        .bubble {
+            position: fixed;
+            bottom: -20px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 33% 33%, rgba(255,255,255,.38), rgba(255,255,255,.04));
+            border: 1px solid rgba(255,255,255,.14);
+            pointer-events: none;
+            z-index: -10;
+            animation: bub-rise var(--dur,7s) ease-in infinite;
+        }
+
+        /* SVG Gauges */
+        .g-arc { transition: stroke-dashoffset .9s cubic-bezier(.4,0,.2,1); }
+        .g-val { font-size: 11px; font-weight: 900; font-family: 'VT323', monospace; fill: white; }
+        .g-unit{ font-size: 8px; font-family: 'VT323', monospace; fill: rgba(255,255,255,.5); }
+
+        /* Glassmorphism elements */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Deep Scattering Layer Flashlight */
+        .flashlight-zone {
+            position: relative;
+            background: #000;
+            cursor: crosshair;
+            overflow: hidden;
+        }
+        .flashlight-mask {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle 80px at 50% 50%, transparent 0%, rgba(0,0,0,0.98) 100%);
+            z-index: 10;
+        }
+
+        /* Hidden Creatures */
+        .hidden-creature {
+            position: absolute;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+            z-index: 20;
+        }
+        .hidden-creature:hover {
+            transform: scale(1.3) rotate(10deg);
+            filter: drop-shadow(0 0 15px rgba(255,215,0,0.8));
+        }
+
+        /* Submarine Fix Animation */
+        @keyframes heal-glow  { 0%{filter:drop-shadow(0 0 0 gold)} 50%{filter:drop-shadow(0 0 15px gold)} 100%{filter:drop-shadow(0 0 0 gold)} }
+        @keyframes sub-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+        .crack { transition:opacity .55s; }
+        .crack.healed { opacity:0; }
+
+        /* Depth Marker Grad */
+        .depth-marker-grad { transition: all 0.3s; }
+        .depth-marker-grad.active .dot { background-color: #f97316; transform: scale(1.5); box-shadow: 0 0 15px #fdba74; }
+        .depth-marker-grad.active .text-label { color: #fdba74; font-weight: 900; transform: translateX(-5px); }
+    </style>
+</head>
+<body class="antialiased font-sans flex flex-col min-h-screen">
+
+    <!-- Bubbles Container -->
+    <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-[-5]"></div>
+
+    <!-- Top Navigation & Info Panels -->
+    <div class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-start pointer-events-none">
+        <div class="pointer-events-auto">
+            <button id="audio-toggle" onclick="toggleAudio()" class="glass-panel text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-700 transition shadow-lg">
+                <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
+            </button>
+        </div>
+        
+        <div class="pointer-events-auto flex flex-col items-end gap-3">
+            <!-- Creature Dex -->
+            <div class="glass-panel p-3 rounded-2xl shadow-xl flex flex-col items-end">
+                <div class="text-xs font-bold uppercase tracking-wider text-cyan-300 mb-2"><i class="fa-solid fa-book-journal-whills mr-1"></i> Creature Dex <span id="dex-count">0</span>/8</div>
+                <div class="flex gap-2 text-2xl" id="creature-dex">
+                    <!-- Slots populated by JS -->
+                </div>
+            </div>
+            
+            <!-- Score Board -->
+            <div class="glass-panel p-3 px-6 rounded-2xl shadow-xl flex flex-col items-end min-w-[120px]">
+                <div class="text-xs font-bold uppercase tracking-wider text-yellow-400 mb-1"><i class="fa-solid fa-star mr-1"></i> Score</div>
+                <div class="text-3xl font-mono font-bold text-white transition-all duration-300" id="score-val">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="flex max-w-7xl mx-auto pt-16 pb-48 w-full px-4 gap-8 relative">
+        
+        <!-- Sticky Left: Gauges & Depth Marker -->
+        <!-- Widened to w-80 to accommodate the Mission Control box alongside the depth track -->
+        <div class="w-80 hidden lg:flex flex-col sticky top-16 h-[calc(100vh-6rem)] flex-shrink-0 z-40">
+            <!-- Analog SVG Gauges -->
+            <div class="glass-panel p-3 rounded-xl border-t-4 border-cyan-400 mb-3 shadow-2xl flex-shrink-0">
+                <h3 class="text-center font-heading font-black text-cyan-400 uppercase tracking-widest mb-2 text-sm">Telemetry</h3>
+                
+                <div class="grid grid-cols-2 gap-2 font-mono text-sm" id="gauge-grid">
+                    <!-- Depth -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-depth" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#22d3ee" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-depth" class="g-val" x="30" y="31" text-anchor="middle">0</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">m</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Depth</span>
+                    </div>
+                    <!-- Temp -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-temp" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#f87171" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-temp" class="g-val" x="30" y="31" text-anchor="middle">25.0</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">°C</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Temp</span>
+                    </div>
+                    <!-- Pressure -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-press" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#c084fc" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-press" class="g-val" x="30" y="31" text-anchor="middle">1</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">atm</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Pressure</span>
+                    </div>
+                    <!-- Salinity -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-sal" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#2dd4bf" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-sal" class="g-val" x="30" y="31" text-anchor="middle">35.0</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">PSU</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Salinity</span>
+                    </div>
+                    <!-- Light -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-light" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#facc15" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-light" class="g-val" x="30" y="31" text-anchor="middle">100</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">%</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Light</span>
+                    </div>
+                    <!-- Density -->
+                    <div class="bg-black/50 p-2 rounded flex flex-col items-center">
+                        <svg viewBox="0 0 60 45" width="65" height="48" style="overflow:visible">
+                            <path d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5.5" stroke-linecap="round"/>
+                            <path id="ga-dens" class="g-arc" d="M4,39 A28,28 0 0,1 56,39" fill="none" stroke="#fb923c" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88"/>
+                            <text id="gv-dens" class="g-val" x="30" y="31" text-anchor="middle">1022</text>
+                            <text class="g-unit" x="30" y="41" text-anchor="middle">kg</text>
+                        </svg>
+                        <span class="text-gray-400 text-[9px] uppercase font-bold tracking-widest mt-1">Density</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side-by-side Mission Control & Depth Track -->
+            <div class="flex-grow flex flex-row min-h-[250px] w-full">
+                
+                <!-- Persistent Mission Control Box -->
+                <div id="mission-control" class="flex-grow mr-4 transition-transform duration-500 z-50">
+                    <div class="glass-panel border-t-4 border-cyan-400 rounded-2xl p-3 shadow-[0_-5px_25px_rgba(0,0,0,0.5)] flex flex-col items-center gap-2 h-full text-center relative">
+                        <div class="w-14 h-14 bg-cyan-900 rounded-full border-2 border-cyan-400 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(34,211,238,0.3)] mt-1">
+                            <span class="text-4xl">👨‍✈️</span>
+                        </div>
+                        <div class="flex-grow flex flex-col mt-2">
+                            <div class="text-cyan-400 text-[10px] font-bold uppercase tracking-widest font-mono mb-1">Incoming Transmission...</div>
+                            <p id="mc-text" class="text-white text-[13px] font-heading leading-tight h-[60px]">
+                                Welcome aboard, Captain! Let's dive deep and explore the ocean's gradients. Scroll down to descend!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Depth Track -->
+                <div class="relative w-28 flex-shrink-0 border-r-4 border-orange-500/30 pr-4 md:pr-6 flex flex-col justify-between py-2">
+                    <div id="submarine-marker" class="absolute right-[-18px] w-8 h-8 bg-yellow-400 rounded-md border-2 border-white shadow-[0_0_15px_gold] flex items-center justify-center transition-all duration-100 z-30" style="top: 0%;">
+                        <i class="fa-solid fa-ship text-black text-xs"></i>
+                    </div>
+                    
+                    <!-- Marks -->
+                    <div class="depth-marker-grad text-right relative" data-target="Mixed Layer">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">0m</span>
+                            <span class="text-xs opacity-70">Mixed</span>
+                        </div>
+                    </div>
+                    <div class="depth-marker-grad text-right relative" data-target="Thermocline">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">200m</span>
+                            <span class="text-xs opacity-70">Temp</span>
+                        </div>
+                    </div>
+                    <div class="depth-marker-grad text-right relative" data-target="Halocline">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">300m</span>
+                            <span class="text-xs opacity-70">Salinity</span>
+                        </div>
+                    </div>
+                    <div class="depth-marker-grad text-right relative" data-target="Oxycline">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">500m</span>
+                            <span class="text-xs opacity-70">Oxygen</span>
+                        </div>
+                    </div>
+                    <div class="depth-marker-grad text-right relative" data-target="Chemocline">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">800m</span>
+                            <span class="text-xs opacity-70">Chemical</span>
+                        </div>
+                    </div>
+                    <div class="depth-marker-grad text-right relative" data-target="Deep Scattering Layer">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">1000m+</span>
+                            <span class="text-xs opacity-70">DSL</span>
+                        </div>
+                    </div>
+                    <!-- New Marker -->
+                    <div class="depth-marker-grad text-right relative" data-target="Thermohaline Circulation">
+                        <div class="dot absolute top-2 right-[-26px] md:right-[-34px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div>
+                        <div class="text-label text-orange-300 transition-all">
+                            <span class="text-lg font-bold block">Global</span>
+                            <span class="text-xs opacity-70">Currents</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Content: The Gradient Zones -->
+        <div class="flex-grow flex flex-col gap-12 lg:gap-24 z-10 w-full" id="zones-container">
+            <!-- Header -->
+            <div class="text-center pt-8 pb-4">
+                <div class="inline-block bg-cyan-500/20 text-cyan-300 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-cyan-500/50"><i class="fa-solid fa-water"></i> Oceanography Data Core</div>
+                <h1 class="text-4xl md:text-6xl font-heading font-black text-white drop-shadow-lg">The Vertical Journey</h1>
+                <p class="text-gray-300 mt-4 max-w-xl mx-auto">Descend into the depths and discover how water properties change dramatically in specific zones called gradients.</p>
+            </div>
+
+            <!-- Zone 1: Mixed Layer -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Mixed Layer" data-msg="Captain! We're in the Mixed Layer. The wind and waves keep the temperature and salt perfectly mixed here. Keep an eye out for surface dwellers!">
+                <div class="hidden-creature" style="top: -20px; right: 20px;" onclick="collectCreature('turtle', this)">🐢</div>
+                <h2 class="text-2xl font-bold text-orange-400 mb-2"><i class="fa-solid fa-wind"></i> Mixed Layer (0-200m)</h2>
+                <p class="text-gray-300 mb-4">The surface layer is stirred heavily by wind and waves, making temperature and salinity uniform.</p>
+                <div class="bg-blue-500/20 p-4 rounded-xl text-center border border-blue-500/30">
+                    <div class="text-5xl anim-swim inline-block">🌊🐟🌊</div>
+                    <p class="text-sm text-cyan-200 mt-2">Smooth sailing! Perfect mixing conditions.</p>
+                </div>
+                
+                <!-- NEW: Mixed Layer Animation Simulator -->
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-700 mt-4">
+                    <p class="text-center text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wider">Interactive Sensor: Wind Mixing</p>
+                    <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+                        <canvas id="mix-cv" width="200" height="120" class="rounded-lg border border-white/10 block bg-[#05263d]"></canvas>
+                        <div class="max-w-[180px]">
+                            <button class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg transition active:scale-95 w-full mb-2" onclick="addWind()">
+                                💨 Add Wind!
+                            </button>
+                            <div id="mix-txt" class="text-xs text-gray-300 leading-relaxed">Wind mixes the top layer — spreading warmth, oxygen, and nutrients evenly.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 2: Thermocline -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Thermocline" data-msg="Brrr! We've hit the Thermocline! The sun's heat can't reach here. Try adjusting the temperature slider to see the water separate!">
+                <div class="hidden-creature" style="top: 50%; right: -15px;" onclick="collectCreature('shark', this)">🦈</div>
+                <h2 class="text-2xl font-bold text-red-400 mb-2"><i class="fa-solid fa-temperature-arrow-down"></i> Thermocline</h2>
+                <p class="text-gray-300 mb-4">A zone of rapid temperature decrease. Cold water is denser, so it sinks below the warm surface water, creating a barrier.</p>
+                
+                <!-- Toy: Thermo Slider -->
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-700">
+                    <p class="text-center text-sm text-gray-400 mb-2 uppercase font-bold">Interactive Sensor: Temperature Drop</p>
+                    <div class="flex gap-4 items-center">
+                        <div class="flex-grow">
+                            <input type="range" id="thermo-slider" min="0" max="100" value="50" oninput="updateThermo(this.value)" class="w-full accent-red-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Cold (Deep)</span><span>Warm (Surface)</span></div>
+                        </div>
+                        <div class="h-24 w-16 rounded border-2 border-white/30 flex flex-col overflow-hidden shadow-inner flex-shrink-0">
+                            <div id="thermo-warm" class="bg-red-500 w-full transition-all duration-75" style="height: 50%;"></div>
+                            <div id="thermo-cold" class="bg-blue-600 w-full transition-all duration-75" style="height: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 3: Halocline -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Halocline" data-msg="Sensors show a massive spike in salinity! It's the Halocline. Salt makes water heavier. Try adding and removing salt to the beaker to float the egg!">
+                <div class="hidden-creature" style="bottom: 10px; left: -10px;" onclick="collectCreature('dolphin', this)">🐬</div>
+                <h2 class="text-2xl font-bold text-teal-400 mb-2"><i class="fa-solid fa-water"></i> Halocline</h2>
+                <p class="text-gray-300 mb-4">A zone of rapid change in salinity (saltiness). High evaporation at the surface or ice melting can create dense, salty layers that act like liquid floors.</p>
+                
+                <!-- Toy: Salt Beaker -->
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-700 flex flex-col items-center">
+                    <p class="text-center text-sm text-gray-400 mb-4 uppercase font-bold">Interactive Sensor: Density by Salinity</p>
+                    <div class="relative w-24 h-32 border-4 border-white/50 rounded-b-xl overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.3)]">
+                        <div id="beaker-water" class="absolute bottom-0 w-full h-24 bg-teal-500/40 transition-colors duration-500"></div>
+                        <div id="beaker-egg" class="absolute w-full text-center text-3xl transition-all duration-500" style="bottom: 5px;">🥚</div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-4 w-full justify-center">
+                        <button onclick="addSalt()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-full shadow-lg transition active:scale-95 flex-1 max-w-[140px] text-sm">
+                            Add Salt <i class="fa-solid fa-plus ml-1"></i>
+                        </button>
+                        <button onclick="removeSalt()" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full shadow-lg transition active:scale-95 flex-1 max-w-[140px] text-sm">
+                            Remove <i class="fa-solid fa-minus ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 4: Oxycline & Nutricline (Combined for flow) -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Oxycline" data-msg="Warning: Oxygen levels dropping in the Oxycline! But look! Nutrient levels are rising (Nutricline). Life adapts to extremes here.">
+                <div class="hidden-creature" style="top: 20px; right: 40px;" onclick="collectCreature('squid', this)">🦑</div>
+                <div class="hidden-creature" style="bottom: 20px; left: 40px;" onclick="collectCreature('crab', this)">🦀</div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Oxycline -->
+                    <div class="flex flex-col h-full">
+                        <h2 class="text-2xl font-bold text-sky-400 mb-2"><i class="fa-solid fa-lungs"></i> Oxycline</h2>
+                        <p class="text-gray-300 text-sm flex-grow">A rapid drop in dissolved oxygen, creating an Oxygen Minimum Zone where only specialized creatures survive.</p>
+                        
+                        <!-- Oxycline Toy -->
+                        <div class="bg-black/50 p-4 rounded-xl border border-gray-700 mt-4">
+                            <p class="text-center text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wider">Interactive Sensor: O2 Depletion</p>
+                            <div class="flex items-center gap-3">
+                                <button onclick="ventOxygen()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 px-3 rounded-full shadow-lg transition active:scale-95 whitespace-nowrap">
+                                    Vent O2 <i class="fa-solid fa-wind ml-1"></i>
+                                </button>
+                                <div class="flex-grow bg-gray-800 h-3 rounded-full overflow-hidden">
+                                    <div id="o2-bar" class="bg-sky-400 h-full w-full transition-all duration-1000"></div>
+                                </div>
+                                <div id="o2-creature" class="text-2xl transition-all duration-1000 w-8 text-center">🐟</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nutricline -->
+                    <div class="flex flex-col h-full">
+                        <h2 class="text-2xl font-bold text-green-400 mb-2"><i class="fa-solid fa-seedling"></i> Nutricline</h2>
+                        <p class="text-gray-300 text-sm flex-grow">A rapid increase in nutrients (nitrates/phosphates) as dead organic matter sinks and decays in the deep.</p>
+                        
+                        <!-- Nutricline Toy -->
+                        <div class="bg-black/50 p-4 rounded-xl border border-gray-700 mt-4">
+                            <p class="text-center text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wider">Interactive Sensor: Marine Snow</p>
+                            <div class="flex flex-col gap-2">
+                                <div id="snow-zone" class="w-full h-12 bg-gray-900 rounded border border-gray-700 relative overflow-hidden flex items-end justify-center">
+                                    <div id="nutrient-base" class="absolute bottom-0 w-full h-0 bg-green-500/60 transition-all duration-300 shadow-[0_-5px_15px_rgba(34,197,94,0.3)]"></div>
+                                </div>
+                                <button onclick="addMarineSnow()" class="bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded-full shadow-lg transition active:scale-95 w-full">
+                                    Decompose Snow <i class="fa-solid fa-arrow-down ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 5: Deep Scattering Layer -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Deep Scattering Layer" data-msg="We've reached the Twilight Zone! The Deep Scattering Layer is full of migrating fish hiding from predators. Turn on your flashlight!">
+                <h2 class="text-2xl font-bold text-indigo-400 mb-2"><i class="fa-solid fa-satellite-dish"></i> Deep Scattering Layer (DSL)</h2>
+                <p class="text-gray-300 mb-4">A dense layer of organisms that migrate vertically. It's so thick it bounces back sonar pings, creating a "false bottom" on ship radars.</p>
+                
+                <!-- Toy: Flashlight -->
+                <div class="bg-black p-2 rounded-xl border border-gray-700">
+                    <p class="text-center text-sm text-gray-500 mb-2 uppercase font-bold">Interactive Sensor: Sonar Flashlight (Hover/Touch)</p>
+                    <div id="dsl-toy" class="flashlight-zone w-full h-48 rounded-lg relative">
+                        <div class="absolute inset-0 flex justify-around items-center text-4xl flex-wrap p-4 content-around">
+                            <span>🐟</span><span class="anim-float">🦐</span><span>🐟</span>
+                            <span class="hidden-creature static hover:scale-125" onclick="collectCreature('lanternfish', this)">🐠</span>
+                            <span class="anim-float" style="animation-delay: 1s;">🦑</span><span>🐟</span>
+                        </div>
+                        <div id="dsl-mask" class="flashlight-mask"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 6: Chemocline -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Chemocline" data-msg="Toxic anomaly detected! It's the Chemocline. Hydrogen sulfide creates a chemical boundary where extremophiles thrive.">
+                <div class="hidden-creature" style="bottom: 10px; right: 20px;" onclick="collectCreature('tubeworm', this)">🪱</div>
+                <div class="hidden-creature" style="top: 10px; left: 10px;" onclick="collectCreature('angler', this)">🐡</div>
+                <h2 class="text-2xl font-bold text-fuchsia-400 mb-2"><i class="fa-solid fa-flask"></i> Chemocline</h2>
+                <p class="text-gray-300 mb-4">A strong chemical boundary separating distinct water masses, often featuring lack of oxygen and high hydrogen sulfide. Some rare ecosystems build entirely around these toxic chemicals!</p>
+                <div class="h-24 bg-gradient-to-b from-blue-900/50 to-fuchsia-900/80 rounded-xl border-b-4 border-fuchsia-500 flex items-end justify-center pb-2">
+                    <div class="flex gap-4 items-end text-fuchsia-300 opacity-50">
+                        <i class="fa-solid fa-volcano text-3xl anim-float"></i>
+                        <i class="fa-solid fa-volcano text-5xl"></i>
+                        <i class="fa-solid fa-volcano text-4xl anim-float" style="animation-delay: 1.5s;"></i>
+                    </div>
+                </div>
+
+                <!-- NEW: Chemocline Simulator -->
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-700 mt-4">
+                    <p class="text-center text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wider">Interactive Sensor: Hydrothermal Vent</p>
+                    <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+                        <div id="vent-box" class="relative w-[170px] h-[150px] bg-[#000014] rounded-xl border border-white/10 overflow-hidden">
+                            <div class="absolute bottom-0 w-full h-[45px] bg-gradient-to-b from-[#1a0800] to-[#2d1200]"></div>
+                            <div class="absolute bottom-[43px] left-1/2 -translate-x-1/2 w-[22px] h-[8px] bg-[#4a2000] rounded-t-sm"></div>
+                            <div id="vent-ptcl" class="absolute inset-0 pointer-events-none"></div>
+                            <div id="vent-life" class="absolute bottom-[42px] left-[26%] text-2xl opacity-0 transition-opacity duration-1000">🪱🦠</div>
+                            <div id="vent-cover" onclick="activateVent()" class="absolute inset-0 flex items-center justify-center bg-black/75 rounded-xl cursor-pointer hover:bg-black/60 transition">
+                                <div class="text-orange-500 text-sm text-center p-3 font-bold">👆 Click to<br>activate vent!</div>
+                            </div>
+                        </div>
+                        <div id="vent-txt" class="text-xs text-gray-300 max-w-[185px] leading-relaxed">Hydrothermal vents spew superheated water at 400°C. Life here uses hydrogen sulfide for energy through <strong class="text-fuchsia-400">chemosynthesis</strong>!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Zone 7 Thermohaline Circulation -->
+            <div class="zone-section glass-panel rounded-3xl p-6 relative" data-zone="Thermohaline Circulation" data-msg="We're riding the global conveyor belt! Cold dense water sinks and drives a current that circles the entire planet.">
+                <h2 class="text-2xl font-bold text-blue-400 mb-2"><i class="fa-solid fa-earth-americas"></i> Thermohaline Circulation</h2>
+                <p class="text-gray-300 mb-4">The global ocean conveyor belt — cold, dense, salty water drives currents spanning all oceans.</p>
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-700 mt-4 flex flex-col items-center">
+                    <p class="text-center text-[10px] text-gray-400 mb-2 uppercase font-bold tracking-wider">Interactive Model: Global Conveyor Belt</p>
+                    <svg viewBox="0 0 340 130" width="100%" class="max-w-[340px] block">
+                        <!-- Ocean floor / map background -->
+                        <rect x="0" y="0" width="340" height="130" rx="12" fill="rgba(0,8,28,.8)"/>
+                        <!-- Simplified continent outlines -->
+                        <rect x="22" y="25" width="40" height="60" rx="4" fill="rgba(74,55,20,.5)"/>
+                        <rect x="170" y="20" width="55" height="70" rx="4" fill="rgba(74,55,20,.5)"/>
+                        <rect x="280" y="30" width="45" height="55" rx="4" fill="rgba(74,55,20,.5)"/>
+                        <text x="40" y="62" text-anchor="middle" fill="rgba(255,200,100,.5)" font-size="8" font-family="monospace">Americas</text>
+                        <text x="197" y="58" text-anchor="middle" fill="rgba(255,200,100,.5)" font-size="8" font-family="monospace">Europe</text>
+                        <text x="302" y="60" text-anchor="middle" fill="rgba(255,200,100,.5)" font-size="8" font-family="monospace">Asia</text>
+                        <!-- Conveyor path: warm surface (top) + cold deep (bottom) -->
+                        <path id="surf-path" d="M70,35 Q120,20 168,32 Q220,18 276,35" fill="none" stroke="rgba(249,115,22,.5)" stroke-width="7"/>
+                        <path id="deep-path" d="M276,96 Q220,112 168,98 Q120,110 70,96" fill="none" stroke="rgba(59,130,246,.5)" stroke-width="7"/>
+                        <!-- Direction arrows -->
+                        <text x="115" y="23" fill="rgba(249,115,22,.9)" font-size="12">→</text>
+                        <text x="222" y="21" fill="rgba(249,115,22,.9)" font-size="12">→</text>
+                        <text x="130" y="118" fill="rgba(59,130,246,.9)" font-size="12">←</text>
+                        <text x="230" y="116" fill="rgba(59,130,246,.9)" font-size="12">←</text>
+                        <!-- Downwelling zone label -->
+                        <line x1="276" y1="35" x2="276" y2="96" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <text x="300" y="68" text-anchor="middle" fill="rgba(255,150,50,.7)" font-size="8" font-family="monospace">SINKING</text>
+                        <!-- Labels -->
+                        <text x="170" y="13" text-anchor="middle" fill="rgba(249,115,22,.8)" font-size="9" font-family="monospace" font-weight="bold">WARM SURFACE FLOW →</text>
+                        <text x="170" y="128" text-anchor="middle" fill="rgba(59,130,246,.8)" font-size="9" font-family="monospace" font-weight="bold">← COLD DEEP RETURN</text>
+                        <!-- Animated particles surface -->
+                        <circle r="5" fill="#f97316" opacity=".9"><animateMotion dur="5s" repeatCount="indefinite" path="M70,35 Q120,20 168,32 Q220,18 276,35"/></circle>
+                        <circle r="4" fill="#fbbf24" opacity=".7"><animateMotion dur="5s" begin="1.6s" repeatCount="indefinite" path="M70,35 Q120,20 168,32 Q220,18 276,35"/></circle>
+                        <!-- Deep particles -->
+                        <circle r="4" fill="#3b82f6" opacity=".8"><animateMotion dur="5s" repeatCount="indefinite" path="M276,96 Q220,112 168,98 Q120,110 70,96"/></circle>
+                        <circle r="3" fill="#60a5fa" opacity=".6"><animateMotion dur="5s" begin="2.5s" repeatCount="indefinite" path="M276,96 Q220,112 168,98 Q120,110 70,96"/></circle>
+                    </svg>
+                    <div class="text-xs text-gray-300 mt-4 leading-relaxed max-w-sm text-center">🌡️ Warm salty water flows north, cools and SINKS. Cold dense water flows back south along the deep ocean floor. One complete circuit takes <strong class="text-blue-400">~1,000 years</strong> and regulates Earth's entire climate!</div>
+                </div>
+            </div>
+
+            <!-- Boss Battle: Fix the Submarine -->
+            <div id="boss-battle" class="mt-12 bg-gray-900 border-4 border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl relative transition-colors duration-1000">
+                
+                <div class="p-6 md:p-10 relative z-10 flex flex-col md:flex-row gap-8 items-center w-full" id="quiz-ui">
+                    
+                    <!-- SVG Submarine -->
+                    <div class="flex-shrink-0 relative">
+                        <svg id="sub-svg" viewBox="0 0 270 168" width="270" height="168">
+                            <ellipse cx="127" cy="108" rx="122" ry="51" fill="#1a3660" stroke="#2563eb" stroke-width="2.5"/>
+                            <rect x="90" y="58" width="56" height="38" rx="9" fill="#1a3660" stroke="#2563eb" stroke-width="2"/>
+                            <rect x="102" y="44" width="32" height="20" rx="5" fill="#1a3660" stroke="#2563eb" stroke-width="1.5"/>
+                            <line x1="124" y1="44" x2="124" y2="17" stroke="#2563eb" stroke-width="3.5"/>
+                            <circle cx="124" cy="15" r="6" fill="#f97316" opacity=".9"/>
+                            <ellipse cx="10" cy="108" rx="7" ry="23" fill="#2563eb" opacity=".58"/>
+                            <ellipse cx="10" cy="108" rx="23" ry="7" fill="#2563eb" opacity=".58"/>
+                            <rect x="18" y="60" width="58" height="22" rx="5" fill="rgba(0,0,0,.62)" stroke="#f97316" stroke-width="1.5"/>
+                            <text id="sub-status" x="47" y="75" text-anchor="middle" fill="#f97316" font-size="8.5" font-family="monospace" font-weight="bold">DAMAGE: 6/6</text>
+                            
+                            <!-- Windows -->
+                            <circle id="w0" cx="62"  cy="108" r="15" fill="#0e7490" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle id="w1" cx="98"  cy="108" r="15" fill="#0e7490" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle id="w2" cx="134" cy="108" r="15" fill="#0e7490" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle id="w3" cx="170" cy="108" r="15" fill="#0e7490" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle id="w4" cx="206" cy="108" r="15" fill="#0e7490" stroke="#38bdf8" stroke-width="2.5"/>
+                            <circle id="w5" cx="242" cy="108" r="10" fill="#0e7490" stroke="#38bdf8" stroke-width="2"/>
+                            
+                            <!-- Cracks -->
+                            <path id="ck0" class="crack" d="M56,99 L62,108 L57,117"    stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path id="ck1" class="crack" d="M92,99 L98,107 L93,117 M98,107 L104,103"   stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path id="ck2" class="crack" d="M129,99 L135,108 L130,117 M135,108 L140,104" stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path id="ck3" class="crack" d="M165,100 L170,108 L165,116" stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path id="ck4" class="crack" d="M200,99 L206,108 L201,117 M206,108 L211,103" stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path id="ck5" class="crack" d="M238,100 L243,108 L239,115" stroke="#ef4444" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Quiz Area -->
+                    <div class="flex-grow w-full bg-black/60 rounded-xl p-6 border border-gray-700">
+                        <h2 class="text-xl font-heading font-black text-red-500 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> SYSTEM MALFUNCTION
+                        </h2>
+                        
+                        <div class="flex justify-between text-gray-400 font-mono text-sm mb-2">
+                            <span>Anomaly Signature <span id="quiz-num">1</span>/6</span>
+                            <span>Hull Integrity: <span id="hull-pct">40%</span></span>
+                        </div>
+                        <div class="w-full bg-gray-800 h-2 rounded mb-6">
+                            <div id="quiz-progress" class="bg-red-500 h-2 rounded transition-all duration-500" style="width: 16%;"></div>
+                        </div>
+
+                        <p id="quiz-q" class="text-xl font-bold text-white mb-6 min-h-[50px] font-mono"></p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="quiz-options">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Victory UI (Hidden initially) -->
+                <div id="victory-ui" class="hidden p-10 text-center relative z-10 bg-green-900/50 w-full">
+                    <i class="fa-solid fa-shield-check text-6xl text-green-400 mb-4 anim-float"></i>
+                    <h2 class="text-4xl font-heading font-black text-white mb-2">SENSORS RECALIBRATED!</h2>
+                    <p class="text-green-200">Excellent work, Captain! The submarine is fully repaired and data collection is complete.</p>
+                    <button onclick="window.scrollTo(0,0)" class="mt-6 bg-cyan-600 hover:bg-cyan-500 px-6 py-3 rounded-full font-bold transition shadow-lg text-white">Return to Surface</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Creature Fact Modal -->
+    <div id="creature-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity">
+        <div class="glass-panel border-2 border-cyan-400 rounded-3xl p-8 max-w-sm w-11/12 text-center anim-pop relative shadow-[0_0_50px_rgba(34,211,238,0.2)]">
+            <button onclick="closeCreatureFact()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-7xl mb-4" id="creature-modal-emoji">🐟</div>
+            <h3 class="text-3xl font-heading font-black text-cyan-300 mb-2" id="creature-modal-title">Name</h3>
+            <p class="text-gray-300 mb-6" id="creature-modal-desc">Fact goes here.</p>
+            <button onclick="closeCreatureFact()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-8 rounded-full shadow-lg transition">Awesome!</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- GLOBAL VARIABLES --- */
+        let scrollDepth = 0;
+        let foundCreatures = [];
+        const totalCreatures = 8;
+        let audioCtx, sonarInterval, humOscillator, humGain;
+        let isAudioPlaying = false;
+        let gameScore = 0;
+        let mcTypeInterval; // To control typewriter effect
+        
+        /* --- NEW SIMULATOR VARIABLES --- */
+        let mixRaf = null;
+        let mixPts = [];
+        let ventActive = false;
+
+        /* --- SCORE LOGIC --- */
+        function addScore(points) {
+            gameScore += points;
+            const scoreEl = document.getElementById('score-val');
+            scoreEl.innerText = gameScore;
+            
+            // Visual pop effect
+            scoreEl.classList.add('text-green-400', 'scale-125');
+            setTimeout(() => {
+                scoreEl.classList.remove('text-green-400', 'scale-125');
+            }, 300);
+        }
+
+        /* --- CREATURE DEX LOGIC --- */
+        const creatureData = {
+            'turtle': { name: 'Leatherback Turtle', emoji: '🐢', facts: 'Sea turtles love the Mixed Layer where they can breathe air and hunt for jellyfish!' },
+            'shark': { name: 'Deep Diving Shark', emoji: '🦈', facts: 'Many sharks dive right through the icy Thermocline to hunt deep-sea prey.' },
+            'dolphin': { name: 'Bottlenose Dolphin', emoji: '🐬', facts: 'Dolphins are mammals that stick near the surface but can hold their breath to dive deep!' },
+            'squid': { name: 'Vampire Squid', emoji: '🦑', facts: 'They hide out in the Oxycline where oxygen is so low that their predators cannot follow!' },
+            'crab': { name: 'Deep Sea Crab', emoji: '🦀', facts: 'Crabs feast on the falling organic matter (marine snow) collecting in the Nutricline.' },
+            'lanternfish': { name: 'Lanternfish', emoji: '🐠', facts: 'They migrate up at night and hide in the pitch-black Deep Scattering Layer by day.' },
+            'tubeworm': { name: 'Giant Tubeworm', emoji: '🪱', facts: 'They survive toxic hydrogen sulfide in the Chemocline by teaming up with special bacteria!' },
+            'angler': { name: 'Anglerfish', emoji: '🐡', facts: 'They use a glowing lure attached to their head to attract prey in the total darkness!' }
+        };
+
+        function initDex() {
+            const container = document.getElementById('creature-dex');
+            container.innerHTML = '';
+            for(let i=0; i<totalCreatures; i++) {
+                container.innerHTML += `<div class="w-10 h-10 bg-black/40 rounded flex items-center justify-center border border-gray-600 text-gray-600 text-sm opacity-50" id="dex-slot-${i}">❓</div>`;
+            }
+        }
+        
+        function showCreatureFact(id) {
+            const c = creatureData[id];
+            document.getElementById('creature-modal-emoji').innerText = c.emoji;
+            document.getElementById('creature-modal-title').innerText = c.name;
+            document.getElementById('creature-modal-desc').innerText = c.facts;
+            document.getElementById('creature-modal').classList.remove('hidden');
+        }
+
+        function closeCreatureFact() {
+            document.getElementById('creature-modal').classList.add('hidden');
+        }
+
+        function collectCreature(id, element) {
+            if(!foundCreatures.includes(id)) {
+                foundCreatures.push(id);
+                addScore(50); // Points for finding a creature!
+                
+                // Visual feedback on the clicked creature
+                element.classList.add('anim-pop');
+                element.style.color = "gold";
+                setTimeout(() => { element.style.display = 'none'; }, 400);
+
+                // Update Dex UI to be clickable buttons
+                const slot = document.getElementById(`dex-slot-${foundCreatures.length - 1}`);
+                slot.innerHTML = `<button onclick="showCreatureFact('${id}')" class="w-full h-full flex items-center justify-center text-2xl hover:scale-110 transition" title="${creatureData[id].name}">${creatureData[id].emoji}</button>`;
+                slot.classList.remove('opacity-50', 'text-gray-600', 'border-gray-600');
+                slot.classList.add('border-cyan-400', 'bg-cyan-900/40', 'anim-pop');
+                
+                document.getElementById('dex-count').innerText = foundCreatures.length;
+                
+                // Play a happy beep if audio is on
+                if(isAudioPlaying && audioCtx) {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+                }
+            }
+            // Always show the fact modal when clicked
+            showCreatureFact(id);
+        }
+
+        /* --- SENSORY BACKGROUND & GAUGES --- */
+        
+        // Spawn organic drifting bubbles
+        function createBubbles() {
+            const container = document.getElementById('bubbles-container');
+            for(let i=0; i<30; i++) {
+                let b = document.createElement('div');
+                b.className = 'bubble';
+                let size = Math.random() * 8 + 2;
+                b.style.width = size + 'px';
+                b.style.height = size + 'px';
+                b.style.left = Math.random() * 100 + 'vw';
+                // Negative animation delay spreads them out initially
+                b.style.animationDelay = `-${Math.random() * 20}s`;
+                // Base speed logic
+                b.dataset.baseSpeed = Math.random() * 6 + 7;
+                b.style.setProperty('--dur', b.dataset.baseSpeed + 's');
+                b.style.setProperty('--drift', (Math.random() - 0.5) * 60 + 'px');
+                container.appendChild(b);
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = Math.min(1, Math.max(0, scrollTop / maxScroll));
+            
+            // Map scroll to 0 - 1200m depth
+            const currentDepth = scrollPercent * 1200; 
+            
+            updateGauges(currentDepth);
+            updateMarker(scrollPercent);
+            
+            // Bubble physics (slower at depth due to pressure)
+            const bubbles = document.querySelectorAll('.bubble');
+            const pressureFactor = 1 + (currentDepth / 200); // Higher depth = slower bubbles
+            bubbles.forEach(b => {
+                const speed = parseFloat(b.dataset.baseSpeed) * pressureFactor;
+                b.style.setProperty('--dur', speed + 's');
+                // Bubbles shrink slightly under pressure
+                b.style.transform = `scale(${Math.max(0.3, 1 - currentDepth/2000)})`;
+            });
+
+            // Update hum frequency if audio is playing
+            if(isAudioPlaying && humOscillator) {
+                // Pitch drops slightly as we go deeper
+                humOscillator.frequency.setTargetAtTime(60 - (scrollPercent * 20), audioCtx.currentTime, 0.5);
+            }
+        });
+
+        // Helper to update SVG Dial Offset
+        function setDialOffset(id, val, min, max) {
+            const arc = document.getElementById(`ga-${id}`);
+            if (arc) {
+                let pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+                let offset = 88 * (1 - (pct / 100));
+                arc.style.strokeDashoffset = offset.toFixed(2);
+            }
+        }
+
+        function updateGauges(depth) {
+            // Text Values
+            document.getElementById('gv-depth').textContent = Math.round(depth);
+            setDialOffset('depth', depth, 0, 1200);
+            
+            // Temp: 25 surface, drops in thermocline (200-800), steady 4 below.
+            let temp = depth < 200 ? 25 : depth > 800 ? 4 : 25 - ((depth-200)/600) * 21;
+            document.getElementById('gv-temp').textContent = temp.toFixed(1);
+            setDialOffset('temp', temp, 2, 26);
+            
+            // Pressure: 1 atm surface, +1 atm per 10m
+            let press = 1 + depth/10;
+            document.getElementById('gv-press').textContent = press.toFixed(0);
+            setDialOffset('press', press, 1, 130);
+            
+            // Salinity: 34-36 range generally.
+            let sal = 35 + (Math.sin(depth/100) * 0.5);
+            document.getElementById('gv-sal').textContent = sal.toFixed(1);
+            setDialOffset('sal', sal, 34, 36);
+            
+            // Light: Rapid decay
+            let light = Math.max(0, 100 * Math.exp(-depth/100));
+            document.getElementById('gv-light').textContent = light.toFixed(1);
+            setDialOffset('light', light, 0, 100);
+            
+            // Density: Increases with depth/cold
+            let dens = 1022 + (depth/1000)*6;
+            document.getElementById('gv-dens').textContent = dens.toFixed(0);
+            setDialOffset('dens', dens, 1022, 1030);
+        }
+
+        function updateMarker(percent) {
+            const marker = document.getElementById('submarine-marker');
+            if(marker) marker.style.top = (percent * 100) + '%';
+        }
+
+        /* --- MISSION CONTROL (Intersection Observer) --- */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const msg = entry.target.getAttribute('data-msg');
+                    const zoneName = entry.target.getAttribute('data-zone');
+                    
+                    if (msg) {
+                        const textEl = document.getElementById('mc-text');
+                        
+                        // Only type out if the message changed
+                        if (textEl.getAttribute('data-current-msg') !== msg) {
+                            textEl.setAttribute('data-current-msg', msg);
+                            clearInterval(mcTypeInterval);
+                            textEl.textContent = "";
+                            let i = 0;
+                            // Faster typing effect without flashing the entire panel
+                            mcTypeInterval = setInterval(() => {
+                                textEl.textContent += msg.charAt(i);
+                                i++;
+                                if (i >= msg.length) clearInterval(mcTypeInterval);
+                            }, 20); 
+                        }
+                    }
+                    
+                    if (zoneName) {
+                        const marker = document.querySelector(`.depth-marker-grad[data-target="${zoneName}"]`);
+                        if (marker) {
+                            document.querySelectorAll('.depth-marker-grad').forEach(el => el.classList.remove('active'));
+                            marker.classList.add('active');
+                        }
+                    }
+                }
+            });
+        }, { rootMargin: "-40% 0px -50% 0px" });
+
+        /* --- TOYS LOGIC --- */
+        // Thermocline
+        function updateThermo(val) {
+            document.getElementById('thermo-warm').style.height = `${val}%`;
+            document.getElementById('thermo-cold').style.height = `${100 - val}%`;
+            
+            // Change colors slightly based on extreme ends to show density mapping
+            if(val < 20) document.getElementById('thermo-cold').style.backgroundColor = '#1e3a8a'; // darker blue
+            else document.getElementById('thermo-cold').style.backgroundColor = '#2563eb';
+        }
+
+        // Halocline
+        let saltAmount = 0;
+        function updateBeaker() {
+            let eggBottom = 5 + (saltAmount * 15);
+            document.getElementById('beaker-egg').style.bottom = `${eggBottom}px`;
+            document.getElementById('beaker-water').style.backgroundColor = `rgba(20, 184, 166, ${0.4 + saltAmount*0.1})`;
+        }
+        function addSalt() {
+            if(saltAmount >= 5) return; // Max limit
+            saltAmount++;
+            updateBeaker();
+        }
+        function removeSalt() {
+            if(saltAmount <= 0) return; // Min limit
+            saltAmount--;
+            updateBeaker();
+        }
+        
+        // Oxycline
+        let o2Level = 100;
+        function ventOxygen() {
+            if (o2Level <= 0) return;
+            o2Level = Math.max(0, o2Level - 25);
+            document.getElementById('o2-bar').style.width = o2Level + '%';
+            
+            const creatureEl = document.getElementById('o2-creature');
+            
+            if (o2Level <= 25) {
+                creatureEl.innerText = '🦑'; // Specialized creature thrives!
+                creatureEl.classList.add('anim-pop');
+                setTimeout(() => creatureEl.classList.remove('anim-pop'), 400);
+            } else {
+                creatureEl.innerText = '😵'; // Normal fish struggling
+            }
+        }
+
+        // Nutricline
+        let nutrientLevel = 0;
+        function addMarineSnow() {
+            const snowZone = document.getElementById('snow-zone');
+            
+            // Create a snowflake
+            const snow = document.createElement('div');
+            snow.innerText = '❄️';
+            snow.className = 'absolute text-xs opacity-50 z-10';
+            snow.style.left = Math.random() * 80 + 10 + '%';
+            snow.style.top = '-20px';
+            snow.style.transition = 'top 1s linear, opacity 1s';
+            snowZone.appendChild(snow);
+            
+            // Animate falling
+            setTimeout(() => { 
+                snow.style.top = '40px'; 
+                snow.style.opacity = '0';
+            }, 50);
+            
+            // Decompose and add to base
+            setTimeout(() => {
+                snow.remove();
+                if (nutrientLevel < 100) {
+                    nutrientLevel = Math.min(100, nutrientLevel + 15);
+                    document.getElementById('nutrient-base').style.height = nutrientLevel + '%';
+                }
+            }, 1050);
+        }
+
+        // DSL Flashlight
+        const dslMask = document.getElementById('dsl-mask');
+        const dslToy = document.getElementById('dsl-toy');
+        
+        dslToy.addEventListener('mousemove', (e) => {
+            const rect = dslToy.getBoundingClientRect();
+            // Need to account for touches vs mouse
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+            
+            dslMask.style.background = `radial-gradient(circle 80px at ${x}px ${y}px, transparent 0%, rgba(0,0,0,0.95) 100%)`;
+        });
+        // Touch support for flashlight
+        dslToy.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // prevent scrolling while flashing
+            const rect = dslToy.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            dslMask.style.background = `radial-gradient(circle 80px at ${x}px ${y}px, transparent 0%, rgba(0,0,0,0.95) 100%)`;
+        }, {passive: false});
+
+        /* --- NEW SIMULATOR LOGIC --- */
+        // Mixed Layer Wind
+        function initMixCv(){
+            if(mixRaf){cancelAnimationFrame(mixRaf);mixRaf=null;}
+            const cv=document.getElementById('mix-cv');if(!cv)return;
+            const ctx=cv.getContext('2d');
+            mixPts=Array.from({length:55},()=>({x:Math.random()*200,y:Math.random()*120,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.3,h:188+Math.random()*28,s:52+Math.random()*30,l:28+Math.random()*24}));
+            function draw(){
+                ctx.fillStyle='#05263d';ctx.fillRect(0,0,200,120);
+                const bg=ctx.createLinearGradient(0,0,0,120);
+                bg.addColorStop(0,'rgba(56,189,248,.2)');bg.addColorStop(1,'rgba(3,105,161,.15)');
+                ctx.fillStyle=bg;ctx.fillRect(0,0,200,120);
+                mixPts.forEach(p=>{
+                    p.vx+=(Math.random()-.5)*.12;p.vy+=(Math.random()-.5)*.07;
+                    p.vx*=.94;p.vy*=.94;p.x+=p.vx;p.y+=p.vy;
+                    if(p.x<0)p.x=200;if(p.x>200)p.x=0;if(p.y<0)p.y=120;if(p.y>120)p.y=0;
+                    ctx.beginPath();ctx.arc(p.x,p.y,2.6,0,Math.PI*2);
+                    ctx.fillStyle=`hsla(${p.h},${p.s}%,${p.l}%,.88)`;ctx.fill();
+                });
+                mixRaf=requestAnimationFrame(draw);
+            }
+            draw();
+        }
+        function addWind(){
+            mixPts.forEach(p=>{p.vx+=(Math.random()-.5)*5+2.8;p.vy+=(Math.random()-.5)*1.2;});
+            document.getElementById('mix-txt').innerText='💨 Wind mixing! The particles are swirling together — this is exactly how the ocean Mixed Layer stays warm and oxygen-rich all the way down to 200m!';
+        }
+
+        // Chemocline Vent
+        function activateVent(){
+            if(ventActive)return;ventActive=true;
+            document.getElementById('vent-cover').style.display='none';
+            document.getElementById('vent-life').style.opacity='1';
+            const ptcl=document.getElementById('vent-ptcl');
+            document.getElementById('vent-txt').innerHTML='🔥 <strong class="text-fuchsia-400">400°C water!</strong> Tube worms and chemosynthetic bacteria thrive here using hydrogen sulfide instead of sunlight. An entire ecosystem powered by Earth\'s heat!';
+            let i=0;
+            function spawnP(){
+                if(!document.getElementById('vent-ptcl'))return;
+                const p=document.createElement('div');
+                const colors=['#f97316','#eab308','#ef4444','rgba(255,255,255,.9)'];
+                const c=colors[Math.floor(Math.random()*colors.length)];
+                const sz=1.5+Math.random()*3.5;
+                p.style.cssText=`position:absolute;bottom:44px;left:${44+Math.random()*12}%;width:${sz}px;height:${sz}px;background:${c};border-radius:50%;pointer-events:none;`;
+                ptcl.appendChild(p);
+                p.animate([{transform:'translateY(0) translateX(0)',opacity:.9},{transform:`translateY(-${35+Math.random()*75}px) translateX(${(Math.random()-.5)*18}px)`,opacity:0}],{duration:500+Math.random()*700,easing:'ease-out',fill:'forwards'});
+                setTimeout(()=>p.remove(),1300);
+                i++;if(i<300)setTimeout(spawnP,60+Math.random()*80);
+            }
+            spawnP();
+        }
+
+        /* --- BOSS BATTLE QUIZ LOGIC --- */
+        const quizQuestions = [
+            {q: "SENSORS DETECT: Sharp change in salinity.", a: "Halocline"},
+            {q: "SENSORS DETECT: Rapid drop in temperature.", a: "Thermocline"},
+            {q: "SENSORS DETECT: Migrating biological mass reflecting sonar.", a: "Deep Scattering Layer"},
+            {q: "SENSORS DETECT: Rapid drop in dissolved oxygen.", a: "Oxycline"},
+            {q: "SENSORS DETECT: Rapid increase of nitrates and phosphates.", a: "Nutricline"},
+            {q: "SENSORS DETECT: Strong toxic chemical boundary.", a: "Chemocline"}
+        ];
+        const allOptions = ["Halocline", "Chemocline", "Oxycline", "Nutricline", "Mixed Layer", "Deep Scattering Layer", "Thermocline", "Pycnocline"];
+        let currentQ = 0;
+
+        function loadQuiz() {
+            if(currentQ >= quizQuestions.length) {
+                // Victory Sequence
+                document.getElementById('quiz-ui').classList.add('hidden');
+                document.getElementById('victory-ui').classList.remove('hidden');
+                document.getElementById('boss-battle').classList.remove('border-cyan-500/30', 'shadow-2xl');
+                document.getElementById('boss-battle').classList.add('border-green-500', 'shadow-[0_0_50px_rgba(34,197,94,0.3)]');
+                
+                // Big points for completing the sub repairs
+                addScore(500); 
+                
+                // Happy sound
+                if(isAudioPlaying && audioCtx) {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + 1);
+                }
+                return;
+            }
+
+            const q = quizQuestions[currentQ];
+            document.getElementById('quiz-num').innerText = currentQ + 1;
+            document.getElementById('hull-pct').innerText = (40 + (currentQ * 10)) + '%';
+            document.getElementById('sub-status').innerText = `DAMAGE: ${6 - currentQ}/6`;
+            
+            document.getElementById('quiz-progress').style.width = ((currentQ / quizQuestions.length) * 100) + '%';
+            document.getElementById('quiz-progress').className = currentQ > 3 ? 'bg-yellow-500 h-2 rounded transition-all duration-500' : 'bg-red-500 h-2 rounded transition-all duration-500';
+            
+            // Typewriter effect for question (Fixed spacing issue by using textContent)
+            const qEl = document.getElementById('quiz-q');
+            qEl.textContent = ""; 
+            let i = 0;
+            const typeInterval = setInterval(() => {
+                qEl.textContent += q.q.charAt(i); 
+                i++;
+                if(i >= q.q.length) clearInterval(typeInterval);
+            }, 30);
+
+            // Generate Options
+            let opts = [q.a];
+            while(opts.length < 4) {
+                const r = allOptions[Math.floor(Math.random() * allOptions.length)];
+                if(!opts.includes(r)) opts.push(r);
+            }
+            opts.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-gray-800 text-white p-4 rounded-xl border-2 border-gray-600 hover:bg-gray-700 hover:border-cyan-400 transition font-mono font-bold text-sm shadow-md flex items-center justify-between";
+                btn.innerHTML = `<span>> ${opt}</span> <i class="fa-solid fa-microchip text-gray-500"></i>`;
+                
+                btn.onclick = () => {
+                    if(opt === q.a) {
+                        btn.classList.add('bg-green-600', 'border-green-400');
+                        btn.innerHTML = `<span>> CORRECT</span> <i class="fa-solid fa-check text-white"></i>`;
+                        
+                        // Score points for correct diagnosis
+                        addScore(100);
+                        
+                        // Trigger SVG Submarine Repair Animations
+                        const ck = document.getElementById('ck' + currentQ);
+                        const wn = document.getElementById('w' + currentQ);
+                        if(ck) { 
+                            ck.style.animation = 'heal-glow .6s ease'; 
+                            setTimeout(() => ck.classList.add('healed'), 400); 
+                        }
+                        if(wn) { 
+                            wn.style.fill = '#059669'; 
+                            setTimeout(() => wn.style.fill = '#0e7490', 700); 
+                        }
+                        
+                        currentQ++;
+                        setTimeout(loadQuiz, 800);
+                    } else {
+                        btn.classList.add('bg-red-600', 'border-red-400');
+                        btn.innerHTML = `<span>> ERROR</span> <i class="fa-solid fa-xmark text-white"></i>`;
+                        
+                        // Shake the SVG submarine
+                        const svgSub = document.getElementById('sub-svg');
+                        if(svgSub) { 
+                            svgSub.style.animation = 'sub-shake .4s ease'; 
+                            setTimeout(() => svgSub.style.animation = '', 420); 
+                        }
+                        
+                        setTimeout(() => {
+                            btn.classList.remove('bg-red-600', 'border-red-400');
+                            btn.innerHTML = `<span>> ${opt}</span> <i class="fa-solid fa-microchip text-gray-500"></i>`;
+                        }, 800);
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        /* --- AUDIO SYSTEM (Web Audio API) --- */
+        function toggleAudio() {
+            const icon = document.getElementById('audio-icon');
+            
+            if(!isAudioPlaying) {
+                // Init Audio Context on first user interaction
+                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                
+                isAudioPlaying = true;
+                icon.className = "fa-solid fa-volume-high text-cyan-400";
+                
+                // Start Ambient Hum
+                humOscillator = audioCtx.createOscillator();
+                humGain = audioCtx.createGain();
+                humOscillator.type = 'triangle';
+                humOscillator.frequency.value = 60; // Deep low hum
+                humGain.gain.value = 0.05;
+                humOscillator.connect(humGain);
+                humGain.connect(audioCtx.destination);
+                humOscillator.start();
+
+                // Start Sonar Ping interval
+                sonarInterval = setInterval(() => {
+                    if(!isAudioPlaying) return;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+                    
+                    // Add slight echo
+                    let delay = audioCtx.createDelay();
+                    delay.delayTime.value = 0.4;
+                    let delayGain = audioCtx.createGain();
+                    delayGain.gain.value = 0.3;
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    gain.connect(delay);
+                    delay.connect(delayGain);
+                    delayGain.connect(audioCtx.destination);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 2);
+                }, 4000);
+
+            } else {
+                isAudioPlaying = false;
+                icon.className = "fa-solid fa-volume-xmark";
+                if(humOscillator) {
+                    humOscillator.stop();
+                    humOscillator.disconnect();
+                }
+                clearInterval(sonarInterval);
+            }
+        }
+
+        /* --- INITIALIZATION --- */
+        window.onload = () => {
+            initDex();
+            createBubbles(); // Generates organic bubbles now
+            loadQuiz();
+            initMixCv(); // Initialize wind canvas
+            
+            // Observe zones for mission control text
+            document.querySelectorAll('.zone-section').forEach(el => observer.observe(el));
+            
+            // Trigger initial scroll calculation
+            window.dispatchEvent(new Event('scroll'));
+        };
+    </script>
+</body>
+</html>

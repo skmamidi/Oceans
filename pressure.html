@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Nunito','sans-serif'],heading:['Poppins','sans-serif']},colors:{'ocean-surface':'#4ea8de','ocean-sunlight':'#0077b6','ocean-twilight':'#03045e','ocean-midnight':'#01012b','ocean-abyssal':'#000010','ocean-hadal':'#000000'}}}}}</script>
+    <title>Pressure | The Living Ocean</title>
+    <style>
+        body{background-color:#0f172a;overflow-x:hidden;}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}} .anim-shake{animation:shake 0.4s ease-in-out;}
+        @keyframes pop-in{0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}} .anim-pop{animation:pop-in 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards;}
+        @keyframes implosion{0%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.2);filter:brightness(2);}100%{transform:translate(-50%,-50%) scale(1,0.1);background-color:#ef4444;border-color:#7f1d1d;}} .sub-crushed{animation:implosion 0.3s cubic-bezier(0.25,0.46,0.45,0.94) forwards;}
+        .sub-hull-steel{background-color:#94a3b8;border-color:#475569;}
+        .sub-hull-titanium{background-color:#cbd5e1;border-color:#3b82f6;box-shadow:inset 0 0 15px rgba(59,130,246,0.5);}
+        .sub-hull-bio{background-color:#d8b4fe;border-color:#9333ea;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;box-shadow:0 0 20px rgba(168,85,247,0.6);}</style>
+</head>
+<body class="text-gray-800 antialiased font-sans">
+    <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+    <div id="interactive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm" style="opacity:0;pointer-events:none;transition:opacity 0.3s;">
+        <div id="modal-content-container" class="bg-white rounded-3xl w-11/12 max-w-2xl overflow-hidden shadow-2xl" style="transform:scale(0.95);transition:transform 0.3s;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-4"><span id="modal-emoji" class="text-4xl">🐠</span><h3 class="text-2xl font-heading font-bold text-gray-800" id="modal-title">Title</h3></div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 text-3xl transition focus:outline-none">&times;</button>
+            </div>
+            <div class="p-6 bg-white max-h-[70vh] overflow-y-auto text-lg text-gray-700" id="modal-body"></div>
+        </div>
+    </div>
+    <div id="badge-toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-full shadow-2xl font-bold text-lg" style="animation:pop-in 0.4s forwards;">🗜️ Physics Pro Badge Earned!</div>
+            <section class="pt-12 pb-4 px-4 max-w-5xl mx-auto text-center">
+                <div class="inline-block bg-red-500/20 text-red-400 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-red-500/50"><i class="fa-solid fa-gauge-high"></i> Trench Run Mini-Game</div>
+                <h2 class="text-4xl font-heading font-black text-white mb-2">Hydrostatic Pressure Simulator</h2>
+                <p class="text-sm text-gray-400 max-w-3xl mx-auto">Equip a hull and start the dive. Use arrows to steer. Dodge deep-sea rocks (🪨) and squids (🦑)—hitting them drops your structural integrity limit! Collect samples (💎, 🧬). Drop ballast to safely surface, or risk implosion to reach 11,000m.</p>
+            </section>
+
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="grid lg:grid-cols-12 gap-6 bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700">
+                    <div class="lg:col-span-4 space-y-6">
+                        <h3 class="text-xl font-bold text-white border-b border-slate-700 pb-2">Hull Upgrades</h3>
+                        <div class="space-y-3">
+                            <button onclick="equipHull(0)" id="hull-btn-0" class="hull-btn w-full text-left p-4 rounded-xl border-2 border-blue-500 bg-blue-900/50 transition hover:bg-slate-700"><h4 class="font-bold text-white">Level 1: Steel Sub</h4><p class="text-xs text-gray-300">Max Stress: <span class="font-bold text-red-400">50 atm</span></p></button>
+                            <button onclick="equipHull(1)" id="hull-btn-1" class="hull-btn w-full text-left p-4 rounded-xl border-2 border-slate-600 bg-slate-700 transition hover:bg-slate-600"><h4 class="font-bold text-white">Level 2: Titanium</h4><p class="text-xs text-gray-300">Max Stress: <span class="font-bold text-red-400">400 atm</span></p></button>
+                            <button onclick="equipHull(2)" id="hull-btn-2" class="hull-btn w-full text-left p-4 rounded-xl border-2 border-slate-600 bg-slate-700 transition hover:bg-slate-600"><h4 class="font-bold text-white">Level 3: Bio-TMAO Hybrid</h4><p class="text-xs text-gray-300">Max Stress: <span class="font-bold text-red-400">1,200 atm</span></p></button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 flex flex-col space-y-4">
+                        <div class="w-full h-[400px] rounded-2xl border-4 border-slate-700 relative transition-colors duration-500 overflow-hidden" id="dive-shaft" style="background: linear-gradient(to bottom, #4ea8de, #0077b6);">
+                            <div id="dive-shaft-ents" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
+                            <div id="sub-vessel" class="absolute transform -translate-x-1/2 w-16 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-75 sub-hull-steel z-20" style="left: 50%; top: 20%;"><div class="w-5 h-5 bg-cyan-200 rounded-full border-2 border-gray-800 absolute right-2 shadow-[0_0_10px_white]"></div><div class="absolute top-[-10px] left-3 w-2 h-3 bg-gray-800 rounded-t-sm"></div><div class="absolute left-[-15px] w-4 h-6 bg-gray-800 clip-tail" style="clip-path: polygon(0 0, 100% 50%, 0 100%);"></div></div>
+                            <div id="implosion-screen" class="hidden absolute inset-0 bg-red-900/95 z-30 flex flex-col items-center justify-center p-4 text-center backdrop-blur-sm"><i class="fa-solid fa-skull-crossbones text-6xl text-red-500 mb-4 anim-shake"></i><h3 class="text-3xl font-black text-white">CATASTROPHIC IMPLOSION</h3><p id="implode-msg" class="text-red-200 mt-2 font-bold"></p><button onclick="resetDive()" class="mt-6 bg-white hover:bg-gray-200 text-red-900 font-bold px-6 py-2 rounded-full transition active:scale-95">Rebuild & Retry</button></div>
+                            <div id="trench-victory" class="hidden absolute inset-0 bg-green-900/95 z-30 flex flex-col items-center justify-center p-4 text-center backdrop-blur-sm"></div>
+                        </div>
+
+                        <!-- Trench Steering Controls -->
+                        <div class="flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700">
+                            <button onmousedown="tGame.keys.l=true" onmouseup="tGame.keys.l=false" ontouchstart="tGame.keys.l=true" ontouchend="tGame.keys.l=false" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-lg font-black text-2xl select-none w-16 h-16 flex items-center justify-center shadow-md active:scale-95">&larr;</button>
+                            <div class="flex flex-col gap-2 items-center w-full px-4">
+                                <button id="btn-start-dive" onclick="startTrenchDive()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg transition tracking-widest active:scale-95">START DIVE</button>
+                                <button id="btn-drop-ballast" onclick="dropBallast()" class="hidden w-full bg-orange-500 hover:bg-orange-400 text-white font-black py-4 rounded-xl shadow-lg transition tracking-widest text-sm active:scale-95">DROP BALLAST (SURFACE)</button>
+                            </div>
+                            <button onmousedown="tGame.keys.r=true" onmouseup="tGame.keys.r=false" ontouchstart="tGame.keys.r=true" ontouchend="tGame.keys.r=false" class="bg-slate-700 hover:bg-slate-600 text-white p-4 rounded-lg font-black text-2xl select-none w-16 h-16 flex items-center justify-center shadow-md active:scale-95">&rarr;</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 space-y-4">
+                        <div class="bg-black border border-slate-600 rounded-xl p-4 flex justify-between items-center"><div class="text-gray-400 font-bold text-sm">Depth</div><div class="text-right text-2xl font-mono text-white"><span id="dash-depth-m">0</span>m</div></div>
+                        <div class="bg-black border border-slate-600 rounded-xl p-4 flex justify-between items-center"><div class="text-gray-400 font-bold text-sm">Pressure</div><div class="text-right text-2xl font-mono text-red-400"><span id="dash-pressure">1.0</span> atm</div></div>
+                        <div class="bg-black border border-slate-600 rounded-xl p-4 flex justify-between items-center"><div class="text-gray-400 font-bold text-sm">Samples</div><div class="text-right text-2xl font-mono text-teal-400"><span id="dash-samples">0</span></div></div>
+                        <div class="bg-slate-700/50 rounded-xl p-4"><div class="text-gray-300 font-bold text-xs mb-1 flex justify-between"><span>Structural Integrity</span><span>Limit: <span id="dash-max-atm">50</span> atm</span></div><div class="w-full bg-black rounded-full h-4 mt-2 border border-gray-600 overflow-hidden"><div id="hull-bar" class="bg-green-500 h-full w-[5%] transition-all"></div></div></div>
+                        <div id="hull-warning" class="hidden text-red-400 font-bold text-sm text-center animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> WARNING: Critical Stress!</div>
+                    </div>
+                </div>
+            </div>
+    <script>
+
+        function closeModal(){document.getElementById('interactive-modal').style.opacity='0';document.getElementById('interactive-modal').style.pointerEvents='none';document.getElementById('modal-content-container').style.transform='scale(0.95)';}
+        function openModal(t,e,c){document.getElementById('modal-title').innerText=t;document.getElementById('modal-emoji').innerText=e;document.getElementById('modal-body').innerHTML=c;document.getElementById('interactive-modal').style.opacity='1';document.getElementById('interactive-modal').style.pointerEvents='auto';document.getElementById('modal-content-container').style.transform='scale(1)';}
+        function awardBadge(){const b=document.getElementById('badge-toast');if(b){b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),4000);}}
+        function confetti(){const c=document.getElementById('confetti-canvas');if(!c)return;c.style.display='block';const ctx=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;let pts=[];for(let i=0;i<150;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*6+2,d:Math.random()*10});function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='gold';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+1+p.r/2;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}});requestAnimationFrame(draw);}draw();setTimeout(()=>c.style.display='none',8000);}
+
+        let currentHullIndex = 0;
+        const hullUpgrades=[{maxAtm:50,cssClass:"sub-hull-steel"},{maxAtm:400,cssClass:"sub-hull-titanium"},{maxAtm:1200,cssClass:"sub-hull-bio"}];
+        const tGame={active:false,surfacing:false,depth:0,x:50,max:0,dmg:0,samp:0,ents:[],id:null,keys:{l:false,r:false}};
+
+        window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')tGame.keys.l=true;if(e.key==='ArrowRight')tGame.keys.r=true;});
+        window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft')tGame.keys.l=false;if(e.key==='ArrowRight')tGame.keys.r=false;});
+
+        function equipHull(i){currentHullIndex=i;document.querySelectorAll('.hull-btn').forEach(b=>b.classList.remove('border-blue-500','bg-blue-900/50'));document.getElementById('hull-btn-'+i).classList.add('border-blue-500','bg-blue-900/50');document.getElementById('dash-max-atm').innerText=hullUpgrades[i].maxAtm;if(!tGame.active)resetTrench();}
+        function resetTrench(){tGame.active=false;tGame.surfacing=false;tGame.depth=0;tGame.x=50;tGame.dmg=0;tGame.samp=0;tGame.ents=[];tGame.max=hullUpgrades[currentHullIndex].maxAtm;document.getElementById('dive-shaft-ents').innerHTML='';const sub=document.getElementById('sub-vessel');sub.classList.remove('sub-crushed');sub.className='absolute transform -translate-x-1/2 w-16 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-75 z-20 '+hullUpgrades[currentHullIndex].cssClass;updateTUI();}
+        function resetDive(){resetTrench();resetTBtn('REBUILD & RETRY');document.getElementById('implosion-screen').classList.add('hidden');}
+        function resetTBtn(t){const sd=document.getElementById('btn-start-dive'),db=document.getElementById('btn-drop-ballast');sd.innerText=t;sd.classList.remove('hidden');db.classList.add('hidden');}
+        function startTrenchDive(){resetTrench();tGame.active=true;document.getElementById('btn-start-dive').classList.add('hidden');document.getElementById('btn-drop-ballast').classList.remove('hidden');document.getElementById('implosion-screen').classList.add('hidden');document.getElementById('trench-victory').classList.add('hidden');tGame.id=requestAnimationFrame(trenchLoop);}
+        function dropBallast(){if(!tGame.active||tGame.surfacing)return;tGame.surfacing=true;}
+        function trenchLoop(){if(!tGame.active)return;if(tGame.keys.l)tGame.x=Math.max(5,tGame.x-1);if(tGame.keys.r)tGame.x=Math.min(95,tGame.x+1);const sub=document.getElementById('sub-vessel');sub.style.left=tGame.x+'%';if(tGame.surfacing){tGame.depth=Math.max(0,tGame.depth-40);tGame.ents=[];if(tGame.depth<=0){tGame.active=false;document.getElementById('trench-victory').innerHTML=`<i class="fa-solid fa-ship text-6xl text-blue-400 mb-4"></i><h3 class="text-3xl font-black text-white">Surfaced Safely!</h3><p class="text-blue-200 mt-2 font-bold">You brought back ${tGame.samp} samples!</p>`;document.getElementById('trench-victory').classList.remove('hidden');resetTBtn('DIVE AGAIN');return;}}else{tGame.depth+=8;}const atm=1+(tGame.depth/10),cMax=tGame.max-tGame.dmg;if(atm>cMax&&!tGame.surfacing){tGame.active=false;sub.classList.add('sub-crushed');document.getElementById('implode-msg').innerText=`Hull breached at ${atm.toFixed(1)} atm! (Integrity limit: ${cMax.toFixed(0)})`;document.getElementById('implosion-screen').classList.remove('hidden');resetTBtn('REBUILD & RETRY');return;}if(tGame.depth>=11000&&!tGame.surfacing){tGame.active=false;document.getElementById('trench-victory').innerHTML=`<i class="fa-solid fa-medal text-6xl text-yellow-400 mb-4"></i><h3 class="text-3xl font-black text-white">Mariana Trench Reached!</h3><p class="text-green-200 mt-2 font-bold">Survived ${atm.toFixed(0)} ATM and collected ${tGame.samp} samples.</p>`;document.getElementById('trench-victory').classList.remove('hidden');resetTBtn('DIVE AGAIN');awardBadge();confetti();return;}if(!tGame.surfacing&&Math.random()<0.08){const isObs=Math.random()<0.6,t=isObs?(Math.random()<0.5?'🪨':'🦑'):(Math.random()<0.5?'💎':'🧬');tGame.ents.push({x:Math.random()*90+5,y:100,isObs:isObs,txt:t,dead:false});}let html='';const sY=Math.max(2,(tGame.depth/11000)*85);for(let i=tGame.ents.length-1;i>=0;i--){let e=tGame.ents[i];e.y-=1.5;if(e.y<-10){tGame.ents.splice(i,1);continue;}if(!e.dead&&Math.abs(e.y-sY)<8&&Math.abs(e.x-tGame.x)<10){e.dead=true;if(e.isObs){tGame.dmg+=(hullUpgrades[currentHullIndex].maxAtm*0.1);sub.classList.add('anim-shake');setTimeout(()=>sub.classList.remove('anim-shake'),400);}else{tGame.samp++;}}if(!e.dead)html+=`<div class="absolute transform -translate-x-1/2 -translate-y-1/2 text-3xl" style="left:${e.x}%;top:${e.y}%;">${e.txt}</div>`;}document.getElementById('dive-shaft-ents').innerHTML=html;updateTUI();if(tGame.active)requestAnimationFrame(trenchLoop);}
+        function updateTUI(){const d=tGame.depth,atm=1+(d/10),m=tGame.max-tGame.dmg,p=(atm/m)*100;document.getElementById('dash-depth-m').innerText=Math.floor(d);document.getElementById('dash-pressure').innerText=atm.toFixed(1);document.getElementById('dash-samples').innerText=tGame.samp;document.getElementById('dash-max-atm').innerText=m.toFixed(0);const b=document.getElementById('hull-bar');b.style.width=Math.min(p,100)+'%';if(p<50){b.className='h-full bg-green-500 transition-all';document.getElementById('hull-warning').classList.add('hidden');}else if(p<90){b.className='h-full bg-yellow-500 transition-all';document.getElementById('hull-warning').classList.add('hidden');}else{b.className='h-full bg-red-500 transition-all';document.getElementById('hull-warning').classList.remove('hidden');}const v=document.getElementById('sub-vessel');if(!v.classList.contains('sub-crushed'))v.style.top=Math.max(2,(d/11000)*85)+'%';}
+        window.onload = () => { resetTrench(); };
+    </script>
+</body>
+</html>

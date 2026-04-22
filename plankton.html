@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plankton Inspector (Microscope Mode)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+        body {
+            font-family: 'Space Mono', monospace;
+            overscroll-behavior: none;
+            touch-action: none; /* Prevent scroll on touch */
+        }
+
+        /* Microscope Vignette Effect */
+        .microscope-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 35%, rgba(0, 10, 5, 0.85) 75%, rgba(0, 0, 0, 1) 100%);
+            box-shadow: inset 0 0 100px rgba(0, 255, 100, 0.1);
+            z-index: 10;
+        }
+
+        /* Grid lines for microscope feel */
+        .microscope-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(rgba(0, 255, 100, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 5;
+        }
+
+        .lens-flare {
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        .crt-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0.3;
+        }
+
+        canvas {
+            display: block;
+            background-color: #021015;
+            cursor: crosshair;
+        }
+
+        /* UI Overlays */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none; /* Let clicks pass to canvas */
+        }
+
+        .panel {
+            pointer-events: auto; /* Re-enable clicks for panels */
+        }
+
+        .animate-pulse-fast {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .scoop-cursor {
+            position: absolute;
+            pointer-events: none;
+            display: none;
+            z-index: 11;
+            transition: width 0.1s, height 0.1s; /* No transform transition, lerped in JS */
+        }
+
+        /* Whale animations based on game state */
+        .is-scooping .whale-mouth {
+            transform: scale(1.1, 1.3);
+        }
+        
+        .is-scooping .whale-baleen {
+            opacity: 1 !important;
+            stroke: #fbbf24;
+        }
+        
+        .is-scooping .hitbox-ring {
+            stroke: rgba(100, 255, 255, 0.6) !important;
+            fill: rgba(100, 200, 255, 0.3) !important;
+            stroke-width: 2;
+        }
+        
+        .clogged .whale-body {
+            fill: #c2410c !important; /* Turn orange/red when clogged */
+        }
+
+        .clogged .hitbox-ring {
+            stroke: #fb923c !important;
+            fill: rgba(251, 146, 60, 0.2) !important;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 100, 0.3);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 100, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-black text-green-400 overflow-hidden select-none">
+
+    <!-- Game Container -->
+    <div id="game-container" class="relative w-full h-screen">
+        <canvas id="microscope-canvas"></canvas>
+        <div class="microscope-grid"></div>
+        <div class="lens-flare"></div>
+        <div class="microscope-vignette"></div>
+        <div class="crt-scanline"></div>
+        
+        <!-- Custom Scoop Cursor -->
+        <div id="scoop-cursor" class="scoop-cursor" style="width: 80px; height: 80px;">
+            <svg viewBox="-50 -50 100 100" style="overflow: visible; width: 100%; height: 100%;">
+                <!-- Tail -->
+                <path d="M -140,0 Q -160,-30 -180,-40 Q -170,0 -180,40 Q -160,30 -140,0" fill="#1e40af" />
+                <!-- Flippers -->
+                <path d="M -80,-40 Q -60,-80 -80,-100 Q -40,-70 -30,-40 Z" fill="#2563eb" />
+                <path d="M -80,40 Q -60,80 -80,100 Q -40,70 -30,40 Z" fill="#2563eb" />
+                <!-- Body -->
+                <path class="whale-body" d="M -150,0 C -150,-60 -20,-60 10,-30 C 35,-15 35,15 10,30 C -20,60 -150,60 -150,0 Z" fill="#3b82f6" style="transition: fill 0.2s;" />
+                
+                <!-- Open Mouth / Baleen -->
+                <g class="whale-mouth" style="transform-origin: 0px 0px; transition: transform 0.1s;">
+                    <!-- The jaw line -->
+                    <path d="M 0,-25 C 40,-10 40,10 0,25" stroke="#60a5fa" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <!-- Baleen -->
+                    <path class="whale-baleen" d="M 5,-20 C 35,-5 35,5 5,20" stroke="#fcd34d" stroke-width="4" stroke-dasharray="2 4" fill="none" opacity="0.4" style="transition: opacity 0.1s;" />
+                </g>
+                
+                <!-- Eyes -->
+                <circle cx="-15" cy="-25" r="4" fill="#0f172a"/>
+                <circle cx="-15" cy="25" r="4" fill="#0f172a"/>
+                
+                <!-- Hitbox indicator -->
+                <circle class="hitbox-ring" cx="0" cy="0" r="48" fill="rgba(100, 200, 255, 0.1)" stroke="rgba(255,255,255,0.3)" stroke-dasharray="4 4" style="transition: all 0.1s;"/>
+            </svg>
+        </div>
+
+        <!-- UI Layer -->
+        <div id="ui-layer" class="flex flex-col justify-between p-4 md:p-8">
+            
+            <!-- HUD -->
+            <div id="hud" class="hidden flex justify-between items-start w-full max-w-4xl mx-auto">
+                <div class="bg-black/70 border border-green-500/50 p-3 rounded-lg backdrop-blur-sm">
+                    <div class="text-sm text-green-300">SCORE</div>
+                    <div id="score-display" class="text-3xl font-bold text-white tracking-widest">0</div>
+                </div>
+                
+                <div class="bg-black/70 border border-yellow-500/50 p-3 rounded-lg backdrop-blur-sm">
+                    <div class="text-sm text-yellow-300">QUOTA</div>
+                    <div id="quota-display" class="text-3xl font-bold text-yellow-400 tracking-widest">0</div>
+                </div>
+
+                <div class="bg-black/70 border border-green-500/50 p-3 rounded-lg backdrop-blur-sm text-center">
+                    <div class="text-sm text-green-300">TIME</div>
+                    <div id="timer-display" class="text-3xl font-bold text-red-400 tracking-widest animate-pulse">60</div>
+                </div>
+
+                <div class="bg-black/70 border border-green-500/50 p-3 rounded-lg backdrop-blur-sm hidden md:block">
+                    <div class="text-xs text-green-300 mb-1">TARGET:</div>
+                    <div class="flex items-center gap-2 text-sm text-white">
+                        <span class="w-3 h-3 rounded-full bg-blue-300 inline-block"></span> Zooplankton
+                    </div>
+                </div>
+
+                <!-- Real-time Stats Panel -->
+                <div class="bg-black/70 border border-green-500/50 p-3 rounded-lg backdrop-blur-sm hidden lg:block text-xs">
+                    <div class="text-green-300 mb-1 font-bold">STOMACH CONTENTS:</div>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-white">
+                        <div class="text-blue-300">Copepods: <span id="stat-copepod" class="font-bold">0</span></div>
+                        <div class="text-blue-300">Larvae: <span id="stat-larva" class="font-bold">0</span></div>
+                        <div class="text-green-400">Diatoms: <span id="stat-diatom" class="font-bold">0</span></div>
+                        <div class="text-green-400">Dinos: <span id="stat-dinoflagellate" class="font-bold">0</span></div>
+                        <div class="text-red-400 col-span-2">Toxic Algae: <span id="stat-algae" class="font-bold">0</span></div>
+                        <div class="text-purple-400 col-span-2">Microplastics: <span id="stat-microplastic" class="font-bold">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Mid-Game Controls -->
+                <div class="flex flex-col gap-2 pointer-events-auto ml-2">
+                    <button id="btn-restart-mid" class="px-3 py-1.5 bg-blue-900/80 hover:bg-blue-700 text-blue-200 text-xs font-bold rounded border border-blue-500/50 backdrop-blur-sm transition-colors uppercase cursor-pointer">Restart</button>
+                    <button id="btn-end-mid" class="px-3 py-1.5 bg-red-900/80 hover:bg-red-700 text-red-200 text-xs font-bold rounded border border-red-500/50 backdrop-blur-sm transition-colors uppercase cursor-pointer">End Early</button>
+                </div>
+            </div>
+
+            <!-- Start Screen -->
+            <div id="start-screen" class="panel absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4">
+                <div class="bg-gray-900 border-2 border-green-500 p-5 sm:p-8 rounded-xl max-w-2xl w-full shadow-[0_0_50px_rgba(0,255,100,0.2)] float-anim max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
+                    <div class="shrink-0">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">PLANKTON INSPECTOR</h1>
+                        <h2 class="text-lg sm:text-xl text-center text-green-300 mb-4 sm:mb-6 tracking-widest">[ MICROSCOPE MODE ]</h2>
+                    </div>
+
+                    <div class="space-y-4 text-gray-300 mb-6 flex-1">
+                        <p class="text-sm sm:text-base">Welcome, Biologist. The water drop is chaotic. We need you to act as a <span class="text-blue-400 font-bold">Baleen Whale</span> and filter feed.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mt-2 sm:mt-4">
+                            <div class="bg-black/50 p-3 sm:p-4 border border-blue-500/30 rounded">
+                                <h3 class="text-blue-400 font-bold mb-1 sm:mb-2 text-sm sm:text-base">🎯 TARGET: Zooplankton (+10)</h3>
+                                <p class="text-xs sm:text-sm">Animal-like drifters (Copepods, larvae). Fast, jerky movements. Semi-transparent blue/white. <strong>Scoop them!</strong></p>
+                            </div>
+                            <div class="bg-black/50 p-3 sm:p-4 border border-green-500/30 rounded">
+                                <h3 class="text-green-400 font-bold mb-1 sm:mb-2 text-sm sm:text-base">🌿 IGNORE: Phytoplankton (-5)</h3>
+                                <p class="text-xs sm:text-sm">Plant-like algae (Diatoms, Dinoflagellates). Slow, geometric shapes. <strong>Leave them be.</strong></p>
+                            </div>
+                            <div class="bg-black/50 p-3 sm:p-4 border border-red-500/30 rounded md:col-span-2">
+                                <h3 class="text-red-400 font-bold mb-1 sm:mb-2 text-sm sm:text-base">⚠️ HAZARD: Toxic Algae (-20)</h3>
+                                <p class="text-xs sm:text-sm">Harmful algal blooms. Pulsing red/purple blobs. <strong>Avoid at all costs!</strong></p>
+                            </div>
+                            <div class="bg-black/50 p-3 sm:p-4 border border-purple-500/30 rounded md:col-span-2">
+                                <h3 class="text-purple-400 font-bold mb-1 sm:mb-2 text-sm sm:text-base">🚯 HAZARD: Microplastics (-10)</h3>
+                                <p class="text-xs sm:text-sm">Bright unnatural geometric shapes. <strong>Clogs baleen (shrinks scoop size)!</strong></p>
+                            </div>
+                            <div class="bg-black/50 p-3 sm:p-4 border border-gray-500/30 rounded md:col-span-2">
+                                <h3 class="text-gray-400 font-bold mb-1 sm:mb-2 text-sm sm:text-base">🔋 METABOLIC COST: Energy Drain (-2/sec)</h3>
+                                <p class="text-xs sm:text-sm">Opening your massive jaw creates drag and wastes energy. <strong>Only open your mouth when near food!</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2 sm:mb-4 bg-blue-900/40 border border-blue-500/50 p-3 sm:p-4 rounded text-left">
+                            <h3 class="text-blue-300 font-bold mb-1 uppercase tracking-widest text-sm sm:text-base">MIGRATION CAMPAIGN</h3>
+                            <p class="text-xs sm:text-sm text-gray-200 mb-2" id="campaign-desc">Survive the migration route! Each stage requires a specific Caloric Quota. Fail to eat enough, and your journey ends.</p>
+                            <div class="text-base sm:text-lg font-bold text-white">Current Stage: <span id="stage-name-display" class="text-yellow-400">1. Arctic Upwelling</span></div>
+                        </div>
+
+                        <div class="bg-green-900/30 border border-green-500/50 p-2 sm:p-3 rounded text-center text-xs sm:text-sm">
+                            <span class="text-white font-bold">HOW TO PLAY:</span> Click and drag (or touch and drag) to create a filtering "scoop". Meet the Caloric Quota before time runs out!
+                        </div>
+                    </div>
+                    
+                    <button id="start-btn" class="shrink-0 w-full py-3 sm:py-4 bg-green-600 hover:bg-green-500 text-white font-bold text-lg sm:text-xl rounded transition-colors border border-green-400 shadow-[0_0_20px_rgba(0,255,100,0.4)]">
+                        START MIGRATION
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="panel absolute inset-0 flex items-center justify-center bg-black/90 backdrop-blur-lg hidden p-2 sm:p-4">
+                <div class="bg-gray-900 border-2 border-green-500 p-5 sm:p-8 rounded-xl max-w-lg w-full text-center max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2 shrink-0">ANALYSIS COMPLETE</h2>
+                    
+                    <div class="my-4 sm:my-8 space-y-2 shrink-0">
+                        <div class="text-gray-400 text-sm sm:text-base">FINAL SCORE</div>
+                        <div id="final-score" class="text-5xl sm:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">0</div>
+                    </div>
+
+                    <div id="performance-feedback" class="text-sm sm:text-lg text-white mb-6 sm:mb-8 p-3 sm:p-4 bg-black/50 rounded border border-gray-700 flex-1">
+                        <!-- Feedback generated dynamically -->
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 shrink-0">
+                        <button id="dex-btn" class="flex-1 py-2 sm:py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-base sm:text-lg rounded transition-colors border border-green-400">
+                            VIEW PLANKTON-DEX
+                        </button>
+                        <button id="restart-btn" class="flex-1 py-2 sm:py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-base sm:text-lg rounded transition-colors border border-blue-400 hidden">
+                            NEXT STAGE
+                        </button>
+                        <button id="fail-restart-btn" class="flex-1 py-2 sm:py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-base sm:text-lg rounded transition-colors border border-red-400 hidden">
+                            RESTART CAMPAIGN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plankton-dex Screen -->
+            <div id="dex-screen" class="panel absolute inset-0 flex items-center justify-center bg-black/95 backdrop-blur-lg hidden p-2 sm:p-4">
+                <div class="bg-gray-900 border-2 border-green-500 p-5 sm:p-8 rounded-xl max-w-3xl w-full h-full max-h-[90vh] flex flex-col">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 shrink-0">PLANKTON-DEX</h2>
+                    <div id="dex-content" class="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pr-2 custom-scrollbar">
+                        <!-- Dex content generated dynamically -->
+                    </div>
+                    <button id="close-dex-btn" class="mt-4 sm:mt-6 w-full py-2 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold text-base sm:text-lg rounded transition-colors border border-gray-500 shadow-[0_0_15px_rgba(255,255,255,0.1)] shrink-0">
+                        RETURN TO ANALYSIS
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * PLANKTON INSPECTOR - Game Logic
+         */
+        
+        // Setup Canvas
+        const canvas = document.getElementById('microscope-canvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimize for no transparency on base canvas
+        
+        // UI Elements
+        const uiHUD = document.getElementById('hud');
+        const uiStartScreen = document.getElementById('start-screen');
+        const uiGameOverScreen = document.getElementById('game-over-screen');
+        const btnStart = document.getElementById('start-btn');
+        const btnRestart = document.getElementById('restart-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const quotaDisplay = document.getElementById('quota-display');
+        const timerDisplay = document.getElementById('timer-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const feedbackDisplay = document.getElementById('performance-feedback');
+        const scoopCursor = document.getElementById('scoop-cursor');
+        const btnRestartMid = document.getElementById('btn-restart-mid');
+        const btnEndMid = document.getElementById('btn-end-mid');
+        
+        // New UI Elements
+        const uiDexScreen = document.getElementById('dex-screen');
+        const btnDex = document.getElementById('dex-btn');
+        const btnCloseDex = document.getElementById('close-dex-btn');
+        const dexContent = document.getElementById('dex-content');
+        const failRestartBtn = document.getElementById('fail-restart-btn');
+        const stageNameDisplay = document.getElementById('stage-name-display');
+
+        // Game State
+        let gameState = 'start'; // start, playing, gameover, dex
+        let score = 0;
+        let timeLeft = 60;
+        let lastTime = 0;
+        let timerInterval;
+        let animationFrameId;
+        
+        // Campaign Data
+        const campaign = [
+            { name: '1. Arctic Upwelling', biome: 'arctic', quota: 150, time: 40, desc: "A nutrient-rich cold start. Plentiful zooplankton.", pZoo: 0.45, pPhyto: 0.50, pTox: 0.05, pPlastic: 0.0, density: 1.0, speedMult: 1.0 },
+            { name: '2. Coastal Shelf', biome: 'tropical', quota: 250, time: 45, desc: "Warmer waters with a higher mix of toxic algae and some early plastic waste.", pZoo: 0.35, pPhyto: 0.40, pTox: 0.15, pPlastic: 0.10, density: 1.3, speedMult: 1.1 },
+            { name: '3. Polluted Estuary', biome: 'polluted', quota: 350, time: 50, desc: "A dangerous chokepoint near human settlements. Avoid the microplastics!", pZoo: 0.25, pPhyto: 0.30, pTox: 0.20, pPlastic: 0.25, density: 1.6, speedMult: 1.3 },
+            { name: '4. The Garbage Patch', biome: 'polluted', quota: 400, time: 60, desc: "The ultimate test of your baleen skills. Survive the plastic soup!", pZoo: 0.15, pPhyto: 0.20, pTox: 0.30, pPlastic: 0.35, density: 2.2, speedMult: 1.5 },
+            { name: '5. Red Tide Nightmare', biome: 'polluted', quota: 500, time: 60, desc: "NIGHTMARE MODE. Overwhelming hazards. Perfection required.", pZoo: 0.10, pPhyto: 0.10, pTox: 0.45, pPlastic: 0.35, density: 3.0, speedMult: 1.8 }
+        ];
+        let currentStageIndex = 0;
+        let currentBiome = 'arctic';
+
+        // Audio Engine
+        const AudioEngine = {
+            ctx: null,
+            ambientGain: null,
+            heartbeatInterval: null,
+            init() {
+                if(this.ctx) return;
+                try {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.ambientGain = this.ctx.createGain();
+                    this.ambientGain.gain.value = 0.3;
+                    this.ambientGain.connect(this.ctx.destination);
+                } catch(e) { console.warn('Web Audio API not supported'); }
+            },
+            playSynth(type, startFreq, endFreq, dur, vol) {
+                if(!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = type;
+                osc.frequency.setValueAtTime(startFreq, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + dur);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + dur);
+                osc.start();
+                osc.stop(this.ctx.currentTime + dur);
+            },
+            playGulp() { this.playSynth('sine', 600 + Math.random()*200, 300, 0.1, 0.3); },
+            playBuzz() { this.playSynth('sawtooth', 100, 50, 0.2, 0.3); },
+            playPlastic() { this.playSynth('square', 200, 20, 0.15, 0.4); },
+            updateHeartbeat(timeLeft, totalTime) {
+                if(!this.ctx) return;
+                clearInterval(this.heartbeatInterval);
+                if (timeLeft <= 0 || gameState !== 'playing') return;
+                const urgency = 1 - (timeLeft / totalTime);
+                const intervalMs = 1000 - (urgency * 600); // Speeds up based on time
+                this.heartbeatInterval = setInterval(() => {
+                    if(gameState !== 'playing') { clearInterval(this.heartbeatInterval); return; }
+                    this.playSynth('sine', 60, 20, 0.25, 0.4);
+                }, intervalMs);
+            }
+        };
+
+        // Statistics Tracker
+        let catchStats = {
+            copepod: 0,
+            larva: 0,
+            diatom: 0,
+            dinoflagellate: 0,
+            algae: 0,
+            microplastic: 0
+        };
+
+        // Entities
+        let planktonList = [];
+        let particlesList = [];
+
+        // Input State
+        const input = {
+            x: -1000,
+            y: -1000,
+            targetAngle: 0,
+            currentAngle: 0,
+            isDragging: false,
+            scoopRadiusBase: 50,
+            scoopRadiusActive: 80,
+            currentRadius: 50,
+            clogTimer: 0, // For microplastics
+            energyTimer: 0 // For metabolic cost
+        };
+
+        // Resize handler
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --------------------------------------------------------
+        // Classes
+        // --------------------------------------------------------
+
+        class Plankton {
+            constructor(width, height) {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.isDead = false; // Add death flag to safely remove during iteration
+                
+                const stage = campaign[currentStageIndex] || campaign[0];
+                
+                // Determine type based on probability
+                const rand = Math.random();
+                if (rand < stage.pZoo) {
+                    this.setupZooplankton(stage.speedMult);
+                } else if (rand < stage.pZoo + stage.pPhyto) {
+                    this.setupPhytoplankton(stage.speedMult);
+                } else if (rand < stage.pZoo + stage.pPhyto + stage.pTox) {
+                    this.setupToxic(stage.speedMult);
+                } else {
+                    this.setupMicroplastic(stage.speedMult);
+                }
+
+                // Initial subtle movement state
+                this.targetVx = this.vx;
+                this.targetVy = this.vy;
+                this.moveTimer = 0;
+            }
+
+            setupZooplankton(speedMult) {
+                this.type = 'zooplankton';
+                this.category = 'zoo'; // The target
+                this.size = Math.random() * 4 + 6; // slightly larger
+                this.speedBase = (Math.random() * 1.5 + 1) * speedMult;
+                this.vx = Math.cos(this.rotation) * this.speedBase;
+                this.vy = Math.sin(this.rotation) * this.speedBase;
+                this.color = `hsla(${200 + Math.random()*40}, 80%, 70%, 0.8)`; // Blueish/white
+                this.value = 10;
+                this.subType = Math.random() > 0.5 ? 'copepod' : 'larva';
+                this.jerkiness = 0.8; // High jerkiness
+            }
+
+            setupPhytoplankton(speedMult) {
+                this.type = 'phytoplankton';
+                this.category = 'phyto'; // The neutral/slight penalty
+                this.size = Math.random() * 5 + 3;
+                this.speedBase = (Math.random() * 0.3 + 0.1) * speedMult; // Very slow, drifters
+                this.vx = Math.cos(this.rotation) * this.speedBase;
+                this.vy = Math.sin(this.rotation) * this.speedBase;
+                this.color = `hsla(${100 + Math.random()*60}, 60%, 50%, 0.6)`; // Greenish/yellowish
+                this.value = -5;
+                this.subType = Math.random() > 0.5 ? 'diatom' : 'dinoflagellate';
+                this.jerkiness = 0.05; // Smooth drifting
+            }
+
+            setupToxic(speedMult) {
+                this.type = 'toxic';
+                this.category = 'hazard'; // Heavy penalty
+                this.size = Math.random() * 6 + 5;
+                this.speedBase = (Math.random() * 0.5 + 0.2) * speedMult * 1.2;
+                this.vx = Math.cos(this.rotation) * this.speedBase;
+                this.vy = Math.sin(this.rotation) * this.speedBase;
+                this.color = `hsla(${330 + Math.random()*40}, 80%, 60%, 0.8)`; // Red/Purple
+                this.value = -20;
+                this.subType = 'algae';
+                this.jerkiness = 0.1;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+
+            setupMicroplastic(speedMult) {
+                this.type = 'microplastic';
+                this.category = 'hazard';
+                this.size = Math.random() * 4 + 3;
+                this.speedBase = (Math.random() * 0.4 + 0.1) * speedMult * 1.5;
+                this.vx = Math.cos(this.rotation) * this.speedBase;
+                this.vy = Math.sin(this.rotation) * this.speedBase;
+                
+                const colors = ['#fb923c', '#e879f9', '#38bdf8', '#fde047'];
+                this.color = colors[Math.floor(Math.random() * colors.length)]; 
+                this.value = -10;
+                this.subType = 'microplastic';
+                this.jerkiness = 0.0;
+                this.sides = Math.floor(Math.random() * 3) + 3; // Triangle, square, or pentagon
+            }
+
+            update(width, height, deltaTime) {
+                // Movement logic based on type behavior
+                this.moveTimer -= deltaTime;
+                if (this.moveTimer <= 0) {
+                    // Change direction/speed occasionally
+                    this.moveTimer = 500 + Math.random() * 2000;
+                    
+                    if (this.category === 'zoo') {
+                        // Jerky, sudden movements
+                        this.rotation += (Math.random() - 0.5) * Math.PI;
+                        this.targetVx = Math.cos(this.rotation) * this.speedBase * (1 + Math.random() * 2);
+                        this.targetVy = Math.sin(this.rotation) * this.speedBase * (1 + Math.random() * 2);
+                    } else {
+                        // Smooth drift
+                        this.rotation += (Math.random() - 0.5) * 0.5;
+                        this.targetVx = Math.cos(this.rotation) * this.speedBase;
+                        this.targetVy = Math.sin(this.rotation) * this.speedBase;
+                    }
+                }
+
+                // FOOD WEB MECHANICS: Zooplankton hunt Phytoplankton
+                if (this.category === 'zoo') {
+                    let nearestPhyto = null;
+                    let minDist = 120 * 120; // Sight range squared
+                    
+                    for (let i = 0; i < planktonList.length; i++) {
+                        const other = planktonList[i];
+                        if (other.isDead) continue; // Skip plankton that are already eaten this frame
+                        if (other.category === 'phyto') {
+                            const dx = other.x - this.x;
+                            const dy = other.y - this.y;
+                            const distSq = dx * dx + dy * dy;
+                            
+                            if (distSq < minDist) {
+                                minDist = distSq;
+                                nearestPhyto = other;
+                            }
+                            
+                            // Eat the phytoplankton if very close
+                            if (distSq < (this.size + other.size) * (this.size + other.size)) {
+                                other.isDead = true; // Mark as dead safely instead of array splice
+                                this.size += 0.3; // Grow slightly after eating
+                                break; // Stop looking this frame
+                            }
+                        }
+                    }
+
+                    if (nearestPhyto) {
+                        // Steer towards food
+                        const angleToFood = Math.atan2(nearestPhyto.y - this.y, nearestPhyto.x - this.x);
+                        this.targetVx = Math.cos(angleToFood) * this.speedBase * 1.8; // Burst speed
+                        this.targetVy = Math.sin(angleToFood) * this.speedBase * 1.8;
+                    }
+                }
+
+                // Smoothly interpolate velocity
+                this.vx += (this.targetVx - this.vx) * 0.1;
+                this.vy += (this.targetVy - this.vy) * 0.1;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Update rotation to face movement direction for zooplankton
+                if (this.category === 'zoo' && (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1)) {
+                    this.rotation = Math.atan2(this.vy, this.vx);
+                } else if (this.category !== 'zoo') {
+                    // Phyto just slowly spins
+                    this.rotation += 0.01;
+                }
+
+                if (this.type === 'toxic') {
+                    this.pulsePhase += 0.05;
+                }
+
+                // Screen Wrap
+                if (this.x < -20) this.x = width + 20;
+                if (this.x > width + 20) this.x = -20;
+                if (this.y < -20) this.y = height + 20;
+                if (this.y > height + 20) this.y = -20;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                if (this.category === 'zoo') {
+                    this.drawZooplankton(ctx);
+                } else if (this.category === 'phyto') {
+                    this.drawPhytoplankton(ctx);
+                } else if (this.type === 'toxic') {
+                    this.drawToxic(ctx);
+                } else if (this.type === 'microplastic') {
+                    this.drawMicroplastic(ctx);
+                }
+
+                ctx.restore();
+            }
+
+            drawZooplankton(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 1;
+
+                if (this.subType === 'copepod') {
+                    // Body
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, this.size, this.size * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Antennae
+                    ctx.beginPath();
+                    ctx.moveTo(this.size * 0.8, -this.size * 0.2);
+                    ctx.lineTo(this.size * 2, -this.size * 1.5);
+                    ctx.moveTo(this.size * 0.8, this.size * 0.2);
+                    ctx.lineTo(this.size * 2, this.size * 1.5);
+                    ctx.stroke();
+
+                    // Tail
+                    ctx.beginPath();
+                    ctx.moveTo(-this.size, 0);
+                    ctx.lineTo(-this.size * 1.8, -this.size * 0.4);
+                    ctx.lineTo(-this.size * 1.5, 0);
+                    ctx.lineTo(-this.size * 1.8, this.size * 0.4);
+                    ctx.closePath();
+                    ctx.fill();
+
+                } else {
+                    // Larva (shrimp-like)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    // segmented body
+                    for(let i=1; i<=3; i++) {
+                        ctx.beginPath();
+                        ctx.arc(-i * this.size * 0.7, 0, this.size * (0.8 - i*0.15), 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            drawPhytoplankton(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = this.color;
+                
+                if (this.subType === 'diatom') {
+                    // Rectangular / pill shape
+                    ctx.beginPath();
+                    ctx.roundRect(-this.size, -this.size*0.4, this.size*2, this.size*0.8, 2);
+                    ctx.fill();
+                    // Pattern inside
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size*0.4);
+                    ctx.lineTo(0, this.size*0.4);
+                    ctx.stroke();
+                } else {
+                    // Dinoflagellate (round with horns/flagella)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Girdle (groove)
+                    ctx.beginPath();
+                    ctx.moveTo(-this.size, 0);
+                    ctx.lineTo(this.size, 0);
+                    ctx.stroke();
+
+                    // Flagellum
+                    ctx.beginPath();
+                    ctx.moveTo(0, this.size);
+                    ctx.quadraticCurveTo(this.size, this.size*2, -this.size*0.5, this.size*3);
+                    ctx.stroke();
+                }
+            }
+
+            drawToxic(ctx) {
+                const pulse = Math.sin(this.pulsePhase) * 0.2 + 1; // 0.8 to 1.2
+                const r = this.size * pulse;
+
+                // Glow effect
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.5);
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Core
+                ctx.fillStyle = '#ff0055';
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Spikes
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 1.5;
+                for(let i=0; i<8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle)*r*0.6, Math.sin(angle)*r*0.6);
+                    ctx.lineTo(Math.cos(angle)*r*1.2, Math.sin(angle)*r*1.2);
+                    ctx.stroke();
+                }
+            }
+
+            drawMicroplastic(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i < this.sides; i++) {
+                    const angle = (i / this.sides) * Math.PI * 2;
+                    const px = Math.cos(angle) * this.size;
+                    const py = Math.sin(angle) * this.size;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, text, color, isPositive) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.alpha = 1;
+                this.vy = isPositive ? -1 : 1;
+                this.life = 1.0;
+            }
+
+            update(deltaTime) {
+                this.y += this.vy;
+                this.life -= deltaTime * 0.001; // Fade out over ~1 second
+                this.alpha = Math.max(0, this.life);
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.font = 'bold 16px "Space Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        // --------------------------------------------------------
+        // Interaction Logic
+        // --------------------------------------------------------
+
+        function updatePointer(e) {
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            // Get canvas position (it's full screen, but good practice)
+            const rect = canvas.getBoundingClientRect();
+            const currentX = clientX - rect.left;
+            const currentY = clientY - rect.top;
+
+            // Determine swim angle
+            if (input.x !== -1000) {
+                const dx = currentX - input.x;
+                const dy = currentY - input.y;
+                if (dx !== 0 || dy !== 0) {
+                    input.targetAngle = Math.atan2(dy, dx);
+                }
+            }
+
+            input.x = currentX;
+            input.y = currentY;
+
+            scoopCursor.style.left = `${clientX}px`;
+            scoopCursor.style.top = `${clientY}px`;
+        }
+
+        function handlePointerDown(e) {
+            if (gameState !== 'playing') return;
+            updatePointer(e);
+            input.isDragging = true;
+            scoopCursor.classList.add('is-scooping');
+            checkScoopCollision(); // Initial check on click
+        }
+
+        function handlePointerMove(e) {
+            if (gameState !== 'playing') return;
+            updatePointer(e);
+            
+            // Show custom cursor only when moving in game
+            if (scoopCursor.style.display !== 'block') {
+                scoopCursor.style.display = 'block';
+            }
+
+            if (input.isDragging) {
+                checkScoopCollision();
+            }
+        }
+
+        function handlePointerUp() {
+            input.isDragging = false;
+            scoopCursor.classList.remove('is-scooping');
+        }
+
+        // Event Listeners for canvas
+        canvas.addEventListener('mousedown', handlePointerDown);
+        window.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handlePointerDown(e); }, {passive: false});
+        window.addEventListener('touchmove', (e) => { if(gameState==='playing') e.preventDefault(); handlePointerMove(e); }, {passive: false});
+        window.addEventListener('touchend', handlePointerUp);
+
+        // Hide cursor when leaving window
+        window.addEventListener('mouseout', () => { scoopCursor.style.display = 'none'; });
+
+        function updateStatsUI() {
+            document.getElementById('stat-copepod').innerText = catchStats.copepod;
+            document.getElementById('stat-larva').innerText = catchStats.larva;
+            document.getElementById('stat-diatom').innerText = catchStats.diatom;
+            document.getElementById('stat-dinoflagellate').innerText = catchStats.dinoflagellate;
+            document.getElementById('stat-algae').innerText = catchStats.algae;
+            document.getElementById('stat-microplastic').innerText = catchStats.microplastic;
+        }
+
+        function updateScore(amount, type, x, y) {
+            score += amount;
+            scoreDisplay.innerText = score;
+            
+            let color = amount > 0 ? '#4ade80' : '#f87171'; // green or red
+            if (type === 'energy') color = '#9ca3af'; // gray for energy
+            let text = amount > 0 ? `+${amount}` : `${amount}`;
+            
+            // Visual shake if toxic
+            if (type === 'toxic') {
+                document.body.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
+                setTimeout(() => document.body.style.transform = 'none', 100);
+            }
+
+            particlesList.push(new Particle(x, y, text, color, amount > 0));
+        }
+
+        function checkScoopCollision() {
+            // Check all plankton against the current scoop radius
+            for (let i = planktonList.length - 1; i >= 0; i--) {
+                const p = planktonList[i];
+                if (p.isDead) continue; // Skip already dead plankton
+                const dx = p.x - input.x;
+                const dy = p.y - input.y;
+                const distSq = dx * dx + dy * dy;
+                
+                const catchRadiusSq = input.currentRadius * input.currentRadius;
+
+                if (distSq < catchRadiusSq) {
+                    // Caught!
+                    updateScore(p.value, p.type, p.x, p.y);
+                    catchStats[p.subType]++; // Track specific species
+                    updateStatsUI(); // Update HUD
+                    
+                    // Audio Triggers
+                    if(p.category === 'zoo') {
+                        AudioEngine.playGulp();
+                    } else if(p.type === 'toxic') {
+                        AudioEngine.playBuzz();
+                    } else if(p.type === 'microplastic') {
+                        AudioEngine.playPlastic();
+                    }
+                    
+                    // MICROPLASTIC PENALTY: Clog the baleen
+                    if (p.type === 'microplastic') {
+                        input.clogTimer = 2000; // 2 seconds of impaired scooping
+                        particlesList.push(new Particle(input.x, input.y - 30, "CLOGGED!", "#fb923c", false));
+                    }
+
+                    p.isDead = true; // Mark as dead safely to be filtered out
+                    
+                    // Immediately spawn a new one somewhere else to keep numbers constant
+                    setTimeout(() => {
+                        if (gameState === 'playing') {
+                           const logicalWidth = window.innerWidth;
+                           const logicalHeight = window.innerHeight;
+                           let newP = new Plankton(logicalWidth, logicalHeight);
+                           // make sure it doesn't spawn under cursor
+                           while(Math.hypot(newP.x - input.x, newP.y - input.y) < 150) {
+                               newP.x = Math.random() * logicalWidth;
+                               newP.y = Math.random() * logicalHeight;
+                           }
+                           planktonList.push(newP);
+                        }
+                    }, 500);
+                }
+            }
+        }
+
+
+        // --------------------------------------------------------
+        // Main Loop & Game Control
+        // --------------------------------------------------------
+
+        function initGame() {
+            AudioEngine.init(); // Init audio context on user interaction
+            
+            planktonList = [];
+            particlesList = [];
+            score = 0;
+            
+            const stage = campaign[currentStageIndex];
+            currentBiome = stage.biome;
+            timeLeft = stage.time;
+            input.clogTimer = 0;
+            input.energyTimer = 0;
+            
+            // Reset Stats
+            catchStats = { copepod: 0, larva: 0, diatom: 0, dinoflagellate: 0, algae: 0, microplastic: 0 };
+            updateStatsUI();
+
+            scoreDisplay.innerText = score;
+            quotaDisplay.innerText = stage.quota;
+            timerDisplay.innerText = timeLeft;
+            timerDisplay.classList.remove('text-red-500', 'animate-ping');
+            timerDisplay.classList.add('text-red-400', 'animate-pulse');
+            
+            stageNameDisplay.innerText = stage.name;
+
+            // Generate initial population (dense for microscope feel)
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+            const numPlankton = Math.floor(((logicalWidth * logicalHeight) / 8000) * stage.density); // Scale with screen size & difficulty
+            const cappedNum = Math.min(Math.max(numPlankton, 100), Math.floor(600 * stage.density)); 
+
+            for(let i=0; i<cappedNum; i++) {
+                planktonList.push(new Plankton(logicalWidth, logicalHeight));
+            }
+
+            gameState = 'playing';
+            uiStartScreen.classList.add('hidden');
+            uiGameOverScreen.classList.add('hidden');
+            uiHUD.classList.remove('hidden');
+            
+            // Show custom cursor at mouse pos if available, else center
+            scoopCursor.style.display = 'block';
+            if(input.x === -1000) {
+                scoopCursor.style.left = '50%';
+                scoopCursor.style.top = '50%';
+            }
+
+            lastTime = performance.now();
+            AudioEngine.updateHeartbeat(timeLeft, stage.time);
+            
+            // Start Timer
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+                AudioEngine.updateHeartbeat(timeLeft, stage.time);
+                
+                if(timeLeft <= 10) {
+                    timerDisplay.classList.add('text-red-500', 'animate-ping');
+                    timerDisplay.classList.remove('text-red-400', 'animate-pulse');
+                }
+
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            if (!animationFrameId) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function endGame() {
+            gameState = 'gameover';
+            clearInterval(timerInterval);
+            clearInterval(AudioEngine.heartbeatInterval);
+            uiHUD.classList.add('hidden');
+            uiGameOverScreen.classList.remove('hidden');
+            scoopCursor.style.display = 'none';
+            input.isDragging = false;
+            
+            const stage = campaign[currentStageIndex];
+            const passed = score >= stage.quota;
+
+            finalScoreDisplay.innerText = score;
+
+            // Generate Feedback
+            let feedback = "";
+            let titleText = "";
+            const titleEl = uiGameOverScreen.querySelector('h2');
+            
+            if (passed) {
+                titleText = "STAGE CLEAR!";
+                titleEl.className = "text-3xl sm:text-4xl font-bold text-green-400 mb-2 shrink-0";
+                if (currentStageIndex === campaign.length - 1) {
+                    feedback = "<span class='text-green-400 font-bold'>Migration Complete!</span> You survived the journey and reached the feeding grounds. Incredible baleen technique!";
+                    btnRestart.innerText = "PLAY AGAIN";
+                    btnRestart.classList.remove('hidden');
+                    failRestartBtn.classList.add('hidden');
+                    currentStageIndex = 0; // Reset for next play
+                } else {
+                    feedback = `<span class='text-blue-400 font-bold'>Caloric Quota Met!</span> You gathered enough energy to continue. Get ready for ${campaign[currentStageIndex+1].name}.`;
+                    btnRestart.innerText = "NEXT STAGE";
+                    btnRestart.classList.remove('hidden');
+                    failRestartBtn.classList.add('hidden');
+                    currentStageIndex++; // Advance stage
+                }
+            } else {
+                titleText = "STARVATION WARNING!";
+                titleEl.className = "text-3xl sm:text-4xl font-bold text-red-500 mb-2 shrink-0";
+                feedback = `<span class='text-red-400 font-bold'>Quota Failed.</span> You only gathered ${score}/${stage.quota} calories. The migration ends here.`;
+                btnRestart.classList.add('hidden');
+                failRestartBtn.classList.remove('hidden');
+                currentStageIndex = 0; // Reset
+            }
+            
+            titleEl.innerText = titleText;
+            
+            feedbackDisplay.innerHTML = `
+                <p class="mb-4">${feedback}</p>
+                <div class="text-xs sm:text-sm text-gray-300 bg-black/50 p-3 sm:p-4 rounded border border-gray-700">
+                    <h4 class="text-green-400 font-bold mb-2 border-b border-gray-600 pb-1">STOMACH CONTENTS</h4>
+                    <div class="grid grid-cols-2 gap-2 text-left">
+                        <div class="text-blue-300">Copepods: <span class="float-right text-white font-bold">${catchStats.copepod}</span></div>
+                        <div class="text-blue-300">Larvae: <span class="float-right text-white font-bold">${catchStats.larva}</span></div>
+                        <div class="text-green-400">Diatoms: <span class="float-right text-white font-bold">${catchStats.diatom}</span></div>
+                        <div class="text-green-400">Dinoflagellates: <span class="float-right text-white font-bold">${catchStats.dinoflagellate}</span></div>
+                        <div class="text-red-400 col-span-2 mt-1 border-t border-red-900 pt-1">Toxic Algae: <span class="float-right text-white font-bold">${catchStats.algae}</span></div>
+                        <div class="text-purple-400 col-span-2">Microplastics: <span class="float-right text-white font-bold">${catchStats.microplastic}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // PLANKTON-DEX LOGIC
+        function populateDex() {
+            dexContent.innerHTML = '';
+            
+            const dexEntries = [
+                {
+                    id: 'copepod', name: 'Copepods', count: catchStats.copepod, color: 'text-blue-400',
+                    fact: "Copepods are arguably the most abundant multi-cellular animals on the planet. They are a crucial link in the food web, transferring energy from phytoplankton up to fish and baleen whales."
+                },
+                {
+                    id: 'larva', name: 'Larvae (Meroplankton)', count: catchStats.larva, color: 'text-blue-300',
+                    fact: "Many marine animals, like crabs, sea stars, and fish, start their lives as tiny drifting larvae. They only remain plankton temporarily before growing and settling down."
+                },
+                {
+                    id: 'diatom', name: 'Diatoms', count: catchStats.diatom, color: 'text-green-400',
+                    fact: "Diatoms are single-celled algae with glass-like cell walls made of silica. They are incredibly important, generating about 20% to 50% of the oxygen produced on Earth each year!"
+                },
+                {
+                    id: 'dinoflagellate', name: 'Dinoflagellates', count: catchStats.dinoflagellate, color: 'text-green-300',
+                    fact: "These plankton have whip-like tails (flagella) to propel themselves. Some can glow in the dark (bioluminescence), while others cause harmful 'red tides'."
+                },
+                {
+                    id: 'algae', name: 'Toxic Algae', count: catchStats.algae, color: 'text-red-500',
+                    fact: "Harmful Algal Blooms (HABs) occur when algae grow out of control, producing toxic or harmful effects on people, fish, shellfish, marine mammals, and birds."
+                },
+                {
+                    id: 'microplastic', name: 'Microplastics', count: catchStats.microplastic, color: 'text-purple-400',
+                    fact: "Tiny fragments of plastic (<5mm) that pollute the oceans. Filter feeders accidentally ingest them, which can clog their baleen plates and introduce hazardous chemicals into the food chain."
+                }
+            ];
+
+            dexEntries.forEach(entry => {
+                const card = document.createElement('div');
+                card.className = `p-3 sm:p-4 rounded-lg bg-gray-800/80 border ${entry.count > 0 ? 'border-green-500/50' : 'border-gray-700 opacity-50'} flex flex-col gap-2`;
+                
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-gray-600 pb-2 gap-2">
+                        <h3 class="text-lg sm:text-xl font-bold ${entry.color}">${entry.name}</h3>
+                        <span class="text-xs sm:text-sm bg-black px-2 sm:px-3 py-1 rounded-full text-white font-mono border border-gray-600 self-start sm:self-auto">Ingested: ${entry.count}</span>
+                    </div>
+                    <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">${entry.count > 0 ? entry.fact : "??? (You didn't ingest any this round. Play again to unlock this knowledge!)"}</p>
+                `;
+                dexContent.appendChild(card);
+            });
+        }
+
+        function drawBackground() {
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+            
+            // Dark murky liquid background
+            ctx.fillStyle = '#021015';
+            ctx.fillRect(0, 0, logicalWidth, logicalHeight);
+            
+            // Draw subtle drifting detritus (marine snow)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+            const t = performance.now() * 0.0001;
+            for(let i=0; i<50; i++) {
+                const x = (Math.sin(t + i*13) * logicalWidth + logicalWidth) % logicalWidth;
+                const y = ((t*50 + i*97) % logicalHeight);
+                ctx.beginPath();
+                ctx.arc(x, y, (i%3)+1, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        function gameLoop(timestamp) {
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+
+            // Handle Clogged Baleen Logic
+            if (gameState === 'playing') {
+                if (input.clogTimer > 0) {
+                    input.clogTimer -= deltaTime;
+                    input.currentRadius = input.scoopRadiusBase * 0.4; // Shrink radius drastically
+                    scoopCursor.classList.add('clogged');
+                } else {
+                    scoopCursor.classList.remove('clogged');
+                    if (input.isDragging) {
+                        input.currentRadius = input.scoopRadiusActive;
+                    } else {
+                        input.currentRadius = input.scoopRadiusBase;
+                    }
+                }
+
+                // Metabolic Energy Cost Logic
+                if (input.isDragging) {
+                    input.energyTimer += deltaTime;
+                    if (input.energyTimer >= 500) { // Every 0.5s = -1 point (-2 per sec)
+                        input.energyTimer = 0;
+                        updateScore(-1, 'energy', input.x + (Math.random() * 40 - 20), input.y - 40);
+                    }
+                } else {
+                    input.energyTimer = 0;
+                }
+                
+                // Update CSS dimensions dynamically based on radius
+                scoopCursor.style.width = `${input.currentRadius * 2}px`;
+                scoopCursor.style.height = `${input.currentRadius * 2}px`;
+
+                // Smooth angle interpolation for the whale cursor
+                let deltaAngle = input.targetAngle - input.currentAngle;
+                while (deltaAngle > Math.PI) deltaAngle -= Math.PI * 2;
+                while (deltaAngle < -Math.PI) deltaAngle += Math.PI * 2;
+                input.currentAngle += deltaAngle * 0.15; // Lerp factor
+                
+                scoopCursor.style.transform = `translate(-50%, -50%) rotate(${input.currentAngle}rad)`;
+            }
+
+            drawBackground();
+
+            // Update & Draw Plankton safely
+            for(let i=0; i<planktonList.length; i++) {
+                const p = planktonList[i];
+                if (p.isDead) continue; // Skip plankton marked for deletion
+
+                if (gameState === 'playing') {
+                    p.update(logicalWidth, logicalHeight, deltaTime);
+                }
+                
+                if (!p.isDead) { // Double check in case it was eaten during its update
+                    p.draw(ctx);
+                }
+            }
+
+            // Clean up dead plankton at the end of the frame
+            planktonList = planktonList.filter(p => !p.isDead);
+
+            // Update & Draw Particles
+            for(let i = particlesList.length - 1; i >= 0; i--) {
+                const pt = particlesList[i];
+                if (gameState === 'playing') {
+                    pt.update(deltaTime);
+                }
+                pt.draw(ctx);
+                if(pt.life <= 0) {
+                    particlesList.splice(i, 1);
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // --------------------------------------------------------
+        // Bindings
+        // --------------------------------------------------------
+        
+        btnStart.addEventListener('click', initGame);
+        btnRestart.addEventListener('click', initGame);
+        failRestartBtn.addEventListener('click', () => {
+            currentStageIndex = 0; // Ensure reset
+            stageNameDisplay.innerText = campaign[currentStageIndex].name;
+            uiGameOverScreen.classList.add('hidden');
+            uiStartScreen.classList.remove('hidden');
+        });
+        btnRestartMid.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            currentStageIndex = 0; // Bailing resets campaign
+            stageNameDisplay.innerText = campaign[currentStageIndex].name;
+            initGame(); 
+        });
+        btnEndMid.addEventListener('click', (e) => { e.stopPropagation(); endGame(); });
+
+        // Plankton-dex UI Logic
+        btnDex.addEventListener('click', () => {
+            uiGameOverScreen.classList.add('hidden');
+            uiDexScreen.classList.remove('hidden');
+            populateDex();
+        });
+
+        btnCloseDex.addEventListener('click', () => {
+            uiDexScreen.classList.add('hidden');
+            uiGameOverScreen.classList.remove('hidden');
+        });
+
+        // Start background animation loop for menu immediately
+        requestAnimationFrame((t) => {
+            lastTime = t;
+            // Add some background entities for the menu
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+            for(let i=0; i<50; i++) {
+                planktonList.push(new Plankton(logicalWidth, logicalHeight));
+            }
+            gameLoop(t);
+        });
+
+    </script>
+</body>
+</html>

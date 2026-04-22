@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Sea Explorer: Sonar Mapper!</title>
+    <!-- Tailwind CSS loaded via CDN for standalone functionality -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome loaded via CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts loaded via CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            touch-action: manipulation; /* Prevent double-tap zoom on mobile */
+            background-image: radial-gradient(circle at top, #1e293b, #020617);
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .grid-container {
+            display: grid;
+            /* Grid template columns set via JS dynamically */
+            gap: 1px;
+            background-color: #1e293b;
+            padding: 4px;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 255, 255, 0.2);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            background-color: #475569; /* Fog color */
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        /* Hide text on smaller screens for 32x32 grid to keep it clean */
+        @media (max-width: 768px) {
+            .cell-text {
+                display: none;
+            }
+            .target-icon {
+                font-size: 0.8rem;
+            }
+        }
+
+        .cell.fog:hover {
+            background-color: #64748b;
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 0 8px rgba(0,255,255,0.4);
+            border-radius: 4px;
+        }
+
+        /* Ping Animation */
+        @keyframes ping-ripple {
+            0% { transform: scale(0); opacity: 1; border: 4px solid #06b6d4; }
+            100% { transform: scale(8); opacity: 0; border: 1px solid #cffafe; }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(6, 182, 212, 0.4);
+            width: 100%;
+            height: 100%;
+            animation: ping-ripple 0.8s ease-out;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* Vibrant Gradient Colors for Kids */
+        .depth-trench { background-color: #020617; color: #4b5563; } /* Slate 950 */
+        .depth-abyssal { background-color: #1e1b4b; color: #818cf8; } /* Indigo 950 */
+        .depth-slope { background-color: #1d4ed8; color: #bfdbfe; } /* Blue 700 */
+        .depth-shelf { background-color: #0ea5e9; color: #f0f9ff; } /* Sky 500 */
+        .depth-mountain { background-color: #2dd4bf; color: #042f2e; } /* Teal 400 */
+        .depth-seamount { background-color: #facc15; color: #713f12; } /* Yellow 400 */
+
+        .target-icon {
+            font-size: 1rem;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8));
+            animation: pulse-icon 1.5s infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes pulse-icon {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.3); }
+        }
+
+        /* Bubbles */
+        .bubble {
+            position: absolute;
+            bottom: -20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: floatUp linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+
+        .float-text {
+            position: absolute;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatTextAnim 1.5s ease-out forwards;
+            z-index: 50;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            white-space: nowrap;
+        }
+
+        @keyframes floatTextAnim {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.3); opacity: 0; }
+        }
+
+        .hud-panel {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid #334155;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        .coord-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            font-weight: bold;
+            color: #64748b;
+            font-family: 'Fredoka', sans-serif;
+            user-select: none;
+        }
+
+        /* Shop & Hazards */
+        .shop-btn {
+            transition: all 0.2s;
+        }
+        .shop-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+        }
+        .shop-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+        .hazard-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.4);
+            width: 100%;
+            height: 100%;
+            animation: ping-ripple 0.8s ease-out;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* Scanner line aesthetic */
+        .scanner-line {
+            height: 2px;
+            width: 100%;
+            background: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 10px #06b6d4;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            z-index: 15;
+            display: none; /* Only show when scanning */
+        }
+        
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Background Bubbles -->
+    <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Header -->
+    <header class="bg-slate-800 text-center py-4 shadow-lg border-b-4 border-cyan-600 relative z-10">
+        <h1 class="text-3xl md:text-4xl font-heading font-bold text-cyan-400 tracking-wide drop-shadow-md">
+            <i class="fa-solid fa-ship text-slate-300"></i> Deep Sea Explorer!
+        </h1>
+        <p class="text-slate-300 text-sm md:text-base mt-2 px-4">
+            Command the sub! Send huge sonar sweeps to find the deepest <strong class="text-indigo-400">Trench</strong> and highest <strong class="text-yellow-400">Seamount</strong> in this giant 32x32 ocean sector.
+        </p>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-2 py-4 flex flex-col lg:flex-row gap-4 items-start justify-center relative z-10">
+        
+        <!-- Left Sidebar: HUD & Legend -->
+        <aside class="w-full lg:w-1/4 flex flex-col gap-4 order-2 lg:order-1 max-w-sm mx-auto lg:mx-0">
+            
+            <!-- Mission Select -->
+            <div class="hud-panel p-4 rounded-xl text-center">
+                <h2 class="font-heading text-xl text-cyan-200 mb-2 border-b border-slate-600 pb-2"><i class="fa-solid fa-map-location-dot"></i> Select Mission</h2>
+                <select id="mission-select" class="w-full bg-slate-900 text-cyan-300 font-bold p-2 rounded-lg border border-cyan-700 outline-none focus:border-cyan-400 cursor-pointer shadow-inner">
+                    <option value="random">Random Sector (Classic)</option>
+                    <option value="mid-atlantic">Level 1: Mid-Atlantic Ridge</option>
+                    <option value="barrier-reef">Level 2: Great Barrier Reef</option>
+                    <option value="mariana">Level 3: Mariana Trench</option>
+                    <option value="ring-of-fire">Level 4: Pacific Ring of Fire</option>
+                    <option value="arctic">Level 5: Arctic Ocean Ridge</option>
+                </select>
+            </div>
+
+            <!-- Stats -->
+            <div class="hud-panel p-4 rounded-xl text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+                <h2 class="font-heading text-xl text-cyan-200 mb-1"><i class="fa-solid fa-satellite-dish"></i> Sonar Battery</h2>
+                <div id="pings-display" class="text-6xl font-bold text-white font-heading drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] mb-2">35</div>
+                <div class="w-full bg-slate-900 rounded-full h-4 mb-1 border border-slate-600">
+                    <div id="pings-bar" class="bg-gradient-to-r from-cyan-600 to-cyan-300 h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Objectives -->
+            <div class="hud-panel p-4 rounded-xl">
+                <h2 class="font-heading text-xl text-cyan-200 mb-3 text-center border-b border-slate-600 pb-2">Mission Targets</h2>
+                <div class="flex items-center justify-between p-2 bg-slate-800/80 rounded-lg mb-2 border border-slate-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-yellow-900 flex items-center justify-center border-2 border-yellow-400">
+                            <i class="fa-solid fa-mountain text-yellow-400"></i>
+                        </div>
+                        <span class="font-bold text-slate-200">The Peak</span>
+                    </div>
+                    <span id="obj-seamount" class="text-2xl drop-shadow-md">❌</span>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-slate-800/80 rounded-lg mb-2 border border-slate-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-indigo-950 flex items-center justify-center border-2 border-indigo-400">
+                            <i class="fa-solid fa-anchor text-indigo-400"></i>
+                        </div>
+                        <span class="font-bold text-slate-200">The Abyss</span>
+                    </div>
+                    <span id="obj-trench" class="text-2xl drop-shadow-md">❌</span>
+                </div>
+                <!-- Secrets Objective -->
+                <div class="flex items-center justify-between p-2 bg-slate-800/80 rounded-lg border border-slate-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center border-2 border-emerald-400">
+                            <i class="fa-solid fa-magnifying-glass text-emerald-400"></i>
+                        </div>
+                        <span class="font-bold text-slate-200">Hidden Secrets</span>
+                    </div>
+                    <span id="obj-secrets" class="font-bold text-emerald-400 text-2xl drop-shadow-md">0/5</span>
+                </div>
+            </div>
+
+            <!-- Upgrades Shop -->
+            <div class="hud-panel p-4 rounded-xl">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-600 pb-2">
+                    <h2 class="font-heading text-xl text-cyan-200"><i class="fa-solid fa-store"></i> Upgrades</h2>
+                    <div class="text-yellow-400 font-bold bg-black/50 px-2 py-1 rounded border border-yellow-600/50">
+                        <i class="fa-solid fa-coins"></i> <span id="coins-display">0</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 mt-2">
+                    <button id="btn-buy-scanner" class="shop-btn bg-slate-800 border border-cyan-700 text-left p-2 rounded-lg flex justify-between items-center hover:bg-slate-700 disabled:opacity-50" onclick="buyScanner()">
+                        <div>
+                            <div class="text-cyan-300 font-bold text-sm"><i class="fa-solid fa-satellite"></i> Line Scanner</div>
+                            <div class="text-[10px] text-slate-400">Reveals cross-section</div>
+                        </div>
+                        <div class="text-yellow-400 text-sm font-bold">20 <i class="fa-solid fa-coins"></i></div>
+                    </button>
+                    <button id="btn-buy-thermal" class="shop-btn bg-slate-800 border border-orange-700 text-left p-2 rounded-lg flex justify-between items-center hover:bg-slate-700 disabled:opacity-50" onclick="buyThermal()">
+                        <div>
+                            <div class="text-orange-300 font-bold text-sm"><i class="fa-solid fa-fire"></i> Thermal Ping</div>
+                            <div class="text-[10px] text-slate-400">Finds nearest secret</div>
+                        </div>
+                        <div class="text-yellow-400 text-sm font-bold">15 <i class="fa-solid fa-coins"></i></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Captain's Log -->
+            <div class="hud-panel p-4 rounded-xl">
+                <h2 class="font-heading text-xl text-cyan-200 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-desktop text-blue-400"></i> Submarine Log
+                </h2>
+                <div class="bg-black/50 p-3 rounded border border-slate-600 h-[100px] overflow-y-auto">
+                    <p id="education-text" class="text-sm text-green-400 font-mono">
+                        > System online...<br>> Grid size 32x32 initialized.<br>> Awaiting commander coordinates. Click to scan!
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center: Game Board -->
+        <section class="w-full lg:w-3/4 flex flex-col items-center">
+            
+            <!-- Depth Legend -->
+            <div class="w-full max-w-[800px] mb-2 flex justify-between items-center text-[10px] md:text-xs font-bold bg-slate-800 rounded-lg p-2 border-2 border-slate-600 shadow-lg">
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#020617] border border-slate-500 mb-1"></div><span class="text-indigo-200">Trench</span></div>
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#1e1b4b] border border-slate-500 mb-1"></div><span class="text-indigo-300">Abyssal</span></div>
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#1d4ed8] border border-slate-500 mb-1"></div><span class="text-blue-300">Midnight</span></div>
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#0ea5e9] border border-slate-500 mb-1"></div><span class="text-sky-200">Twilight</span></div>
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#2dd4bf] border border-slate-500 mb-1"></div><span class="text-teal-200">Sunlight</span></div>
+                <div class="flex flex-col items-center"><div class="w-5 h-5 md:w-6 md:h-6 rounded-md bg-[#facc15] border border-slate-500 mb-1"></div><span class="text-yellow-200">Seamount</span></div>
+            </div>
+
+            <!-- Grid Wrapper -->
+            <div class="flex flex-col w-full max-w-[800px] mx-auto relative group">
+                <!-- X-Axis -->
+                <div id="x-coords" class="grid gap-[1px] ml-[20px] mb-1"></div>
+                
+                <div class="flex gap-[1px]">
+                    <!-- Y-Axis -->
+                    <div id="y-coords" class="flex flex-col gap-[1px] w-[18px]"></div>
+                    
+                    <!-- Game Board Container -->
+                    <div class="relative flex-grow rounded-lg overflow-hidden border-2 border-cyan-800">
+                        <div class="scanner-line" id="scanner-line"></div>
+                        <div id="game-board" class="grid-container m-0 border-none rounded-none shadow-none">
+                            <!-- Cells generated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-restart" class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-heading text-xl py-3 px-10 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.6)] transform transition hover:scale-105 hidden border-2 border-emerald-200">
+                <i class="fa-solid fa-anchor mr-2"></i> Launch New Submarine
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Game Over Modal -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 hidden backdrop-blur-sm p-4">
+        <div class="bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-cyan-500 rounded-3xl p-8 max-w-lg w-full text-center shadow-[0_0_40px_rgba(6,182,212,0.5)] transform scale-95 transition-transform duration-300" id="modal-content">
+            <h2 id="modal-title" class="text-4xl md:text-5xl font-heading font-bold mb-4"></h2>
+            <p id="modal-message" class="text-lg md:text-xl text-slate-300 mb-6"></p>
+            <div class="bg-black/40 p-5 rounded-xl mb-6 border border-slate-600">
+                <h3 class="font-bold text-cyan-400 mb-2 text-xl"><i class="fa-solid fa-graduation-cap"></i> Did you know?</h3>
+                <p class="text-md text-cyan-100 italic leading-relaxed" id="modal-fact"></p>
+            </div>
+            <button id="btn-modal-close" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 w-full">
+                Play Again!
+            </button>
+        </div>
+    </div>
+
+    <!-- Trivia Modal -->
+    <div id="trivia-modal" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50 hidden backdrop-blur-md p-4">
+        <div class="bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-emerald-500 rounded-3xl p-6 max-w-lg w-full text-center shadow-[0_0_40px_rgba(16,185,129,0.5)] transform scale-95 transition-transform duration-300" id="trivia-content">
+            <div class="text-emerald-400 text-6xl mb-4 animate-bounce" id="trivia-icon"></div>
+            <h2 class="text-3xl md:text-4xl font-heading font-bold mb-2 text-white" id="trivia-title">Secret Discovered!</h2>
+            <p class="text-md text-emerald-200 mb-6">Answer this ocean trivia question to unlock <strong class="text-yellow-300">bonus battery power!</strong></p>
+            <div class="bg-black/50 p-5 rounded-xl border border-slate-600">
+                <p id="trivia-question" class="text-xl text-white font-bold mb-6 drop-shadow-md"></p>
+                <div id="trivia-options" class="flex flex-col gap-3">
+                    <!-- Buttons injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Configuration & State ---
+        const GRID_SIZE = 32; // DOUBLED SIZE
+        const INITIAL_PINGS = 45; // Increased slightly to balance the smaller ping radius
+        let pingsLeft = INITIAL_PINGS;
+        let grid = []; 
+        let revealed = []; 
+        
+        let seamountFound = false;
+        let trenchFound = false;
+        let seamountPos = {r: 0, c: 0, val: -999};
+        let trenchPos = {r: 0, c: 0, val: 999};
+        
+        // Secrets state
+        let secrets = [];
+        let secretsFound = 0;
+        const MAX_SECRETS = 5;
+
+        // Upgrades, Hazards, & Biology State
+        let coins = 0;
+        let hazards = []; // {r, c, type}
+        let whale = { r: -1, c: -1, found: false };
+        let activePowerup = null;
+        let currentMission = 'random';
+
+        let gameOver = false;
+        let triviaActive = false;
+
+        // --- Kid-Friendly Trivia Database ---
+        const oceanTrivia = [
+            { q: "What covers about 71% of the Earth's surface?", options: ["Deserts", "Forests", "The Ocean"], a: 2, exp: "The ocean is the largest habitat on our planet!" },
+            { q: "What is the deepest known point in the oceans?", options: ["Mariana Trench", "Bermuda Triangle", "Great Blue Hole"], a: 0, exp: "The Mariana Trench drops nearly 7 miles (11km) deep!" },
+            { q: "What do we call an underwater mountain formed by volcanoes?", options: ["Coral Reef", "Seamount", "Geyser"], a: 1, exp: "Seamounts disrupt currents and provide homes for deep-sea life." },
+            { q: "How does Sonar measure ocean depth?", options: ["Bouncing sound waves", "Shining a giant laser", "Dropping a heavy weight"], a: 0, exp: "Sonar calculates depth by timing how long sound echoes take to return." },
+            { q: "In which ocean zone does most marine life live?", options: ["Midnight Zone", "Abyssal Zone", "Sunlight Zone"], a: 2, exp: "Sunlight allows plants to grow, feeding the whole marine food web." },
+            { q: "What causes the ocean's tides?", options: ["Wind pushing water", "The Moon's gravity", "Earthquakes"], a: 1, exp: "The gravity of the Moon pulls on Earth's oceans, making them bulge." },
+            { q: "What do some deep-sea fish (like the Anglerfish) use to glow in the dark?", options: ["Batteries", "Bioluminescence", "Magic"], a: 1, exp: "Bioluminescence is a chemical reaction inside their bodies that creates light!" },
+            { q: "Which ocean is the largest on Earth?", options: ["Atlantic Ocean", "Indian Ocean", "Pacific Ocean"], a: 2, exp: "The Pacific Ocean is so big it covers more than 30% of the Earth!" },
+            { q: "What is the largest animal to ever live on Earth?", options: ["Megalodon Shark", "Blue Whale", "T-Rex"], a: 1, exp: "The Blue Whale is even bigger than the largest dinosaurs!" },
+            { q: "What do you call a scientist who studies the ocean?", options: ["Astronomer", "Oceanographer", "Geologist"], a: 1, exp: "Oceanographers explore everything from ocean currents to marine life!" }
+        ];
+
+        // --- Visual Effects (Bubbles) ---
+        function initBubbles() {
+            const container = document.getElementById('bubbles-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 25; i++) {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    const size = Math.random() * 20 + 5;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${Math.random() * 100}vw`;
+                    bubble.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                    container.appendChild(bubble);
+                }, Math.random() * 5000);
+            }
+        }
+        initBubbles();
+
+        // --- Aggressive Audio Context Setup & Unlocking ---
+        let audioCtx = null;
+        
+        function initAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.warn('Web Audio API not supported or blocked', e);
+            }
+        }
+
+        // Global listeners to unlock audio securely as soon as the user interacts anywhere
+        ['mousedown', 'touchstart', 'keydown', 'click'].forEach(evt => {
+            document.addEventListener(evt, initAudio, { once: true, capture: true });
+        });
+
+        function playSound(type) {
+            initAudio(); 
+            if (!audioCtx) return;
+            
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                // Add a robust 50ms buffer to ensure precise, glitch-free scheduling
+                const now = audioCtx.currentTime + 0.05; 
+                
+                if (type === 'ping') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.4);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'whale') {
+                    // Deep, resonant whale sound
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(250, now); 
+                    osc.frequency.exponentialRampToValueAtTime(350, now + 1.5);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 3.0);
+                    gainNode.gain.setValueAtTime(0, now);
+                    gainNode.gain.linearRampToValueAtTime(0.6, now + 1.5); 
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 3.0); 
+                    osc.start(now);
+                    osc.stop(now + 3.0);
+                } else if (type === 'hazard') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.linearRampToValueAtTime(80, now + 0.3);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'bonus') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, now);
+                    osc.frequency.linearRampToValueAtTime(1108.73, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.2, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554, now + 0.1);
+                    osc.frequency.setValueAtTime(659, now + 0.2);
+                    osc.frequency.setValueAtTime(880, now + 0.3);
+                    gainNode.gain.setValueAtTime(0.3, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                } else if (type === 'win') {
+                    osc.type = 'square';
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                        osc.frequency.setValueAtTime(freq, now + i*0.15);
+                    });
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 1.0);
+                    osc.start(now);
+                    osc.stop(now + 1.0);
+                } else if (type === 'lose') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 1.0);
+                    gainNode.gain.setValueAtTime(0.2, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 1.0);
+                    osc.start(now);
+                    osc.stop(now + 1.0);
+                }
+            } catch (e) {
+                console.error("Audio playback error:", e);
+            }
+        }
+
+        // --- Core Logic ---
+
+        function generateTerrain() {
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            revealed = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(false));
+            
+            seamountPos = {r: 0, c: 0, val: -999};
+            trenchPos = {r: 0, c: 0, val: 999};
+
+            // Switch to generate specific campaign maps
+            switch(currentMission) {
+                case 'mid-atlantic':
+                    generateMidAtlantic();
+                    break;
+                case 'barrier-reef':
+                    generateBarrierReef();
+                    break;
+                case 'mariana':
+                    generateMarianaTrench();
+                    break;
+                case 'ring-of-fire':
+                    generateRingOfFire();
+                    break;
+                case 'arctic':
+                    generateArcticOcean();
+                    break;
+                case 'random':
+                default:
+                    generateRandomTerrain();
+                    break;
+            }
+
+            // Apply base smoothing to procedurally generated maps
+            for(let blurPass=0; blurPass<2; blurPass++) {
+                let newGrid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+                for(let r=0; r<GRID_SIZE; r++) {
+                    for(let c=0; c<GRID_SIZE; c++) {
+                        let sum = 0, count = 0;
+                        for(let dr=-1; dr<=1; dr++) {
+                            for(let dc=-1; dc<=1; dc++) {
+                                if(r+dr>=0 && r+dr<GRID_SIZE && c+dc>=0 && c+dc<GRID_SIZE) {
+                                    sum += grid[r+dr][c+dc];
+                                    count++;
+                                }
+                            }
+                        }
+                        newGrid[r][c] = sum / count;
+                    }
+                }
+                grid = newGrid;
+            }
+
+            // Add micro-texture noise
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    grid[r][c] += (Math.random() * 10 - 5);
+                }
+            }
+
+            // 4. Find absolute min and max to assign the Official Targets
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    grid[r][c] += (Math.random() - 0.5) * 0.1; 
+                    
+                    if(grid[r][c] > seamountPos.val) {
+                        seamountPos = {r, c, val: grid[r][c]};
+                    }
+                    if(grid[r][c] < trenchPos.val) {
+                        trenchPos = {r, c, val: grid[r][c]};
+                    }
+                }
+            }
+            
+            // Force extremes so they trigger the exact depth color targets
+            grid[seamountPos.r][seamountPos.c] = 100;
+            grid[trenchPos.r][trenchPos.c] = -100;
+
+            // 5. Hide Kids-Friendly Secrets
+            secrets = [];
+            const secretTypes = [
+                { icon: 'fa-skull-crossbones text-slate-300', name: 'Pirate Shipwreck' },
+                { icon: 'fa-gem text-yellow-400', name: 'Sunken Treasure' },
+                { icon: 'fa-fish text-teal-300', name: 'Rare Glowing Fish' },
+                { icon: 'fa-tooth text-slate-100', name: 'Megalodon Fossil' },
+                { icon: 'fa-fire text-orange-500', name: 'Volcanic Vent' }
+            ];
+            
+            for (let i = 0; i < MAX_SECRETS; i++) {
+                let sr, sc;
+                do {
+                    sr = Math.floor(Math.random() * GRID_SIZE);
+                    sc = Math.floor(Math.random() * GRID_SIZE);
+                } while (
+                    (sr === seamountPos.r && sc === seamountPos.c) || 
+                    (sr === trenchPos.r && sc === trenchPos.c) ||
+                    secrets.some(s => s.r === sr && s.c === sc)
+                );
+                secrets.push({ r: sr, c: sc, ...secretTypes[i], found: false });
+            }
+
+            // Place Hazards (Currents and Vents)
+            hazards = [];
+            for (let i = 0; i < 10; i++) {
+                hazards.push({
+                    r: Math.floor(Math.random() * GRID_SIZE),
+                    c: Math.floor(Math.random() * GRID_SIZE),
+                    type: Math.random() > 0.5 ? 'current' : 'vent'
+                });
+            }
+
+            // Place Whale
+            whale = {
+                r: Math.floor(Math.random() * GRID_SIZE),
+                c: Math.floor(Math.random() * GRID_SIZE),
+                found: false
+            };
+        }
+
+        // --- Specific Campaign Map Generators ---
+
+        function generateRandomTerrain() {
+            addFeature(true, 100, 8); 
+            addFeature(false, -100, 8); 
+            for(let i=0; i<8; i++) addFeature(true, Math.random()*50 + 20, 6);
+            for(let i=0; i<8; i++) addFeature(false, -(Math.random()*50 + 20), 6);
+        }
+
+        function generateMidAtlantic() {
+            // A long ridge down the middle (roughly North to South)
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    let wavyCenter = (GRID_SIZE/2) + Math.sin(r / 3) * 3;
+                    let distFromCenter = Math.abs(c - wavyCenter);
+                    // Deeper the further away from the ridge
+                    grid[r][c] = 50 - (distFromCenter * 7); 
+                }
+            }
+            // Add a few extra peaks on the ridge and deep trenches on the sides
+            addFeature(true, 80, 5); 
+            addFeature(false, -90, 6); 
+            for(let i=0; i<4; i++) addFeature(true, Math.random()*30 + 10, 4);
+        }
+
+        function generateBarrierReef() {
+            // Shallow waters on the West (left), sharp drop-off to the East (right)
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    let dropOffEdge = (GRID_SIZE * 0.4) + Math.sin(r / 4) * 2;
+                    if (c < dropOffEdge) {
+                        grid[r][c] = 40 + Math.random() * 40; // Shallow shelf
+                    } else {
+                        let dist = c - dropOffEdge;
+                        grid[r][c] = Math.max(-90, 20 - (dist * 8)); // Drop into abyss
+                    }
+                }
+            }
+            addFeature(true, 60, 4); // Reef peak
+            addFeature(false, -100, 5); // Deep ocean trench
+        }
+
+        function generateMarianaTrench() {
+            // A deep flat abyssal plain, with a massive crescent-shaped trench
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    grid[r][c] = -40; // Baseline Abyssal
+                    
+                    let cx = GRID_SIZE * 1.3;
+                    let cy = GRID_SIZE / 2;
+                    let distFromCenter = Math.sqrt(Math.pow(c - cx, 2) + Math.pow(r - cy, 2));
+                    let trenchRadius = GRID_SIZE * 0.8;
+                    let distFromTrench = Math.abs(distFromCenter - trenchRadius);
+                    
+                    if (distFromTrench < 7) {
+                        grid[r][c] -= (7 - distFromTrench) * 12; // Plunge into the trench
+                    }
+                }
+            }
+            addFeature(false, -120, 5); // Challenger Deep
+            addFeature(true, 80, 6); // Marianas Islands Peak
+        }
+
+        function generateRingOfFire() {
+            // Center is a deep abyssal plain.
+            // Edges are shallow volcanic islands, immediately bordering a sharp deep trench.
+            let cx = GRID_SIZE / 2;
+            let cy = GRID_SIZE / 2;
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    let dist = Math.sqrt(Math.pow(c - cx, 2) + Math.pow(r - cy, 2));
+                    if (dist > GRID_SIZE * 0.45) {
+                        // Volcanic Edge (Shallow/Peaks)
+                        grid[r][c] = 40 + Math.random() * 40; 
+                    } else if (dist > GRID_SIZE * 0.35) {
+                        // The subduction trench ring (Very Deep)
+                        grid[r][c] = -80 - Math.random() * 30; 
+                    } else {
+                        // The inner Pacific plate (Abyssal Plain)
+                        grid[r][c] = -40; 
+                    }
+                }
+            }
+            // Add prominent volcanoes and extreme trench spots
+            addFeature(true, 100, 5); 
+            addFeature(false, -120, 5);
+        }
+
+        function generateArcticOcean() {
+            // Very shallow shelves on the north/south, dropping into a deep basin, divided by a straight central ridge
+            for(let r=0; r<GRID_SIZE; r++) {
+                for(let c=0; c<GRID_SIZE; c++) {
+                    grid[r][c] = -60; // Deep cold basin
+                    
+                    // Continental shelves (Siberia / North America)
+                    if (r < GRID_SIZE * 0.25 || r > GRID_SIZE * 0.75) {
+                        grid[r][c] = 20 + Math.random() * 20;
+                    }
+                    
+                    // The Lomonosov Ridge (diagonal slice)
+                    let ridgeDist = Math.abs((r) - (c));
+                    if (ridgeDist < 4) {
+                        grid[r][c] += (5 - ridgeDist) * 15; // Raised underwater mountain range
+                    }
+                }
+            }
+            addFeature(true, 80, 4); 
+            addFeature(false, -100, 5);
+        }
+
+
+        // --- Utility Math & Helpers ---
+
+        function addFeature(isSeamount, intensity, radius) {
+            let cx = Math.floor(Math.random() * GRID_SIZE);
+            let cy = Math.floor(Math.random() * GRID_SIZE);
+            
+            for(let r=0; r<GRID_SIZE; r++){
+                for(let c=0; c<GRID_SIZE; c++){
+                    let dist = Math.sqrt(Math.pow(cx-c, 2) + Math.pow(cy-r, 2));
+                    if(dist < radius) {
+                        let effect = intensity * (1 - (dist/radius));
+                        grid[r][c] += effect;
+                    }
+                }
+            }
+        }
+
+        function getDepthClass(depth) {
+            if (depth <= -80) return 'depth-trench';
+            if (depth <= -40) return 'depth-abyssal';
+            if (depth <= -10) return 'depth-slope';
+            if (depth <= 40) return 'depth-shelf';
+            if (depth <= 80) return 'depth-mountain';
+            return 'depth-seamount';
+        }
+
+        function getColLabel(c) {
+            let label = "";
+            let temp = c;
+            while (temp >= 0) {
+                label = String.fromCharCode(65 + (temp % 26)) + label;
+                temp = Math.floor(temp / 26) - 1;
+            }
+            return label;
+        }
+
+        function writeLog(text, color="text-green-400") {
+            const logBox = document.getElementById('education-text');
+            logBox.innerHTML = `> <span class="${color}">${text}</span><br>` + logBox.innerHTML;
+        }
+
+        function getEducationalText(depth, r, c) {
+            const sector = `[${getColLabel(c)}-${r+1}]`;
+            if (depth <= -80) return `${sector} <strong>Trench Detected!</strong> Crushing pressure and absolute darkness!`;
+            if (depth <= -40) return `${sector} <strong>Abyssal Plain.</strong> The vast, freezing flat bottom of the ocean.`;
+            if (depth <= -10) return `${sector} <strong>Midnight Zone.</strong> No sunlight at all. Fish here use bioluminescence!`;
+            if (depth <= 40) return `${sector} <strong>Twilight Zone.</strong> Light is fading. Shadows everywhere.`;
+            if (depth <= 80) return `${sector} <strong>Sunlight Zone.</strong> Warm waters where coral and dolphins live.`;
+            return `${sector} <strong>Seamount Peak!</strong> An underwater mountain rising high!`;
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('game-board');
+            const xCoords = document.getElementById('x-coords');
+            const yCoords = document.getElementById('y-coords');
+            
+            // Set dynamic grid columns based on GRID_SIZE
+            board.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+            xCoords.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+
+            board.innerHTML = '';
+            xCoords.innerHTML = '';
+            yCoords.innerHTML = '';
+            
+            // X Axis (Letters)
+            for(let c=0; c<GRID_SIZE; c++) {
+                const label = document.createElement('div');
+                label.className = 'coord-label';
+                label.textContent = getColLabel(c);
+                xCoords.appendChild(label);
+            }
+
+            for(let r=0; r<GRID_SIZE; r++) {
+                // Y Axis (Numbers)
+                const label = document.createElement('div');
+                label.className = 'coord-label flex-grow';
+                label.textContent = r + 1;
+                yCoords.appendChild(label);
+
+                for(let c=0; c<GRID_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell fog';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.addEventListener('click', () => handleCellClick(r, c));
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(r, c) {
+            if(gameOver || triviaActive) return;
+
+            if(revealed[r][c] && !activePowerup) return; // Already pinged
+            if(pingsLeft <= 0) return;
+
+            pingsLeft--;
+            
+            // Process Environmental Hazards first (unless scanning)
+            if (!activePowerup) {
+                let triggeredHazard = hazards.find(h => h.r === r && h.c === c);
+                if (triggeredHazard) {
+                    if (triggeredHazard.type === 'current') {
+                        writeLog(`⚠️ Caught in a strong current! Ping drifted!`, "text-orange-400 font-bold");
+                        playSound('hazard');
+                        r = Math.min(GRID_SIZE - 1, Math.max(0, r + (Math.floor(Math.random() * 5) - 2)));
+                        c = Math.min(GRID_SIZE - 1, Math.max(0, c + (Math.floor(Math.random() * 5) - 2)));
+                    } else if (triggeredHazard.type === 'vent') {
+                        writeLog(`⚠️ Thermal vent blasted the sonar! Ping lost!`, "text-red-400 font-bold");
+                        playSound('hazard');
+                        updateHUD();
+                        
+                        const index = r * GRID_SIZE + c;
+                        const cell = document.querySelectorAll('.cell')[index];
+                        const ripple = document.createElement('div');
+                        ripple.className = 'hazard-ripple';
+                        cell.appendChild(ripple);
+                        setTimeout(() => ripple.remove(), 800);
+                        return; // Abort ping
+                    }
+                }
+            }
+
+            // Move Whale
+            if (!whale.found) {
+                whale.r = Math.max(0, Math.min(GRID_SIZE - 1, whale.r + (Math.random() > 0.5 ? 1 : -1)));
+                whale.c = Math.max(0, Math.min(GRID_SIZE - 1, whale.c + (Math.random() > 0.5 ? 1 : -1)));
+                
+                let distToWhale = Math.sqrt(Math.pow(whale.r - r, 2) + Math.pow(whale.c - c, 2));
+                if (distToWhale < 6 && distToWhale > 0) {
+                    writeLog(`🐋 Mysterious biological sounds detected nearby...`, "text-blue-200 italic");
+                    playSound('whale'); // WHALE AUDIO TRIGGER
+                } else if (r === whale.r && c === whale.c) {
+                    whale.found = true;
+                    coins += 25;
+                    pingsLeft += 5;
+                    playSound('win');
+                    writeLog(`🐋 YOU FOUND THE BLUE WHALE! (+25 Coins, +5 Battery)`, "text-cyan-300 font-bold text-lg");
+                    const index = r * GRID_SIZE + c;
+                    const cell = document.querySelectorAll('.cell')[index];
+                    showFloatText(cell, "WHALE FOUND!", "text-cyan-300");
+                }
+            }
+
+            updateHUD();
+
+            if (activePowerup === 'scanner') {
+                activePowerup = null;
+                playSound('success');
+                writeLog(`Scanner beam fired at [${getColLabel(c)}-${r+1}]!`, "text-cyan-300 font-bold");
+                
+                const scanner = document.getElementById('scanner-line');
+                scanner.style.display = 'block';
+                setTimeout(() => scanner.style.display = 'none', 1000);
+
+                revealArea(r, c, true);
+            } else {
+                playSound('ping');
+                writeLog(getEducationalText(grid[r][c], r, c), "text-cyan-300");
+
+                const scanner = document.getElementById('scanner-line');
+                scanner.style.display = 'block';
+                setTimeout(() => scanner.style.display = 'none', 500);
+
+                revealArea(r, c, false);
+            }
+        }
+
+        function showFloatText(cell, text, colorClass) {
+            const floatText = document.createElement('div');
+            floatText.className = `float-text ${colorClass} text-xl md:text-3xl font-bold`;
+            floatText.textContent = text;
+            cell.appendChild(floatText);
+            setTimeout(() => floatText.remove(), 1500);
+        }
+
+        function revealArea(startR, startC, isLineScan = false) {
+            const cells = document.querySelectorAll('.cell');
+            
+            let queue = [];
+            if (isLineScan) {
+                for(let i=0; i<GRID_SIZE; i++) {
+                    queue.push({r: i, c: startC, isStart: false, step: 99});
+                    queue.push({r: startR, c: i, isStart: false, step: 99});
+                }
+            } else {
+                queue = [{r: startR, c: startC, isStart: true, step: 0}];
+            }
+            
+            let processed = new Set();
+            let triggeredEcho = false;
+            let discoveredSecrets = []; 
+            
+            while(queue.length > 0) {
+                let {r: centerR, c: centerC, isStart, step} = queue.shift();
+                const key = `${centerR},${centerC}`;
+                if(processed.has(key)) continue;
+                processed.add(key);
+
+                // Circular reveal for the starting ping to make a big splash
+                let directions = [];
+                if (isStart && !isLineScan) {
+                    let radius = 1.5; // Reduced radius for a tighter, more challenging ping
+                    for(let dr=-2; dr<=2; dr++) {
+                        for(let dc=-2; dc<=2; dc++) {
+                            if (Math.sqrt(dr*dr + dc*dc) <= radius) {
+                                directions.push([dr, dc]);
+                            }
+                        }
+                    }
+                } else {
+                    // Standard cascade for flat areas
+                    directions = [[0,0], [-1,0], [1,0], [0,-1], [0,1]];
+                }
+
+                for(let [dr, dc] of directions) {
+                    let r = centerR + dr;
+                    let c = centerC + dc;
+
+                    if(r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE) {
+                        if(!revealed[r][c]) {
+                            revealed[r][c] = true;
+                            
+                            const index = r * GRID_SIZE + c;
+                            const cell = cells[index];
+                            const depth = Math.round(grid[r][c]);
+                            
+                            // Visuals
+                            cell.classList.remove('fog');
+                            cell.classList.add(getDepthClass(depth));
+                            
+                            if(r === startR && c === startC && isStart) {
+                                const ripple = document.createElement('div');
+                                ripple.className = 'ripple';
+                                cell.appendChild(ripple);
+                                setTimeout(() => ripple.remove(), 800);
+                            }
+
+                            // Targets
+                            if(r === seamountPos.r && c === seamountPos.c && !seamountFound) {
+                                seamountFound = true;
+                                cell.innerHTML = '<i class="fa-solid fa-mountain target-icon text-yellow-300 drop-shadow-lg"></i>';
+                                playSound('success');
+                                writeLog(`TARGET FOUND: Highest Peak at [${getColLabel(c)}-${r+1}]!`, "text-yellow-400 font-bold text-lg");
+                            } else if(r === trenchPos.r && c === trenchPos.c && !trenchFound) {
+                                trenchFound = true;
+                                cell.innerHTML = '<i class="fa-solid fa-anchor target-icon text-indigo-200 drop-shadow-lg"></i>';
+                                playSound('success');
+                                writeLog(`TARGET FOUND: Deepest Trench at [${getColLabel(c)}-${r+1}]!`, "text-indigo-400 font-bold text-lg");
+                            } else {
+                                // Check Secrets
+                                let secret = secrets.find(s => s.r === r && s.c === c);
+                                if (secret && !secret.found) {
+                                    secret.found = true;
+                                    secretsFound++;
+                                    cell.innerHTML = `<i class="fa-solid ${secret.icon} target-icon text-2xl"></i>`;
+                                    discoveredSecrets.push({cell: cell, secret: secret});
+                                } else if (r === whale.r && c === whale.c && whale.found) {
+                                    cell.innerHTML = '<i class="fa-solid fa-fish-fins text-blue-300 drop-shadow-lg text-2xl"></i>';
+                                } else {
+                                    // Depth Number
+                                    cell.innerHTML = `<span class="cell-text">${depth > 0 ? '+'+depth : depth}</span>`;
+                                }
+                            }
+
+                            // Echo Cascade: continue revealing if terrain is very flat
+                            if(Math.abs(depth) <= 15 && step < 1 && !isStart) {
+                                queue.push({r: r, c: c, isStart: false, step: step + 1});
+                                triggeredEcho = true;
+                            } else if (isStart && Math.abs(depth) <= 15) {
+                                queue.push({r: r, c: c, isStart: false, step: 0});
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (triggeredEcho) {
+                writeLog("Flat plains detected! Sonar wave echoed further.", "text-blue-300 text-xs italic");
+            }
+
+            if (discoveredSecrets.length > 0) {
+                triggerTrivia(discoveredSecrets[0].cell, discoveredSecrets[0].secret);
+                
+                // Auto-award any additional secrets found in the same giant ping
+                for(let i=1; i<discoveredSecrets.length; i++) {
+                    pingsLeft += 3;
+                    showFloatText(discoveredSecrets[i].cell, "+3 Battery", "text-emerald-400");
+                }
+            } else {
+                checkGameState();
+            }
+        }
+
+        // --- Trivia Logic ---
+        function triggerTrivia(cell, secret) {
+            triviaActive = true;
+            
+            const modal = document.getElementById('trivia-modal');
+            const icon = document.getElementById('trivia-icon');
+            const title = document.getElementById('trivia-title');
+            const qEl = document.getElementById('trivia-question');
+            const optionsEl = document.getElementById('trivia-options');
+            
+            icon.innerHTML = `<i class="fa-solid ${secret.icon}"></i>`;
+            title.textContent = `Woah! You found a ${secret.name}!`;
+            
+            const qData = oceanTrivia[Math.floor(Math.random() * oceanTrivia.length)];
+            qEl.textContent = qData.q;
+            
+            optionsEl.innerHTML = '';
+            qData.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-slate-700 hover:bg-emerald-600 text-white font-bold py-4 px-4 rounded-xl transition-colors border-2 border-slate-600 hover:border-emerald-300 text-lg shadow-md";
+                btn.textContent = optText;
+                btn.onclick = () => handleTriviaAnswer(index === qData.a, cell, secret, modal, qData);
+                optionsEl.appendChild(btn);
+            });
+            
+            modal.classList.remove('hidden');
+        }
+
+        function handleTriviaAnswer(isCorrect, cell, secret, modal, qData) {
+            modal.classList.add('hidden');
+            
+            if (isCorrect) {
+                playSound('win');
+                pingsLeft += 5; // Generous reward for kids
+                coins += 15; // NEW Reward
+                showFloatText(cell, "+5 Batt, +15 Coins!", "text-emerald-400");
+                writeLog(`Correct! ${qData.exp} (+5 Battery, +15 Coins)`, "text-emerald-400 font-bold");
+            } else {
+                playSound('lose');
+                showFloatText(cell, "Missed!", "text-orange-400");
+                writeLog(`Oops! ${qData.exp}`, "text-orange-400");
+            }
+            
+            updateHUD();
+            triviaActive = false;
+            checkGameState();
+        }
+
+        // --- Shop Functions ---
+        function buyScanner() {
+            if (coins >= 20) {
+                coins -= 20;
+                activePowerup = 'scanner';
+                playSound('bonus');
+                writeLog(`🚀 Line Scanner armed! Next click will scan a full row and column!`, "text-yellow-300 font-bold");
+                updateHUD();
+            }
+        }
+
+        function buyThermal() {
+            if (coins >= 15) {
+                coins -= 15;
+                playSound('ping');
+                updateHUD();
+                
+                let unfound = secrets.filter(s => !s.found);
+                if (!whale.found) unfound.push({...whale, name: "Massive Biology"});
+                
+                if (unfound.length > 0) {
+                    let target = unfound[Math.floor(Math.random() * unfound.length)];
+                    let ns = target.r < GRID_SIZE/2 ? "North" : "South";
+                    let ew = target.c < GRID_SIZE/2 ? "West" : "East";
+                    writeLog(`🔥 Thermal signature detected in the ${ns}-${ew} quadrant!`, "text-orange-400 font-bold text-lg");
+                } else {
+                    writeLog(`No thermal signatures remaining. Sector clear.`, "text-slate-400");
+                }
+            }
+        }
+
+        function updateHUD() {
+            document.getElementById('pings-display').textContent = pingsLeft;
+            document.getElementById('coins-display').textContent = coins;
+            
+            // Update shop buttons
+            document.getElementById('btn-buy-scanner').disabled = coins < 20;
+            document.getElementById('btn-buy-thermal').disabled = coins < 15;
+
+            const barWidth = Math.min((pingsLeft / INITIAL_PINGS) * 100, 100);
+            const bar = document.getElementById('pings-bar');
+            bar.style.width = `${barWidth}%`;
+            
+            if (barWidth <= 20) {
+                bar.className = "bg-gradient-to-r from-red-600 to-red-400 h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(239,68,68,0.8)]";
+            } else if (barWidth <= 50) {
+                bar.className = "bg-gradient-to-r from-yellow-500 to-yellow-300 h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(234,179,8,0.8)]";
+            } else {
+                bar.className = "bg-gradient-to-r from-cyan-600 to-cyan-300 h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.8)]";
+            }
+
+            document.getElementById('obj-seamount').textContent = seamountFound ? '✅' : '❌';
+            document.getElementById('obj-trench').textContent = trenchFound ? '✅' : '❌';
+            document.getElementById('obj-secrets').textContent = `${secretsFound}/${MAX_SECRETS}`;
+        }
+
+        function checkGameState() {
+            if(seamountFound && trenchFound) {
+                gameOver = true;
+                setTimeout(() => showModal(true), 800);
+            } else if (pingsLeft <= 0) {
+                gameOver = true;
+                revealTargets();
+                setTimeout(() => showModal(false), 1200);
+            }
+        }
+
+        function revealTargets() {
+            const cells = document.querySelectorAll('.cell');
+            
+            if(!seamountFound) {
+                const sIdx = seamountPos.r * GRID_SIZE + seamountPos.c;
+                cells[sIdx].classList.remove('fog');
+                cells[sIdx].classList.add(getDepthClass(100));
+                cells[sIdx].innerHTML = '<i class="fa-solid fa-mountain text-yellow-900 text-2xl animate-pulse"></i>';
+            }
+            if(!trenchFound) {
+                const tIdx = trenchPos.r * GRID_SIZE + trenchPos.c;
+                cells[tIdx].classList.remove('fog');
+                cells[tIdx].classList.add(getDepthClass(-100));
+                cells[tIdx].innerHTML = '<i class="fa-solid fa-anchor text-indigo-900 text-2xl animate-pulse"></i>';
+            }
+        }
+
+        const funFacts = [
+            "We have better maps of the surface of Mars than we do of our own ocean floor!",
+            "Mauna Kea in Hawaii is an underwater volcano. Measured from the sea floor, it's taller than Mount Everest!",
+            "The deepest part of the ocean, the Mariana Trench, is so deep you could hide Mount Everest inside it with a mile to spare!",
+            "More than 80% of our ocean is unmapped, unobserved, and unexplored.",
+            "Water pressure at the bottom of the ocean is like having 50 jumbo jets piled on top of you!"
+        ];
+
+        function showModal(isWin) {
+            const overlay = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const msg = document.getElementById('modal-message');
+            const fact = document.getElementById('modal-fact');
+            const btnRestart = document.getElementById('btn-restart');
+
+            if(isWin) {
+                playSound('win');
+                title.textContent = "Mission Accomplished! 🏆";
+                title.className = "text-4xl md:text-5xl font-heading font-bold mb-4 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]";
+                
+                let rank = "Submarine Rookie";
+                if (pingsLeft >= 15) rank = "Master Ocean Explorer 🌟";
+                else if (pingsLeft >= 5) rank = "Expert Bathymetrist 🏅";
+                
+                msg.innerHTML = `Amazing job, Commander! You mapped the extreme depths of this sector.<br><br><strong>Final Rank:</strong> <span class="text-yellow-300 text-2xl font-bold block mt-2">${rank}</span>`;
+            } else {
+                playSound('lose');
+                title.textContent = "Battery Empty! ⚠️";
+                title.className = "text-4xl md:text-5xl font-heading font-bold mb-4 text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]";
+                msg.innerHTML = "Oh no! The submarine ran out of battery. The missing targets have been revealed on your map.";
+            }
+
+            fact.textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+
+            overlay.classList.remove('hidden');
+            btnRestart.classList.remove('hidden');
+        }
+
+        function startGame() {
+            pingsLeft = INITIAL_PINGS;
+            coins = 0;
+            activePowerup = null;
+            seamountFound = false;
+            trenchFound = false;
+            secretsFound = 0;
+            gameOver = false;
+            triviaActive = false;
+            
+            document.getElementById('modal-overlay').classList.add('hidden');
+            document.getElementById('trivia-modal').classList.add('hidden');
+            document.getElementById('btn-restart').classList.add('hidden');
+            
+            generateTerrain();
+            updateHUD();
+            renderBoard();
+
+            // Setup Mission Text flavor
+            let missionStartText = "> <span class='text-green-400'>System online... Awaiting coordinates.</span>";
+            if (currentMission === 'mid-atlantic') {
+                missionStartText = "> <span class='text-blue-300'>Level 1: Mid-Atlantic Ridge deployed! Search for the massive central mountain range dividing the ocean.</span>";
+            } else if (currentMission === 'barrier-reef') {
+                missionStartText = "> <span class='text-blue-300'>Level 2: Great Barrier Reef deployed! The waters are shallow here, but watch out for the sharp drop-off into the abyss.</span>";
+            } else if (currentMission === 'mariana') {
+                missionStartText = "> <span class='text-blue-300'>Level 3: Mariana Trench deployed! We're starting in an abyssal plain. Scan for the massive crescent-shaped drop.</span>";
+            } else if (currentMission === 'ring-of-fire') {
+                missionStartText = "> <span class='text-blue-300'>Level 4: Pacific Ring of Fire! Volcanic peaks surround a ring of deep, subduction trenches.</span>";
+            } else if (currentMission === 'arctic') {
+                missionStartText = "> <span class='text-blue-300'>Level 5: Arctic Ocean Ridge! Shallow icy shelves plunge into a deep basin split by a central ridge.</span>";
+            }
+            document.getElementById('education-text').innerHTML = missionStartText;
+        }
+
+        // Event Listeners
+        document.getElementById('btn-modal-close').addEventListener('click', startGame);
+        document.getElementById('btn-restart').addEventListener('click', startGame);
+        
+        // Handle Mission Select changes
+        document.getElementById('mission-select').addEventListener('change', (e) => {
+            currentMission = e.target.value;
+            startGame();
+        });
+
+        // Initialize first game
+        startGame();
+
+    </script>
+</body>
+</html>

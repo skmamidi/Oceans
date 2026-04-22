@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Quest - Deep Sea Ecology Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030d1e;
+            --card-bg: rgba(4, 18, 44, 0.90);
+            --card-border: rgba(0, 230, 220, 0.18);
+            --cyan: #00f0e0;
+            --cyan2: #4cc9f0;
+            --green: #39ff14;
+            --purple: #c96fff;
+            --yellow: #ffe234;
+            --red: #ff4d4d;
+            --gold: #ffd700;
+            --xp: #44ff88;
+            --text: rgba(220, 245, 255, 1);
+            --dim: rgba(160, 210, 235, 0.55);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .orbitron { font-family: 'Orbitron', sans-serif; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; }
+
+        /* Layers */
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
+        #ocean-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; background: radial-gradient(ellipse 80% 60% at 30% 40%, #021b40 0%, #030d1e 55%, #010810 100%); overflow: hidden; }
+        #hud { position: fixed; top: 0; left: 0; width: 100%; height: 60px; z-index: 200; background: rgba(2, 10, 25, 0.85); backdrop-filter: blur(8px); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transition: opacity 0.5s; }
+        .screen { position: relative; z-index: 10; min-height: 100vh; padding-top: 80px; padding-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Modals */
+        .modal { position: fixed; inset: 0; background: rgba(0, 5, 15, 0.85); backdrop-filter: blur(4px); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .mbox { background: #04122e; border: 2px solid var(--cyan); border-radius: 26px; width: 90%; max-width: 520px; max-height: 88vh; overflow-y: auto; position: relative; padding: 25px; transform: scale(0.93) translateY(18px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 40px rgba(0, 240, 224, 0.15); }
+        .modal.active .mbox { transform: scale(1) translateY(0); }
+        .mclose { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); color: white; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); z-index: 10; }
+        .mclose:hover { background: var(--red); border-color: var(--red); }
+
+        /* Overlays */
+        #lvl-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9997; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+        .lvl-card { text-align: center; background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%); padding: 40px; border-radius: 20px; transform: scale(0.8); transition: transform 0.4s; }
+        #lvl-overlay.show { opacity: 1; pointer-events: all; }
+        #lvl-overlay.show .lvl-card { transform: scale(1); }
+        #lvl-text { font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); font-family: 'Orbitron'; margin-bottom: 10px; }
+        #lvl-sub { font-size: 1.4rem; font-weight: 800; color: white; }
+
+        #badge-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px); z-index: 9998; background: var(--card-bg); border: 2px solid var(--cyan); border-radius: 50px; padding: 12px 24px; font-weight: 800; font-size: 1.1rem; box-shadow: 0 0 20px rgba(0,240,224,0.3); display: flex; align-items: center; gap: 10px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #badge-toast.show { transform: translateX(-50%) translateY(0); }
+        
+        .xp-pop { position: fixed; font-family: 'Orbitron'; font-size: 1.3rem; color: var(--xp); text-shadow: 0 0 10px var(--xp); z-index: 9999; pointer-events: none; animation: xpfly 1.4s ease-out forwards; }
+
+        /* Utils & Animations */
+        .hidden { display: none !important; }
+        @keyframes rise { 0% { transform: translateY(100vh) translateX(0); opacity: 0; } 10% { opacity: 0.6; } 90% { opacity: 0.6; } 100% { transform: translateY(-10vh) translateX(calc(var(--drift) * 1px)); opacity: 0; } }
+        @keyframes blink { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1.3); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes popin { 0% { transform: scale(0) rotate(-180deg); } 100% { transform: scale(1) rotate(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px var(--gold); border-color: var(--gold); } 50% { box-shadow: 0 0 25px var(--gold); border-color: #fff; } }
+        @keyframes xpfly { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-75px) scale(1.4); opacity: 0; } }
+        
+        .bubble { position: absolute; border-radius: 50%; background: rgba(0, 240, 224, 0.15); border: 1px solid rgba(0, 240, 224, 0.3); animation: rise linear infinite; }
+        .gldot { position: absolute; border-radius: 50%; animation: blink ease-in-out infinite; box-shadow: 0 0 8px currentColor; }
+
+        /* HUD Components */
+        .hud-left, .hud-right, .hud-center { display: flex; align-items: center; gap: 15px; }
+        .hud-logo { font-size: 1.2rem; color: var(--cyan); text-shadow: 0 0 8px var(--cyan); letter-spacing: 1px; }
+        .hud-profile { display: flex; align-items: center; gap: 8px; font-weight: 900; }
+        .hud-lvl { background: var(--cyan); color: #000; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .hud-xp-box { display: flex; flex-direction: column; width: 120px; font-size: 0.7rem; color: var(--dim); }
+        .hud-bar-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 2px; }
+        .hud-bar-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.9s ease-out; }
+        .hud-score { color: var(--gold); font-size: 1.1rem; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
+        .hud-health-box { width: 140px; display: flex; flex-direction: column; font-size: 0.7rem; color: var(--dim); font-weight: bold; }
+        .hud-health-fill { height: 100%; background: linear-gradient(90deg, var(--red) 0%, orange 50%, var(--green) 100%); width: 0%; transition: width 1s; }
+
+        /* Setup Screen */
+        .welcome-title { font-size: clamp(2.5rem, 8vw, 5rem); text-align: center; background: linear-gradient(90deg, var(--cyan), #4cc9f0, var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(0,240,224,0.4)); margin: 10px 0; }
+        .welcome-sub { font-size: 1.2rem; color: var(--dim); margin-bottom: 40px; text-align: center; }
+        .giant-emoji { font-size: 5rem; animation: float 4s ease-in-out infinite; }
+        .setup-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 30px; width: 90%; max-width: 430px; display: flex; flex-direction: column; gap: 20px; }
+        .input-lbl { font-size: 0.8rem; color: var(--cyan); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        #player-name { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px; border-radius: 10px; font-family: 'Nunito'; font-size: 1rem; font-weight: 700; outline: none; transition: border-color 0.3s, box-shadow 0.3s; }
+        #player-name:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,240,224,0.3); }
+        .avatar-grid { display: flex; justify-content: space-between; gap: 10px; }
+        .av-btn { font-size: 1.8rem; width: 54px; height: 54px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 2px solid transparent; transition: all 0.2s; }
+        .av-btn:hover { background: rgba(255,255,255,0.1); }
+        .av-btn.sel { border-color: var(--cyan); background: rgba(0,240,224,0.15); box-shadow: 0 0 15px rgba(0,240,224,0.4); }
+        .btn-primary { background: linear-gradient(135deg, var(--cyan), var(--cyan2)); color: #000; font-size: 1.2rem; padding: 15px; border-radius: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,240,224,0.4); }
+
+        /* Map Screen */
+        .map-title { font-size: 2.2rem; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); margin-bottom: 5px; }
+        .big-health { width: 100%; max-width: 500px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .big-health-bar { flex-grow: 1; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; }
+        .zones-list { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 550px; }
+        .zone-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; display: flex; align-items: center; cursor: pointer; transition: transform 0.3s, border-color 0.3s; position: relative; overflow: hidden; }
+        .zone-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--zc); }
+        .zone-card:hover { transform: translateX(5px); border-color: var(--zc); }
+        .zone-card.locked { opacity: 0.48; pointer-events: none; }
+        .zone-card.done { border-color: var(--green); }
+        .zc-emoji { font-size: 2.5rem; margin-right: 20px; }
+        .zc-info { flex-grow: 1; }
+        .zc-name { font-size: 1.3rem; color: white; text-shadow: 0 0 5px var(--zc); }
+        .zc-depth { font-size: 0.8rem; color: var(--dim); margin-top: 2px; }
+        .zc-status { text-align: right; }
+        .stars { color: rgba(255,255,255,0.2); font-size: 1.2rem; letter-spacing: 2px; }
+        .stars .gold { color: var(--gold); text-shadow: 0 0 5px var(--gold); }
+        .tag-complete { background: rgba(57,255,20,0.15); color: var(--green); font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; font-weight: bold; border: 1px solid var(--green); position: absolute; top: 10px; right: 10px; }
+
+        /* Zone Hub Screen */
+        .ghost-btn { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); padding: 8px 16px; border-radius: 8px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
+        .ghost-btn:hover { background: rgba(0,240,224,0.1); }
+        .zone-hdr { background: var(--card-bg); border: 1px solid var(--zc); box-shadow: 0 0 20px rgba(var(--zc-rgb), 0.2); border-radius: 20px; padding: 30px; text-align: center; width: 90%; max-width: 600px; margin-top: 30px; margin-bottom: 25px; }
+        .zh-emoji { font-size: 3rem; margin-bottom: 10px; }
+        .zh-name { font-size: 1.8rem; color: var(--zc); text-shadow: 0 0 10px var(--zc); margin-bottom: 5px; }
+        .zh-depth { font-size: 0.9rem; color: var(--dim); margin-bottom: 15px; }
+        .act-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 90%; max-width: 700px; margin-bottom: 25px; }
+        @media(max-width: 600px) { .act-grid { grid-template-columns: 1fr; } .ghost-btn.back-btn { position: relative; top: 0; left: 0; margin-bottom: 20px; } }
+        .ghost-btn.back-btn { position: absolute; top: 80px; left: 20px; }
+        .act-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+        .act-card:hover { background: rgba(255,255,255,0.05); transform: translateY(-3px); border-color: rgba(255,255,255,0.3); }
+        .act-card.done { border-color: var(--green); background: rgba(57,255,20,0.05); }
+        .ac-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .ac-name { font-size: 1.1rem; font-weight: 900; color: white; margin-bottom: 5px; }
+        .ac-sub { font-size: 0.8rem; color: var(--dim); margin-bottom: 10px; }
+        .ac-xp { font-size: 0.85rem; color: var(--xp); font-weight: bold; background: rgba(68,255,136,0.1); padding: 3px 8px; border-radius: 10px; display: inline-block; }
+        .ac-badge { position: absolute; top: -10px; right: -10px; width: 26px; height: 26px; background: var(--green); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #000; }
+        .zone-msg { font-size: 1rem; color: var(--dim); font-weight: bold; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
+
+        /* Generic Modals */
+        .m-header { text-align: center; margin-bottom: 20px; }
+        .m-title { font-size: 1.4rem; color: white; margin-bottom: 5px; }
+        .pill { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid; }
+        .pill.cyan { border-color: var(--cyan); color: var(--cyan); background: rgba(0,240,224,0.1); }
+        .pill.purple { border-color: var(--purple); color: var(--purple); background: rgba(201,111,255,0.1); }
+        .pill.red { border-color: var(--red); color: var(--red); background: rgba(255,77,77,0.1); }
+        
+        /* Discover Modal */
+        .sp-count { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+        .sp-emoji { font-size: 4.8rem; margin: 15px 0; animation: popin 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .sp-roles { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .fact-box { border-left: 4px solid var(--cyan); background: rgba(0,0,0,0.4); padding: 15px; border-radius: 0 10px 10px 0; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; }
+        .quiz-box { background: rgba(0,240,224,0.05); border-radius: 15px; padding: 15px; border: 1px solid rgba(0,240,224,0.2); }
+        .qb-lbl { font-size: 0.75rem; color: var(--gold); font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .qb-q { font-weight: 800; font-size: 1rem; margin-bottom: 15px; }
+        .q-btn { width: 100%; text-align: left; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; font-weight: 700; transition: all 0.2s; }
+        .q-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+        .q-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .q-btn.right { background: rgba(57,255,20,0.2) !important; border-color: var(--green) !important; color: var(--green); }
+        .q-btn.wrong { background: rgba(255,77,77,0.2) !important; border-color: var(--red) !important; color: var(--red); animation: shake 0.4s; }
+        .btn-next { width: 100%; background: var(--cyan); color: #000; padding: 12px; border-radius: 10px; font-weight: 900; font-family: 'Orbitron'; margin-top: 15px; display: none; }
+
+        /* Food Web Modal */
+        .fw-hint { background: rgba(201,111,255,0.1); border: 1px solid rgba(201,111,255,0.3); color: #eebbff; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.85rem; margin-bottom: 15px; }
+        .fw-stage { height: 320px; background: rgba(0,0,0,0.3); border-radius: 15px; position: relative; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .fw-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .fw-node { position: absolute; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; }
+        .fw-circle { width: 64px; height: 64px; border-radius: 50%; background: #0a1930; border: 2px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: all 0.2s; }
+        .fw-node:hover .fw-circle { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0,240,224,0.5); }
+        .fw-node.sel .fw-circle { border-color: var(--gold); animation: pulse-glow 1.5s infinite; }
+        .fw-node.correct .fw-circle { border-color: var(--green); box-shadow: 0 0 15px rgba(57,255,20,0.4); }
+        .fw-label { font-size: 0.65rem; text-align: center; margin-top: 4px; font-weight: 800; line-height: 1.1; background: rgba(0,0,0,0.7); padding: 2px 4px; border-radius: 4px; }
+        .fw-status { text-align: center; font-size: 0.9rem; font-weight: bold; min-height: 24px; margin-bottom: 10px; }
+        .fw-actions { display: flex; justify-content: space-between; }
+        .fw-btn { background: transparent; color: var(--dim); border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
+        .fw-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        /* Crisis Modal */
+        .cr-story { font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.85); margin-bottom: 15px; }
+        .cr-conseq { border-left: 4px solid orange; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 0 10px 10px 0; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.5; }
+        .cr-q { color: var(--cyan); font-weight: 900; margin-bottom: 15px; font-size: 1.05rem; }
+        .cr-feedback { margin-top: 15px; padding: 15px; border-radius: 10px; font-size: 0.9rem; line-height: 1.4; display: none; }
+        .cr-feedback.good { display: block; background: rgba(57,255,20,0.1); border: 1px solid var(--green); }
+        .cr-feedback.bad { display: block; background: rgba(255,77,77,0.1); border: 1px solid var(--red); }
+        .cr-fb-title { font-weight: 900; margin-bottom: 5px; font-size: 1rem; }
+        .cr-fb-xp { color: var(--gold); font-family: 'Orbitron'; font-weight: 900; margin-top: 10px; display: block; }
+        .vocab-chip { display: inline-block; border: 1px solid var(--cyan); color: var(--cyan); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; margin-top: 10px; background: rgba(0,240,224,0.05); }
+
+        /* Done states for Modals */
+        .done-screen { text-align: center; padding: 20px 0; }
+        .ds-icon { font-size: 5rem; margin-bottom: 15px; color: var(--green); }
+        .ds-title { font-size: 1.8rem; color: var(--green); margin-bottom: 10px; }
+        .ds-text { font-size: 1rem; color: var(--dim); margin-bottom: 25px; }
+
+        /* Master Food Web */
+        .btn-master { background: linear-gradient(135deg, var(--purple), #ff007f); color: white; border-radius: 12px; font-weight: 900; font-family: 'Orbitron'; padding: 12px 20px; margin-top: 10px; width: 100%; max-width: 500px; font-size: 1.1rem; box-shadow: 0 0 15px rgba(201, 111, 255, 0.4); border: 1px solid rgba(255,255,255,0.2); }
+        .mfw-stage { background: #010810; border-radius: 15px; width: 100%; height: 1600px; position: relative; overflow: hidden; margin-top: 15px; border: 1px solid var(--purple); }
+        .mfw-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .mfw-zone-label { position: absolute; left: 10px; font-family: 'Orbitron'; font-size: 1.2rem; opacity: 0.3; z-index: 1; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* AI Chat Side Panel */
+        .chat-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 360px;
+            max-width: 90vw;
+            height: 100vh;
+            background: rgba(4, 18, 44, 0.98);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid var(--cyan);
+            z-index: 9000; /* Stays above all standard 500 z-index modals */
+            display: flex;
+            flex-direction: column;
+            transition: right 0.35s cubic-bezier(0.175, 0.885, 0.32, 1);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            padding-top: 25px;
+        }
+        .chat-panel.open { right: 0; }
+        .chat-panel-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+            z-index: 10;
+        }
+        .chat-panel-close:hover { background: var(--red); border-color: var(--red); }
+
+        .fab-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), #ff007f);
+            color: white;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(201, 111, 255, 0.5);
+            cursor: pointer;
+            z-index: 9001; /* Stays above the chat panel if overlapping */
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+            border: 2px solid rgba(255,255,255,0.2);
+            opacity: 0; pointer-events: none;
+        }
+        .fab-chat.show { opacity: 1; pointer-events: all; }
+        .fab-chat:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 8px 25px rgba(201, 111, 255, 0.8); }
+        .fab-tooltip {
+            position: absolute; right: 85px; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.9); padding: 8px 12px; border-radius: 8px;
+            font-size: 0.9rem; font-family: 'Nunito', sans-serif;
+            white-space: nowrap; pointer-events: none;
+            border: 1px solid var(--purple); color: white;
+            opacity: 0; transition: opacity 0.2s; font-weight: 800;
+        }
+        .fab-chat:hover .fab-tooltip { opacity: 1; }
+
+        .cmsg { padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; max-width: 90%; line-height: 1.4; animation: popin 0.3s ease-out; }
+        .cmsg.ai { background: rgba(0, 240, 224, 0.15); border-bottom-left-radius: 2px; align-self: flex-start; border: 1px solid rgba(0,240,224,0.3); color: white; }
+        .cmsg.user { background: rgba(57, 255, 20, 0.15); border-bottom-right-radius: 2px; align-self: flex-end; border: 1px solid rgba(57,255,20,0.3); color: var(--green); }
+        .typing { font-style: italic; color: var(--dim); font-size: 0.85rem; align-self: flex-start; margin-left: 10px; }
+        .chat-input-wrapper { display: flex; gap: 10px; margin-top: 10px; flex-shrink: 0; }
+        .chat-input { flex-grow: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--cyan); background: rgba(0,0,0,0.6); color: white; font-family: 'Nunito'; font-size: 1rem; outline: none; width: 100%; }
+        .chat-input:focus { box-shadow: 0 0 10px rgba(0,240,224,0.3); }
+        .chat-send-btn { padding: 10px 16px; font-size: 1rem; border-radius: 10px; background: linear-gradient(135deg, var(--cyan), var(--cyan2)); color: black; font-weight: 900; font-family: 'Orbitron'; cursor: pointer; transition: transform 0.2s; }
+        .chat-send-btn:hover { transform: translateY(-2px); }
+        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .chat-mic-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--cyan); color: white; border-radius: 10px; width: 44px; flex-shrink: 0; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .chat-mic-btn:hover { background: rgba(0,240,224,0.1); }
+        .chat-mic-btn.listening { background: rgba(255,77,77,0.2); border-color: var(--red); animation: pulse-glow-red 1.5s infinite; }
+        @keyframes pulse-glow-red { 0%, 100% { box-shadow: 0 0 5px var(--red); border-color: var(--red); } 50% { box-shadow: 0 0 15px var(--red); border-color: #fff; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+    <div id="ocean-bg" aria-hidden="true"></div>
+
+    <header id="hud" class="hidden">
+        <div class="hud-left">
+            <div class="hud-logo orbitron">OCEAN QUEST</div>
+            <div class="hud-profile">
+                <span id="hud-av"></span>
+                <span id="hud-name"></span>
+                <span id="hud-lvl">LVL 1</span>
+            </div>
+        </div>
+        <div class="hud-center">
+            <div class="hud-xp-box">
+                <span id="hud-xp-lbl">0 / 100 XP</span>
+                <div class="hud-bar-bg"><div id="hud-xp-fill" class="hud-bar-fill"></div></div>
+            </div>
+            <div class="hud-score orbitron" id="hud-score">0 pts</div>
+            <div title="Badges Earned">🏆 <span id="hud-badges">0</span></div>
+        </div>
+        <div class="hud-right">
+            <div class="hud-health-box">
+                <span>OCEAN HEALTH: <span id="hud-health-pct">0%</span></span>
+                <div class="hud-bar-bg"><div id="hud-health-fill" class="hud-health-fill"></div></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="lvl-overlay">
+        <div class="lvl-card">
+            <div id="lvl-text">LEVEL UP!</div>
+            <div id="lvl-sub">You reached Level 2!</div>
+        </div>
+    </div>
+
+    <div id="badge-toast">🏆 <span id="bt-msg">Badge Earned!</span></div>
+
+    <!-- Floating Global Chat Button -->
+    <button id="global-chat-btn" class="fab-chat" onclick="toggleChat()">
+        👩‍🔬
+        <div class="fab-tooltip">Ask Dr. Mariana ✨</div>
+    </button>
+
+    <!-- Screen 1: Welcome -->
+    <div id="screen-welcome" class="screen">
+        <div class="giant-emoji">🐙</div>
+        <h1 class="welcome-title orbitron">OCEAN QUEST</h1>
+        <div class="welcome-sub">Explore the Deep • Discover Life • Save the Seas!</div>
+        <div class="setup-box">
+            <div>
+                <div class="input-lbl mb-2">YOUR EXPLORER NAME</div>
+                <input type="text" id="player-name" placeholder="e.g. Captain Finley..." maxlength="22" style="width:100%;">
+            </div>
+            <div>
+                <div class="input-lbl mb-2" style="margin-bottom:8px;">CHOOSE YOUR AVATAR</div>
+                <div class="avatar-grid" id="av-grid">
+                    <button class="av-btn sel" onclick="pickAv(this, '🤿')">🤿</button>
+                    <button class="av-btn" onclick="pickAv(this, '🧜‍♀️')">🧜‍♀️</button>
+                    <button class="av-btn" onclick="pickAv(this, '🧜‍♂️')">🧜‍♂️</button>
+                    <button class="av-btn" onclick="pickAv(this, '🐧')">🐧</button>
+                    <button class="av-btn" onclick="pickAv(this, '🐢')">🐢</button>
+                </div>
+            </div>
+            <button class="btn-primary orbitron" onclick="startGame()">DIVE IN!</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Map -->
+    <div id="screen-map" class="screen hidden">
+        <h2 class="map-title orbitron">OCEAN DEPTH MAP</h2>
+        <div style="color:var(--dim); margin-bottom: 20px; text-align:center;">Complete each zone to unlock the next. Every action saves the ocean!</div>
+        <div class="big-health">
+            <div style="font-weight:900; font-size:0.9rem;">OCEAN HEALTH</div>
+            <div class="big-health-bar"><div id="map-health-fill" class="hud-health-fill"></div></div>
+            <div style="font-weight:900;" id="map-health-pct">0%</div>
+        </div>
+        <button class="btn-master" onclick="openMasterWeb()">🌐 VIEW MASTER FOOD WEB</button>
+        <div id="zones-list" class="zones-list" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Screen 3: Zone Hub -->
+    <div id="screen-zone" class="screen hidden">
+        <button class="ghost-btn back-btn" onclick="showScreen('map')">← Back to Map</button>
+        <div id="zone-hdr-div" class="zone-hdr"></div>
+        <div id="act-grid" class="act-grid"></div>
+        <div id="zone-msg" class="zone-msg"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="m-disc" class="modal">
+        <div class="mbox">
+            <button class="mclose" onclick="closeModal('m-disc')">X</button>
+            <div id="disc-content"></div>
+        </div>
+    </div>
+
+    <div id="m-fw" class="modal">
+        <div class="mbox" style="max-width:600px;">
+            <button class="mclose" onclick="closeModal('m-fw')">X</button>
+            <div id="fw-content"></div>
+        </div>
+    </div>
+
+    <div id="m-cr" class="modal">
+        <div class="mbox">
+            <button class="mclose" onclick="closeModal('m-cr')">X</button>
+            <div id="cr-content"></div>
+        </div>
+    </div>
+
+    <!-- Master Web Modal -->
+    <div id="m-master" class="modal">
+        <div class="mbox" style="max-width: 800px; width: 95%;">
+            <button class="mclose" onclick="closeModal('m-master')">X</button>
+            <div class="m-header" style="margin-bottom:10px;">
+                <div class="m-title orbitron" style="color:var(--purple);">GLOBAL OCEAN FOOD WEB</div>
+                <div style="color:var(--dim); font-size:0.85rem;">Connect species across the entire ocean!</div>
+            </div>
+            <div class="fw-status" id="mfw-status" style="color:var(--text); margin-bottom:10px; font-size:1.1rem; text-align:center;">Select starting prey...</div>
+            <div class="mfw-stage" id="mfw-stage">
+                <svg class="mfw-svg" id="mfw-svg"></svg>
+                <div id="mfw-nodes-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Side Panel -->
+    <div id="chat-panel" class="chat-panel">
+        <button class="chat-panel-close" onclick="toggleChat()">X</button>
+        <div class="m-header" style="margin-bottom:10px; margin-top: 10px; text-align: left;">
+            <div class="m-title orbitron" style="color:var(--cyan2); font-size: 1.1rem;">ASK A BIOLOGIST ✨</div>
+            <div style="color:var(--dim); font-size:0.85rem;" id="chat-subtitle">Ask me anything!</div>
+        </div>
+        <div id="chat-log" style="flex-grow: 1; overflow-y: auto; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px;">
+            <!-- Messages go here -->
+        </div>
+        <div class="chat-input-wrapper">
+            <button id="chat-mic-btn" class="chat-mic-btn" onclick="toggleVoice()" title="Use Microphone">🎤</button>
+            <input type="text" id="chat-input" class="chat-input" placeholder="Type here..." onkeypress="if(event.key==='Enter') sendChat()">
+            <button id="chat-send-btn" class="chat-send-btn" onclick="sendChat()">SEND</button>
+        </div>
+    </div>
+
+<script>
+/* ==========================================================================
+   DATA
+========================================================================== */
+const ZONES_DATA = [
+    {
+        id: 'intertidal', name: 'Intertidal Zone', alt: 'Shoreline', depth: 'Tide Line', color: '#f4a261', emoji: '🏖️',
+        species: [
+            { name: 'Sea Lettuce', emoji: '🌿', role: 'Producer', level: 1, fact: "This bright green algae survives baking in the sun at low tide and crashing waves at high tide.", q: "How do seaweeds like Sea Lettuce stay anchored in crashing waves?", opts: ["Using strong root systems called holdfasts", "By burying themselves deep in the sand", "They glue themselves with sticky sap"], ans: 0 },
+            { name: 'Acorn Barnacle', emoji: '🗻', role: 'Filter Feeder', level: 2, fact: "Barnacles spend their entire adult lives glued to one rock, kicking food into their mouths with feathery legs.", q: "What happens to barnacles when the tide goes out?", opts: ["They close their shells tightly to trap moisture", "They detach and crawl to the water", "They dry out and die"], ans: 0 },
+            { name: 'Ochre Sea Star', emoji: '⭐', role: 'Keystone Predator', level: 3, fact: "Sea stars can pry open a mussel shell, eject their own stomach inside out, and digest the prey outside their body!", q: "If a sea star loses an arm, what happens?", opts: ["It can regrow (regenerate) the missing arm over time", "It swims in circles forever", "It immediately dies"], ans: 0 },
+            { name: 'Shore Crab', emoji: '🦀', role: 'Scavenger', level: 2, fact: "Shore crabs hide under rocks and eat almost anything—dead fish, algae, or tiny snails.", q: "Why do shore crabs molt (shed shells)?", opts: ["To grow bigger, because their hard shell cannot stretch", "To change colors for the seasons", "To swim faster in the open ocean"], ans: 0 },
+            { name: 'Seagull', emoji: '🪶', role: 'Aerial Predator', level: 4, fact: "Seagulls can drink saltwater! They have special glands above their eyes that filter out the salt.", q: "How do seagulls eat hard-shelled prey like crabs or clams?", opts: ["By flying high and dropping them on rocks to smash them", "By swallowing them whole and digesting the shell", "By waiting for the crab to molt"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:15, y:70}, {x:40, y:80}, {x:75, y:80}, {x:40, y:40}, {x:75, y:20} ],
+            conns: [ [0,1], [1,2], [0,3], [3,4] ] 
+        },
+        crisis: {
+            title: 'Coastal Runoff', badge: 'Shoreline Savior', badgemoji: '🛡️', vocab: 'EUTROPHICATION',
+            story: "Heavy rains washed agricultural fertilizers from coastal farms straight into the bay. The sudden flood of nutrients is causing an explosive, unnatural algae bloom.",
+            concept: "EUTROPHICATION: Excess nutrients cause algae to grow out of control. When the algae dies and decomposes, the process consumes all the oxygen in the water, suffocating fish.",
+            questions: [
+                {
+                    q: "What is the FIRST thing that happens during a eutrophication event?",
+                    opts: ["Algae populations explode rapidly (an algal bloom)", "All the fish immediately die of poisoning", "The water temperature drops below freezing"], ans: 0,
+                    fbBad: ["", "The fertilizer isn't directly poisonous to fish.", "Fertilizers don't freeze water."],
+                    fbGood: "CORRECT! The excess nitrogen and phosphorus act like plant steroids, causing an unnatural, massive algae bloom."
+                },
+                {
+                    q: "How does the massive algae bloom actually end up killing marine animals?",
+                    opts: ["Decomposing bacteria eat the dying algae and use up all the dissolved oxygen", "The algae grows so thick it tangles up all the fish", "The algae drinks all the water"], ans: 0,
+                    fbBad: ["", "While thick, physical entanglement isn't the primary killer.", "Algae lives in water, it doesn't consume it."],
+                    fbGood: "CORRECT! The true killer is the lack of oxygen (hypoxia) caused by the billions of bacteria breaking down the dead algae."
+                },
+                {
+                    q: "What natural coastal feature acts as a 'filter' to trap runoff before it hits the ocean?",
+                    opts: ["Wetlands and mangrove forests", "Sandy beaches", "Coral reefs"], ans: 0,
+                    fbBad: ["", "Sand doesn't absorb excess agricultural nutrients effectively.", "Coral reefs are in the ocean and are victims of runoff, not filters."],
+                    fbGood: "CORRECT! The root systems of wetlands and mangroves trap sediment and absorb excess nutrients brilliantly."
+                },
+                {
+                    q: "What is the best long-term solution to prevent coastal eutrophication?",
+                    opts: ["Reduce fertilizer use and restore destroyed coastal wetlands", "Pour bleach into the ocean to kill the algae", "Build a giant concrete wall around the beach"], ans: 0,
+                    fbBad: ["", "Bleach would kill absolutely everything in the ecosystem.", "A wall would destroy the intertidal zone entirely."],
+                    fbGood: "CORRECT! Prevention at the source (farms) combined with natural wetland restoration is the most effective approach."
+                }
+            ]
+        }
+    },
+    {
+        id: 'neritic', name: 'Neritic Zone', alt: 'Coastal Shelf', depth: '0-200m', color: '#2a9d8f', emoji: '🦦',
+        species: [
+            { name: 'Giant Kelp', emoji: '🎋', role: 'Producer', level: 1, fact: "Giant kelp can grow up to 2 feet in a single day! It forms underwater forests that shelter thousands of species.", q: "How does Giant Kelp reach the sunlight from the seafloor?", opts: ["Gas-filled bladders lift the fronds toward the surface", "It swims upward using microscopic fins", "It only grows in water 1 foot deep"], ans: 0 },
+            { name: 'Purple Sea Urchin', emoji: '🦔', role: 'Primary Consumer', level: 2, fact: "Urchins use five calcium-carbonate teeth to chew through the tough stalks (holdfasts) of kelp.", q: "What happens when too many sea urchins live in a kelp forest?", opts: ["They chew through the holdfasts, destroying the entire kelp forest", "They protect the kelp from other predators", "They turn into kelp themselves"], ans: 0 },
+            { name: 'Sea Otter', emoji: '🦦', role: 'Keystone Predator', level: 3, fact: "Sea otters don't have blubber! They rely on the thickest fur in the animal kingdom (1 million hairs per square inch) to stay warm.", q: "How do sea otters eat spiky sea urchins?", opts: ["They use rocks as tools to smash them open on their bellies", "They swallow them whole", "They dissolve them with acid spit"], ans: 0 },
+            { name: 'Coastal Phyto', emoji: '🦠', role: 'Producer', level: 1, fact: "Coastal waters are murky green because they are packed with billions of phytoplankton thriving on nutrients washed from the land.", q: "Why are coastal waters greener than the open ocean?", opts: ["Higher concentrations of phytoplankton", "Reflection from the green grass on the shore", "Pollution from green paint factories"], ans: 0 },
+            { name: 'Anchovy', emoji: '🐟', role: 'Planktivore', level: 2, fact: "Anchovies swim with their mouths wide open, filtering out tiny plankton from the water as they school in the millions.", q: "Why do anchovies swim in massive, synchronized schools?", opts: ["To confuse predators and make it hard to target a single fish", "To keep each other warm", "To communicate via telepathy"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:15, y:80}, {x:40, y:60}, {x:75, y:40}, {x:15, y:20}, {x:40, y:20} ],
+            conns: [ [0,1], [1,2], [3,4], [4,2] ] 
+        },
+        crisis: {
+            title: 'Keystone Collapse', badge: 'Kelp Guardian', badgemoji: '🛡️', vocab: 'KEYSTONE SPECIES',
+            story: "Sea otters were historically hunted for their incredibly dense fur. With the otters gone, the coastal ecosystem is throwing itself out of balance.",
+            concept: "KEYSTONE SPECIES: A species on which other species in an ecosystem largely depend. If it is removed, the ecosystem changes drastically.",
+            questions: [
+                {
+                    q: "With sea otters removed, what happens to the purple sea urchins?",
+                    opts: ["Their population explodes because they have no natural predators", "They starve and die off completely", "They migrate to the deep abyss"], ans: 0,
+                    fbBad: ["", "They have plenty of kelp to eat, so they won't starve yet.", "Urchins cannot survive the pressure of the abyss."],
+                    fbGood: "CORRECT! Without otters keeping them in check, the urchin population multiplies uncontrollably."
+                },
+                {
+                    q: "What does this massive population of urchins do to the Giant Kelp?",
+                    opts: ["They eat the kelp holdfasts, creating barren underwater deserts", "They help the kelp grow faster by fertilizing it", "They protect the kelp from fish"], ans: 0,
+                    fbBad: ["", "Excessive grazing destroys the kelp faster than it can grow.", "Urchins are the main threat to the kelp here."],
+                    fbGood: "CORRECT! This creates an 'Urchin Barren'—a lifeless rocky seafloor stripped of all kelp."
+                },
+                {
+                    q: "What makes the Sea Otter a 'Keystone Species'?",
+                    opts: ["Its presence holds the entire structure of the ecosystem together", "It is made literally out of stone", "It is the largest animal in the ocean"], ans: 0,
+                    fbBad: ["", "Keystone is an architectural metaphor.", "Blue whales are the largest."],
+                    fbGood: "CORRECT! Just like the keystone in an arch, removing the otter causes the whole kelp ecosystem to collapse."
+                },
+                {
+                    q: "How can scientists best restore the kelp forest?",
+                    opts: ["Reintroduce sea otters and actively cull excess urchins", "Plant plastic kelp", "Introduce great white sharks to eat the urchins"], ans: 0,
+                    fbBad: ["", "Plastic kelp doesn't provide food or cycle nutrients.", "Sharks don't eat urchins."],
+                    fbGood: "CORRECT! Bringing back the keystone predator is the most natural way to restore the balance."
+                }
+            ]
+        }
+    },
+    {
+        id: 'sunlight', name: 'Sunlight Zone', alt: 'Epipelagic', depth: 'Open 0-200m', color: '#00b4d8', emoji: '🌊',
+        species: [
+            { name: 'Phytoplankton', emoji: '🦠', role: 'Producer', level: 1, fact: "Phytoplankton produce over 50% of Earth's oxygen—more than all rainforests combined!", q: "Phytoplankton make food using sunlight. What is this process called?", opts: ["Photosynthesis", "Chemosynthesis", "Bioluminescence"], ans: 0 },
+            { name: 'Zooplankton', emoji: '🦐', role: 'Primary Consumer', level: 2, fact: "Zooplankton make the biggest daily animal migration on Earth!", q: "Why do zooplankton sink back to the dark every morning?", opts: ["To hide from predators in the darkness", "They need to sleep", "They follow warmer water"], ans: 0 },
+            { name: 'Bluefin Tuna', emoji: '🐟', role: 'Secondary Consumer', level: 3, fact: "Bluefin Tuna can swim at 45 mph—as fast as a car on a highway!", q: "The correct energy flow in the sunlit food chain is:", opts: ["Sun → Phytoplankton → Zooplankton → Tuna", "Tuna → Zooplankton → Phytoplankton → Sun", "Zooplankton → Phytoplankton → Tuna"], ans: 0 },
+            { name: 'Great White Shark', emoji: '🦈', role: 'Apex Predator', level: 4, fact: "Sharks keep oceans healthy by hunting weak and sick animals.", q: "An 'apex predator' like a shark means:", opts: ["Nothing naturally hunts it in the wild", "It only eats plants", "It lives at the deepest part of the ocean"], ans: 0 },
+            { name: 'Jellyfish', emoji: '🪼', role: 'Primary Consumer', level: 2, fact: "Jellyfish are 95% water and have no brain, blood, or heart!", q: "Since jellyfish lack a brain, how do they survive?", opts: ["A simple nerve net detects stimuli", "They are controlled by the tide", "They rely entirely on symbiotic bacteria"], ans: 0 },
+            { name: 'Sea Turtle', emoji: '🐢', role: 'Secondary Consumer', level: 3, fact: "Leatherback sea turtles are immune to jellyfish stings and eat hundreds of them a day.", q: "Why might a sea turtle accidentally eat a plastic bag?", opts: ["It looks exactly like a swimming jellyfish", "The plastic smells like fish", "They need the salt from the plastic"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:15, y:80}, {x:35, y:60}, {x:65, y:40}, {x:85, y:20}, {x:50, y:80}, {x:80, y:60} ],
+            conns: [ [0,1], [1,2], [2,3], [1,4], [4,5], [5,3] ] 
+        },
+        crisis: {
+            title: 'Microplastic Invasion', badge: 'Sunlight Guardian', badgemoji: '🛡️', vocab: 'BIOACCUMULATION',
+            story: "Millions of plastic bottles and bags are breaking down into 'microplastics' - pieces smaller than a grain of rice. Zooplankton are mistaking these tiny bits for food!",
+            concept: "BIOACCUMULATION: Toxins concentrate up the food chain. Apex predators suffer the most from plastic dropped at the bottom!",
+            questions: [
+                {
+                    q: "What is the BEST scientific response to ocean microplastic pollution?",
+                    opts: ["Remove all fish from the polluted zone", "Reduce single-use plastics AND run ocean cleanup programs", "Release extra zooplankton to dilute the plastic"], ans: 1,
+                    fbBad: ["Removing fish would devastate the food web and the plastic would still remain.", "", "More zooplankton just means more bioaccumulation!"],
+                    fbGood: "YES! Prevention at the source + active cleanup is most effective."
+                },
+                {
+                    q: "How do ingested microplastics primarily harm zooplankton?",
+                    opts: ["They create a false sense of fullness, leading to starvation", "They cause the zooplankton to sink", "They turn them into apex predators"], ans: 0,
+                    fbBad: ["", "Plastics are often buoyant, actually making it harder to sink.", "Eating plastic does not increase trophic level."],
+                    fbGood: "CORRECT! Their tiny stomachs fill with indigestible plastic, leaving no room for actual nutritious food."
+                },
+                {
+                    q: "What role do ocean surface currents play in this plastic crisis?",
+                    opts: ["They break down the plastic completely", "They concentrate plastics into massive 'garbage patches' (gyres)", "They push all plastic safely onto beaches"], ans: 1,
+                    fbBad: ["Plastic takes hundreds of years to break down, currents just move it.", "", "Much of it remains trapped in the open ocean for decades."],
+                    fbGood: "CORRECT! Ocean gyres act like giant whirlpools, trapping millions of tons of plastic in the center of the ocean."
+                },
+                {
+                    q: "If a seabird eats a fish full of microplastics, what happens to the toxins?",
+                    opts: ["The bird magically digests them", "They are harmlessly passed through", "They bioaccumulate into the bird's tissues"], ans: 2,
+                    fbBad: ["Birds cannot digest synthetic plastics.", "The chemical toxins attached to plastics leach out into the body.", ""],
+                    fbGood: "CORRECT! The toxins transfer from the fish to the bird, magnifying the concentration at the top of the food web."
+                }
+            ]
+        }
+    },
+    {
+        id: 'twilight', name: 'Twilight Zone', alt: 'Mesopelagic', depth: '200-1000m', color: '#4361ee', emoji: '🦑',
+        species: [
+            { name: 'Lanternfish', emoji: '🐟', role: 'Vertical Migrator', level: 2, fact: "Lanternfish are the most abundant vertebrate on Earth by weight!", q: "Lanternfish use bioluminescence. This light helps them:", opts: ["Confuse predators looking up from below", "Attract mates like a lighthouse", "Hunt zooplankton in the dark"], ans: 0 },
+            { name: 'Humboldt Squid', emoji: '🦑', role: 'Aggressive Pack Hunter', level: 3, fact: "Humboldt squid hunt in packs of hundreds, flashing red and white color signals.", q: "Humboldt squid flash color signals rapidly. This is used for:", opts: ["Communicating tactics with each other", "Photosynthesis from bioluminescence", "Attracting phytoplankton"], ans: 0 },
+            { name: 'Sperm Whale', emoji: '🐋', role: 'Deep-Diving Apex', level: 4, fact: "Sperm whales dive 3,000 meters deep and hold their breath for 90 minutes!", q: "Sperm whales produce a powerful click. This may:", opts: ["Stun squid prey before catching them", "Call for help from distant whales", "Echo-locate bottom sediments"], ans: 0 },
+            { name: 'Copepod', emoji: '🦐', role: 'Primary Consumer', level: 2, fact: "Copepods have a single red eye and are the 'insects of the sea'.", q: "Why are copepods crucial to the twilight zone?", opts: ["They are the main food source for lanternfish", "They produce light for the whole zone", "They eat giant squids"], ans: 0 },
+            { name: 'Viperfish', emoji: '🐡', role: 'Ambush Predator', level: 3, fact: "Viperfish have teeth so large they don't fit inside their mouth!", q: "Why do deep-sea predators like viperfish have such huge teeth?", opts: ["To ensure prey cannot escape since meals are rare", "To chew through coral reefs", "To filter tiny plankton"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:40, y:60}, {x:65, y:40}, {x:85, y:20}, {x:15, y:80}, {x:30, y:30} ], 
+            conns: [ [3,0], [0,1], [1,2], [3,4], [4,1] ] 
+        },
+        crisis: {
+            title: 'Industrial Deep-Sea Trawling', badge: 'Twilight Defender', badgemoji: '🛡️', vocab: 'CARBON PUMP',
+            story: "Fishing companies are dragging enormous nets through the twilight zone, scooping up billions of lanternfish for fishmeal and pet food.",
+            concept: "BIOLOGICAL CARBON PUMP: Lanternfish eat carbon-rich plankton at the surface, then carry it deep. Without them, CO2 stays in the atmosphere!",
+            questions: [
+                {
+                    q: "How should we protect the twilight zone's biological carbon pump?",
+                    opts: ["Ban all trawling in the mesopelagic zone", "Replace lanternfish with farmed fish", "Pump oxygen via pipes"], ans: 0,
+                    fbBad: ["", "Farmed fish don't vertically migrate to pump carbon.", "Oxygen isn't the issue, physically moving carbon is."],
+                    fbGood: "CORRECT! Lanternfish are worth far more alive as a CARBON PUMP than as fishmeal."
+                },
+                {
+                    q: "Why are lanternfish crucial for other twilight predators?",
+                    opts: ["They provide the only source of heat", "They are the main link bringing surface energy to the deep", "They build reefs for shelter"], ans: 1,
+                    fbBad: ["Lanternfish are cold-blooded.", "", "There are no coral reefs in the open twilight waters."],
+                    fbGood: "CORRECT! They 'commute' to the surface for food, then become food for deep-sea predators when they return."
+                },
+                {
+                    q: "If the biological carbon pump stops, what happens to global climate?",
+                    opts: ["The ocean freezes over", "More CO2 remains in the atmosphere, accelerating warming", "It rains more frequently"], ans: 1,
+                    fbBad: ["Stopping the pump does not freeze the ocean.", "", "Rain patterns might shift, but warming is the direct chemical result."],
+                    fbGood: "CORRECT! The deep ocean safely stores carbon for centuries. Disrupted, that carbon warms the globe."
+                },
+                {
+                    q: "How does noise pollution from giant trawlers affect this zone?",
+                    opts: ["It disrupts the echolocation of diving whales", "It makes lanternfish swim faster", "It causes bioluminescence to burn out"], ans: 0,
+                    fbBad: ["", "Noise causes panic and scatters schools, making them exhausted.", "Bioluminescence is chemical, not affected by sound waves."],
+                    fbGood: "CORRECT! Sperm whales rely entirely on sound to find squid in total darkness. Trawler noise blinds them."
+                }
+            ]
+        }
+    },
+    {
+        id: 'midnight', name: 'Midnight Zone', alt: 'Bathypelagic', depth: '1000-4000m', color: '#9b5de5', emoji: '🌑',
+        species: [
+            { name: 'Marine Snow', emoji: '❄️', role: 'Energy Source', level: 0, fact: "Marine snow is a constant shower of dead plankton and particles drifting down.", q: "Where does marine snow's energy originally come from?", opts: ["Sunlight from upper zones", "Volcanic heat", "Chemical reactions"], ans: 0 },
+            { name: 'Anglerfish', emoji: '🎣', role: 'Ambush Predator', level: 2, fact: "Females use a bioluminescent lure to attract prey in total darkness!", q: "How does the lure work?", opts: ["Like a glowing baited hook", "Scares away predators", "Communicates with others"], ans: 0 },
+            { name: 'Giant Squid', emoji: '👁️', role: 'Elusive Giant', level: 3, fact: "Giant squid have eyes the size of dinner plates!", q: "Why do Giant Squid have massive eyes?", opts: ["To detect faint predator glows", "To see deep-sea coral", "To navigate by moonlight"], ans: 0 },
+            { name: 'Vampire Squid', emoji: '🦑', role: 'Detritivore', level: 2, fact: "It doesn't drink blood! It uses sticky filaments to catch falling marine snow.", q: "What does the Vampire Squid primarily eat?", opts: ["Marine snow (detritus)", "Smaller squid", "Whale blood"], ans: 0 },
+            { name: 'Sleeper Shark', emoji: '🦈', role: 'Apex Scavenger', level: 4, fact: "These sluggish sharks live up to 400 years and scavenge giant squid carcasses.", q: "How does the Sleeper Shark conserve energy?", opts: ["By swimming extremely slowly in the cold water", "By hibernating in the mud", "By photosynthesizing"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:15, y:80}, {x:40, y:60}, {x:65, y:40}, {x:30, y:30}, {x:85, y:20} ], 
+            conns: [ [0,1], [1,2], [0,3], [3,2], [2,4] ] 
+        },
+        crisis: {
+            title: 'Whale Fall Disturbance', badge: 'Midnight Sentinel', badgemoji: '🛡️', vocab: 'ALLOCHTHONOUS',
+            story: "A dead sperm whale sank to the midnight zone. A research sub is accidentally disturbing the carcass before creatures can colonize it.",
+            concept: "ALLOCHTHONOUS ENERGY: Energy from OUTSIDE the zone (the whale) acts like an oasis supporting hundreds of species.",
+            questions: [
+                {
+                    q: "What is the scientifically correct response to a whale fall discovery?",
+                    opts: ["Observe passively from a safe distance", "Remove the carcass to prevent contamination", "Add lights to help animals find it"], ans: 0,
+                    fbBad: ["", "The decomposing whale IS the ecosystem!", "Artificial lights would blind darkness-adapted animals."],
+                    fbGood: "PERFECT! Whale falls are invaluable. They go through distinct stages of ecological succession."
+                },
+                {
+                    q: "What is the FIRST stage of a whale fall ecosystem?",
+                    opts: ["Bone-eating worms taking root", "Mobile scavengers like hagfish stripping soft tissue", "Sulfur-loving bacteria forming mats"], ans: 1,
+                    fbBad: ["Worms can only access the bone once the blubber is gone.", "", "Bacteria mats form much later during the sulfophilic stage."],
+                    fbGood: "CORRECT! Hagfish and sleeper sharks can strip the soft meat off a giant whale in just a few months."
+                },
+                {
+                    q: "How do Osedax (zombie worms) feed on the remaining skeleton?",
+                    opts: ["They use sharp teeth to bite the bone", "They secrete acid to dissolve bone and use symbiotic bacteria", "They smash the bones with heavy tails"], ans: 1,
+                    fbBad: ["Osedax worms completely lack a mouth and teeth!", "", "They are tiny worms, incapable of smashing bone."],
+                    fbGood: "CORRECT! They have root-like structures that melt into the bone, letting bacteria digest the rich lipids inside."
+                },
+                {
+                    q: "Why are whale falls crucial for deep-sea biodiversity?",
+                    opts: ["They act as 'stepping stones' for species to cross the barren ocean floor", "They poison rival predators", "They block volcanic vents"], ans: 0,
+                    fbBad: ["", "They enrich the environment, they don't poison it.", "They are entirely separate from volcanic vents."],
+                    fbGood: "CORRECT! The vast abyss is mostly empty. Whale falls provide waystations for unique species to spread."
+                }
+            ]
+        }
+    },
+    {
+        id: 'benthic', name: 'Deep Benthic Zone', alt: 'Deep Seafloor', depth: 'Ocean Floor', color: '#8338ec', emoji: '🪸',
+        species: [
+            { name: 'Marine Snow', emoji: '❄️', role: 'Energy Source', level: 0, fact: "By the time it hits the bottom, this snow has fallen for weeks and is the main food for seafloor life.", q: "What happens to the marine snow that isn't immediately eaten?", opts: ["It turns into thick mud and sediment on the seafloor", "It floats back to the surface", "It dissolves into fresh water"], ans: 0 },
+            { name: 'Hagfish', emoji: '🪱', role: 'Scavenger', level: 2, fact: "Hagfish produce buckets of suffocating slime in seconds when attacked!", q: "Why do hagfish tie themselves into knots?", opts: ["To gain leverage to tear off chunks of meat from carcasses", "Because they are bored", "To trap smaller fish"], ans: 0 },
+            { name: 'Blobfish', emoji: '🐡', role: 'Ambush Predator', level: 3, fact: "They lack muscle and simply hover just above the seafloor, swallowing whatever drifts into their mouths.", q: "Why does the blobfish look 'blobby' at the surface?", opts: ["It is adapted to high pressure and expands when brought up", "It is made of jelly", "It gets sunburned"], ans: 0 },
+            { name: 'Cold Seep Bacteria', emoji: '🦠', role: 'Chemosynthetic Producer', level: 1, fact: "Unlike hot vents, cold seeps slowly leak methane and hydrogen sulfide from the seafloor over thousands of years.", q: "What do cold seep bacteria use to make food?", opts: ["Methane and sulfide gas", "Sunlight", "Marine snow"], ans: 0 },
+            { name: 'Tube Anemone', emoji: '🪼', role: 'Consumer', level: 2, fact: "These anemones build tubes out of their own mucus and stinging cells to hide in.", q: "How do tube anemones survive in the dark benthic zone?", opts: ["They catch drifting organic matter and cold-seep bacteria", "They rely on photosynthesis", "They eat giant squid"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:15, y:20}, {x:40, y:40}, {x:75, y:60}, {x:15, y:80}, {x:40, y:80} ],
+            conns: [ [0,1], [1,2], [3,4] ] 
+        },
+        crisis: {
+            title: 'Benthic Dead Zone', badge: 'Seafloor Sentinel', badgemoji: '🛡️', vocab: 'HYPOXIA',
+            story: "A massive, dense pocket of water with nearly zero oxygen (a 'dead zone') is settling onto the deep seafloor, suffocating slow-moving benthic animals.",
+            concept: "HYPOXIA: Water completely depleted of oxygen. Unlike pelagic fish that can quickly swim away, benthic organisms are trapped on the seafloor and suffocate.",
+            questions: [
+                {
+                    q: "What is a Benthic Dead Zone (Hypoxia)?",
+                    opts: ["An area of the ocean with zero or critically low dissolved oxygen", "A place where the water temperature is boiling", "A spot where no sunlight reaches"], ans: 0,
+                    fbBad: ["", "Water temperature doesn't strictly define a dead zone.", "The entire deep sea lacks sunlight, but isn't necessarily a dead zone."],
+                    fbGood: "CORRECT! Hypoxia refers specifically to the lack of life-giving oxygen in the water column."
+                },
+                {
+                    q: "Why are benthic (seafloor) animals hit hardest by dead zones?",
+                    opts: ["They move too slowly or are permanently attached to the bottom and cannot escape", "They need the most oxygen in the ocean", "They are allergic to the mud"], ans: 0,
+                    fbBad: ["", "They actually require relatively little oxygen, but zero oxygen is still lethal.", "They evolved to live in the mud."],
+                    fbGood: "CORRECT! Fast pelagic fish can simply swim around the hypoxic pocket. Benthic creatures are trapped."
+                },
+                {
+                    q: "What is the primary human-caused origin of massive deep-water dead zones?",
+                    opts: ["Agricultural fertilizer runoff washing down rivers into the sea", "Dropping metal anchors on the seafloor", "Using submarine sonar too loudly"], ans: 0,
+                    fbBad: ["", "Physical damage is bad, but doesn't remove oxygen from the water.", "Sound waves do not alter oxygen chemistry."],
+                    fbGood: "CORRECT! Nutrient runoff causes surface algal blooms. When those die and sink, bacteria consume all the oxygen at the bottom."
+                },
+                {
+                    q: "What is the most effective way to shrink ocean dead zones?",
+                    opts: ["Implement stricter fertilizer management on upstream farms", "Pump giant oxygen tanks down to the seafloor", "Harvest all the algae by hand"], ans: 0,
+                    fbBad: ["", "The ocean is far too large to mechanically oxygenate.", "It's practically impossible to harvest microscopic algae across millions of square miles."],
+                    fbGood: "CORRECT! Preventing the excessive nutrients from entering the rivers in the first place is the only viable cure."
+                }
+            ]
+        }
+    },
+    {
+        id: 'abyss', name: 'Abyssal Zone', alt: 'Abyssopelagic', depth: '4000-6000m', color: '#480ca8', emoji: '🕳️',
+        species: [
+            { name: 'Sea Cucumber', emoji: '🥒', role: 'Benthic Detritivore', level: 1, fact: "Sea cucumbers breathe through their rear end!", q: "Sea cucumbers are 'detritivores.' What does that mean they eat?", opts: ["Dead organic matter on the seafloor", "Phytoplankton", "Smaller shrimp"], ans: 0 },
+            { name: 'Giant Isopod', emoji: '🪲', role: 'Abyssal Scavenger', level: 2, fact: "Giant isopods can survive WITHOUT EATING for over 5 years!", q: "How long can Giant Isopods survive with no food?", opts: ["Over 5 years", "6 months", "3 weeks"], ans: 0 },
+            { name: 'Snailfish', emoji: '👻', role: 'Ultra-Deep Predator', level: 3, fact: "Snailfish cells produce a chemical called TMAO to survive crushing pressure.", q: "How do they survive 8,000m deep pressure?", opts: ["A chemical (TMAO) protects their cells", "Metal skeleton", "Pressurized gas"], ans: 0 },
+            { name: 'Brittle Star', emoji: '⭐', role: 'Detritivore', level: 1, fact: "They carpet the abyssal plain, sweeping the mud for edible particles.", q: "How do brittle stars find food in the mud?", opts: ["Using sensitive, flexible arms", "By swimming rapidly", "By shooting venom"], ans: 0 },
+            { name: 'Dumbo Octopus', emoji: '🐙', role: 'Benthic Predator', level: 3, fact: "Named for its ear-like fins, it hovers just above the seafloor seeking prey.", q: "How does the Dumbo Octopus move?", opts: ["Flapping its ear-like fins", "Jet propulsion only", "Walking on two legs"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:20, y:75}, {x:50, y:50}, {x:80, y:25}, {x:20, y:30}, {x:50, y:20} ], 
+            conns: [ [0,1], [1,2], [3,1], [3,4], [4,2] ] 
+        },
+        crisis: {
+            title: 'Deep-Sea Mining Alert', badge: 'Abyss Avenger', badgemoji: '🛡️', vocab: 'PRECAUTIONARY PRINCIPLE',
+            story: "Corporations want to mine 'polymetallic nodules' from the abyssal plain. Massive machines would plow through the seafloor, destroying everything.",
+            concept: "PRECAUTIONARY PRINCIPLE: When actions risk severe irreversible harm, the burden of proof lies on showing it's safe - not on proving it's harmful.",
+            questions: [
+                {
+                    q: "What is the most responsible approach to abyssal resource management?",
+                    opts: ["Start mining before regulations are finalized", "Require full ecosystem mapping before any permits are issued", "Mine selectively then replant sea cucumbers"], ans: 1,
+                    fbBad: ["Racing to mine is what conservationists fear most.", "", "Transplanted animals won't survive the abyssal pressure changes."],
+                    fbGood: "EXACTLY! The PRECAUTIONARY PRINCIPLE is international law for the deep sea."
+                },
+                {
+                    q: "What is a major secondary threat from mining machines scraping the bottom?",
+                    opts: ["Massive sediment plumes smothering filter feeders", "The machines catching on fire", "Spilling fresh water into the salt water"], ans: 0,
+                    fbBad: ["", "Fires are impossible 4,000m underwater.", "Freshwater isn't used by these machines."],
+                    fbGood: "CORRECT! The fine mud gets kicked up and can drift for miles, choking delicate animals that filter the water."
+                },
+                {
+                    q: "Why is recovery from disturbance so agonizingly slow in the abyss?",
+                    opts: ["Because the animals are lazy", "Extremely low food and cold temperatures result in very slow growth rates", "Because there is too much sunlight"], ans: 1,
+                    fbBad: ["It's biological adaptation, not laziness.", "", "There is zero sunlight in the abyss."],
+                    fbGood: "CORRECT! Some nodules take millions of years to grow, and abyssal sponges can live for thousands of years."
+                },
+                {
+                    q: "What is a sustainable alternative to destroying the abyss for battery metals?",
+                    opts: ["Mining the moon instead", "Recycling existing electronics and improving battery technology", "Burning more coal"], ans: 1,
+                    fbBad: ["Moon mining is currently economically and technologically unfeasible.", "", "Coal worsens climate change, harming the entire ocean."],
+                    fbGood: "CORRECT! Advancing recycling and using sodium-ion batteries reduces the desperate need for deep-sea cobalt."
+                }
+            ]
+        }
+    },
+    {
+        id: 'hadal', name: 'Hadal Zone & Vents', alt: 'Hydrothermal Vents', depth: '6000m+', color: '#e63946', emoji: '🌋',
+        species: [
+            { name: 'Chemo-Bacteria', emoji: '🦠', role: 'Chemosynthetic Producer', level: 1, fact: "These bacteria convert toxic volcanic chemicals into food energy!", q: "Vent bacteria making food from chemicals is called:", opts: ["Chemosynthesis", "Photosynthesis", "Electrosynthesis"], ans: 0 },
+            { name: 'Giant Tubeworm', emoji: '🪱', role: 'Chemosynthesis Host', level: 2, fact: "Giant tubeworms have NO MOUTH or STOMACH. They host billions of bacteria inside.", q: "How do tubeworms get energy?", opts: ["From symbiotic bacteria living inside them", "Absorbing minerals", "Filtering marine snow"], ans: 0 },
+            { name: 'Yeti Crab', emoji: '🦀', role: 'Vent Farmer', level: 3, fact: "Yeti crabs farm their own bacteria food on their hairy claws!", q: "Where do Yeti Crabs wave their hairy claws to farm bacteria?", opts: ["Near hydrothermal vent flows", "At the surface", "Inside tubeworms"], ans: 0 },
+            { name: 'Vent Mussel', emoji: '🦪', role: 'Primary Consumer', level: 2, fact: "They thrive at the edge of the scalding hot vent water.", q: "How do vent mussels survive the toxic water?", opts: ["Symbiotic bacteria in their gills process the toxins", "They keep their shells permanently closed", "They have a metal shell"], ans: 0 },
+            { name: 'Vent Octopus', emoji: '🐙', role: 'Apex Predator', level: 4, fact: "They lay their eggs near the hot vents to speed up hatching time.", q: "Why use the vent heat for eggs?", opts: ["It cuts incubation time from years down to months", "It cooks the eggs", "It makes the eggs invisible"], ans: 0 }
+        ],
+        fw: { 
+            nodes: [ {x:20, y:75}, {x:50, y:55}, {x:80, y:35}, {x:20, y:30}, {x:50, y:15} ], 
+            conns: [ [0,1], [1,2], [0,3], [3,4], [2,4] ] 
+        },
+        crisis: {
+            title: 'Hydrothermal Vent Shutdown', badge: 'Vent Warden', badgemoji: '🛡️', vocab: 'AUTOCHTHONOUS',
+            story: "An earthquake has blocked a major hydrothermal vent field. The hot, mineral-rich water has stopped flowing. The chemical energy source is gone.",
+            concept: "AUTOCHTHONOUS ENERGY: Energy produced LOCALLY. Without vent flow, the oasis collapses. But this is a naturally occurring event.",
+            questions: [
+                {
+                    q: "When a natural vent shutoff occurs, what should scientists do?",
+                    opts: ["Monitor and document migration", "Drill into the seafloor to reopen it", "Drop food parcels from ships"], ans: 0,
+                    fbBad: ["", "Drilling could trigger toxic gas releases or massive quakes.", "Tubeworms have no digestive system to process surface food!"],
+                    fbGood: "CORRECT! Natural vent shutoffs happen. Scientists document the natural succession without interfering."
+                },
+                {
+                    q: "How do vent species survive sudden vent death as a population?",
+                    opts: ["They quickly evolve to eat marine snow", "They produce mobile larvae that drift on currents to find new vents", "They swim to the surface"], ans: 1,
+                    fbBad: ["Evolution takes millions of years, not days.", "", "Surface pressure changes would kill them instantly."],
+                    fbGood: "CORRECT! Vent animals are adapted to ephemeral environments, sending larvae out to colonize the dark ocean."
+                },
+                {
+                    q: "What replaces the chemosynthetic ecosystem after a vent cools completely?",
+                    opts: ["A vibrant coral reef", "Standard abyssal scavengers and cold-seep organisms slowly take over", "A permanent dead zone"], ans: 1,
+                    fbBad: ["Coral needs sunlight and specific shallow conditions.", "", "The ocean is resilient; abyssal scavengers will utilize any organic remains."],
+                    fbGood: "CORRECT! The remains of the vent community are slowly consumed by wandering deep-sea scavengers."
+                },
+                {
+                    q: "How do active hydrothermal vents influence global ocean chemistry?",
+                    opts: ["They act as chemical factories, filtering seawater and adding essential minerals like iron", "They make the ocean completely toxic", "They boil the entire ocean"], ans: 0,
+                    fbBad: ["", "While localized water is toxic, the vast ocean dilutes it into useful trace minerals.", "The ocean is too vast to be boiled by vents."],
+                    fbGood: "CORRECT! They are crucial for cycling minerals between the Earth's crust and the seawater, supporting life everywhere."
+                }
+            ]
+        }
+    }
+];
+
+const INTER_CONNS = [
+    { z1: 0, s1: 4, z2: 1, s2: 4, c: 'var(--yellow)' }, // Intertidal Seagull -> Neritic Anchovy
+    { z1: 2, s1: 1, z2: 3, s2: 0, c: 'var(--cyan)' },   // Sunlight Zoo -> Twilight Lanternfish
+    { z1: 3, s1: 2, z2: 4, s2: 2, c: 'var(--cyan)' },   // Twilight Sperm Whale -> Midnight Giant Squid
+    { z1: 2, s1: 0, z2: 4, s2: 0, c: 'var(--green)' },  // Sunlight Phyto -> Midnight Marine Snow
+    { z1: 4, s1: 0, z2: 5, s2: 0, c: 'var(--green)' },  // Midnight Snow -> Benthic Snow
+    { z1: 5, s1: 0, z2: 6, s2: 3, c: 'var(--green)' }   // Benthic Snow -> Abyss Brittle Star
+];
+
+const XP_PER_LEVEL = 100;
+
+/* ==========================================================================
+   STATE MANAGEMENT
+========================================================================== */
+let S = {
+    name: '', av: '🤿', level: 1, xp: 0, score: 0,
+    curZone: null, quizDone: false, crDone: false,
+    zp: {},
+    badges: [], bonuses: {}, fwState: null, globalFw: { made: [] }
+};
+
+const initZones = () => {
+    ['intertidal', 'neritic', 'sunlight', 'twilight', 'midnight', 'benthic', 'abyss', 'hadal'].forEach(z => {
+        S.zp[z] = { found: [], fwDone: false, crDone: false, crStep: 0 };
+    });
+    S.globalFw = { made: [] };
+};
+initZones();
+
+function save() {
+    try { localStorage.setItem('oq_v2_2', JSON.stringify(S)); } catch(e) {}
+}
+
+function load() {
+    try {
+        const d = localStorage.getItem('oq_v2_2') || localStorage.getItem('oq_v2_1'); 
+        if (d) { 
+            const parsed = JSON.parse(d);
+            S.name = parsed.name || ''; S.av = parsed.av || '🤿';
+            S.level = parsed.level || 1; S.xp = parsed.xp || 0; S.score = parsed.score || 0;
+            S.globalFw = parsed.globalFw || { made: [] };
+            if(parsed.zp) {
+                for(const k in parsed.zp) { 
+                    if(parsed.zp[k]) {
+                        if (!S.zp[k]) S.zp[k] = { found: [], fwDone: false, crDone: false, crStep: 0 };
+                        S.zp[k] = parsed.zp[k];
+                        if(typeof S.zp[k].crStep === 'undefined') S.zp[k].crStep = S.zp[k].crDone ? 4 : 0;
+                    } 
+                }
+            }
+            if(parsed.badges) S.badges = parsed.badges;
+            if(parsed.bonuses) S.bonuses = parsed.bonuses;
+            return true; 
+        }
+    } catch(e) {}
+    return false;
+}
+
+/* ==========================================================================
+   GEMINI API SYSTEM
+========================================================================== */
+const apiKey = ""; // Set by environment
+
+async function fetchGemini(promptText, zoneName) {
+    const sysPrompt = "You are Dr. Mariana, an enthusiastic and friendly marine biologist. You are talking to a 10-to-13-year-old explorer playing a game called 'Ocean Quest'. They are currently exploring " + zoneName + ". Keep your answers brief (2-3 short sentences maximum), highly educational, easy to understand, and fun. Always use a couple of relevant emojis! Do NOT use markdown formatting.";
+    
+    const payload = {
+        contents: [{ parts: [{ text: `SYSTEM INSTRUCTION: ${sysPrompt}\n\nUSER PROMPT: ${promptText}` }] }]
+    };
+    
+    let key = typeof apiKey !== 'undefined' ? apiKey : '';
+    let isLocal = false;
+
+    if (!key || key.trim() === '') {
+        isLocal = true;
+        key = localStorage.getItem('oq_local_gemini_key');
+        if (!key || key.trim() === '') {
+            key = prompt("Local execution detected! To use the AI Chat, please enter your Gemini API Key:");
+            if (key && key.trim() !== '') {
+                localStorage.setItem('oq_local_gemini_key', key.trim());
+            } else {
+                return "I need a Gemini API Key to chat with you locally! Refresh the page to enter it. 🌊";
+            }
+        }
+    }
+
+    const models = isLocal ? 
+        ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"] : 
+        ["gemini-2.5-flash-preview-09-2025", "gemini-1.5-flash"];
+
+    let lastStatus = null;
+
+    for (const model of models) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key.trim()}`;
+        
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            lastStatus = res.status;
+            
+            if (res.ok) {
+                const data = await res.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) return text;
+                if (data?.promptFeedback?.blockReason) return "My sensors blocked that message! Let's stay focused on marine biology. 🐟";
+                throw new Error('Invalid response structure');
+            }
+            
+            if (res.status === 404) continue; // Try next model fallback
+            
+            if (res.status === 403 || res.status === 400) {
+                if (isLocal) localStorage.removeItem('oq_local_gemini_key');
+                return `API Error ${res.status}: Your API Key is invalid or restricted by region. I've cleared it! Please refresh and try a valid key. 🛑`;
+            }
+            
+            if (res.status === 429) {
+                return "Oops! 📻 Rate limit reached (Error 429). Please wait a minute before trying again! ⏳🌊";
+            }
+            
+        } catch(e) {
+            console.error("Fetch error:", e);
+        }
+    }
+    
+    return `Oops! 📻 My submarine radio couldn't connect (Last Error: ${lastStatus || 'Network'}). Your API key might not support these free models in your region. 🌊🐟`;
+}
+
+/* ==========================================================================
+   VOICE RECOGNITION (Web Speech API)
+========================================================================== */
+let recognition = null;
+let isListening = false;
+
+function initSpeech() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+            isListening = true;
+            const micBtn = document.getElementById('chat-mic-btn');
+            if(micBtn) micBtn.classList.add('listening');
+            document.getElementById('chat-input').placeholder = "Listening...";
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('chat-input').value = transcript;
+            sendChat(); // Automatically send the message
+        };
+
+        recognition.onerror = function(event) {
+            console.error("Speech recognition error:", event.error);
+            stopListening();
+        };
+
+        recognition.onend = function() {
+            stopListening();
+        };
+    } else {
+        const micBtn = document.getElementById('chat-mic-btn');
+        if(micBtn) micBtn.style.display = 'none'; // Hide if unsupported browser
+    }
+}
+
+function stopListening() {
+    isListening = false;
+    const micBtn = document.getElementById('chat-mic-btn');
+    if(micBtn) micBtn.classList.remove('listening');
+    document.getElementById('chat-input').placeholder = "Type here...";
+}
+
+function toggleVoice() {
+    if (!recognition) {
+        alert("Voice recognition is not supported in this browser. Try Chrome or Edge!");
+        return;
+    }
+    if (isListening) {
+        recognition.stop();
+    } else {
+        try {
+            recognition.start();
+        } catch(e) {
+            console.error("Mic start error", e);
+        }
+    }
+}
+
+/* ==========================================================================
+   AUDIO SYSTEM (Web Audio API)
+========================================================================== */
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playAnimalSound(speciesName) {
+    if(!audioCtx) return;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    let t = audioCtx.currentTime;
+    let freq1 = 400, freq2 = 100, type = 'square', dur = 0.3;
+
+    const name = speciesName.toLowerCase();
+    if (name.includes('shark') || name.includes('whale')) {
+        freq1 = 120; freq2 = 40; type = 'sawtooth'; dur = 0.6; // Deep bass crunch
+    } else if (name.includes('bird') || name.includes('seagull') || name.includes('crab')) {
+        freq1 = 800; freq2 = 1200; type = 'triangle'; dur = 0.25; // High snap/peck
+    } else if (name.includes('squid') || name.includes('octopus') || name.includes('jelly') || name.includes('anemone')) {
+        freq1 = 300; freq2 = 600; type = 'sine'; dur = 0.5; // Squishy bloop
+    } else {
+        freq1 = 600; freq2 = 150; type = 'triangle'; dur = 0.4; // Standard chomp
+    }
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq1, t);
+    osc.frequency.exponentialRampToValueAtTime(freq2, t + dur);
+    
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.5, t + 0.05); // Attack
+    gain.gain.exponentialRampToValueAtTime(0.01, t + dur); // Decay
+
+    osc.start(t);
+    osc.stop(t + dur);
+}
+
+/* ==========================================================================
+   BACKGROUND INITIALIZATION
+========================================================================== */
+function initBg() {
+    const bg = document.getElementById('ocean-bg');
+    for(let i=0; i<28; i++) {
+        let b = document.createElement('div');
+        b.className = 'bubble';
+        let size = 3 + Math.random() * 11;
+        let left = Math.random() * 100;
+        let dur = 8 + Math.random() * 14;
+        let drift = (Math.random() - 0.5) * 100;
+        let delay = Math.random() * 20;
+        b.style.width = `${size}px`; b.style.height = `${size}px`;
+        b.style.left = `${left}%`; b.style.bottom = `-20px`;
+        b.style.animationDuration = `${dur}s`;
+        b.style.animationDelay = `-${delay}s`;
+        b.style.setProperty('--drift', drift);
+        bg.appendChild(b);
+    }
+    const colors = ['var(--cyan)', 'var(--green)', 'var(--purple)', 'var(--yellow)'];
+    for(let i=0; i<35; i++) {
+        let d = document.createElement('div');
+        d.className = 'gldot';
+        let size = 2 + Math.random() * 4;
+        let c = colors[Math.floor(Math.random() * colors.length)];
+        let left = Math.random() * 100;
+        let top = Math.random() * 100;
+        let dur = 1.8 + Math.random() * 4;
+        let delay = Math.random() * 5;
+        d.style.width = `${size}px`; d.style.height = `${size}px`;
+        d.style.left = `${left}%`; d.style.top = `${top}%`;
+        d.style.color = c; d.style.background = c;
+        d.style.animationDuration = `${dur}s`;
+        d.style.animationDelay = `-${delay}s`;
+        bg.appendChild(d);
+    }
+}
+
+/* ==========================================================================
+   UTILS & UI CORE
+========================================================================== */
+function calcHealth() {
+    let done = 0, total = 0;
+    ZONES_DATA.forEach(z => {
+        total += 3;
+        const p = S.zp[z.id];
+        done += (p.found.length >= z.species.length ? 1 : 0) + (p.fwDone ? 1 : 0) + (p.crDone ? 1 : 0);
+    });
+    return Math.round((done / total) * 100);
+}
+
+function updateHUD() {
+    document.getElementById('hud-av').innerText = S.av;
+    document.getElementById('hud-name').innerText = S.name;
+    document.getElementById('hud-lvl').innerText = `LVL ${S.level}`;
+    
+    let xpInLevel = S.xp % XP_PER_LEVEL;
+    document.getElementById('hud-xp-lbl').innerText = `${xpInLevel} / ${XP_PER_LEVEL} XP`;
+    document.getElementById('hud-xp-fill').style.width = `${(xpInLevel/XP_PER_LEVEL)*100}%`;
+    document.getElementById('hud-score').innerText = `${S.score.toLocaleString()} pts`;
+    document.getElementById('hud-badges').innerText = S.badges.length;
+
+    let health = calcHealth();
+    document.getElementById('hud-health-pct').innerText = `${health}%`;
+    document.getElementById('hud-health-fill').style.width = `${health}%`;
+    
+    let mhFill = document.getElementById('map-health-fill');
+    if(mhFill) mhFill.style.width = `${health}%`;
+    let mhPct = document.getElementById('map-health-pct');
+    if(mhPct) mhPct.innerText = `${health}%`;
+}
+
+function showScreen(id) {
+    if (id === 'map') renderMap();
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(`screen-${id}`).classList.remove('hidden');
+    
+    if(id !== 'welcome') {
+        document.getElementById('hud').classList.remove('hidden');
+        document.getElementById('hud').style.opacity = 1;
+        document.getElementById('global-chat-btn').classList.add('show');
+    } else {
+        document.getElementById('global-chat-btn').classList.remove('show');
+    }
+    window.scrollTo(0, 0);
+}
+
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    let anyOtherActive = document.querySelectorAll('.modal.active').length > 0;
+    if(!anyOtherActive) {
+        document.body.style.overflow = '';
+    }
+    if(S.curZone && id !== 'm-master') renderZoneHub(S.curZone);
+}
+
+function pickAv(el, emoji) {
+    document.querySelectorAll('.av-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    S.av = emoji;
+}
+
+function startGame() {
+    const input = document.getElementById('player-name').value.trim();
+    S.name = input || "Explorer";
+    save();
+    updateHUD();
+    renderMap();
+    showScreen('map');
+}
+
+/* ==========================================================================
+   REWARDS
+========================================================================== */
+function addXP(amt, x, y) {
+    S.xp += amt;
+    S.score += (amt * 8);
+    
+    let oldLvl = S.level;
+    S.level = Math.floor(S.xp / XP_PER_LEVEL) + 1;
+    updateHUD();
+    save();
+
+    if(S.level > oldLvl) doLevelUp(S.level);
+
+    if(x !== undefined && y !== undefined) {
+        let p = document.createElement('div');
+        p.className = 'xp-pop';
+        p.innerText = `+${amt} XP`;
+        p.style.left = `${x}px`; p.style.top = `${y}px`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1400);
+    }
+}
+
+function doLevelUp(lv) {
+    const ov = document.getElementById('lvl-overlay');
+    document.getElementById('lvl-sub').innerText = `You reached Level ${lv}! Amazing ocean knowledge!`;
+    ov.classList.add('show');
+    doConfetti();
+    setTimeout(() => ov.classList.remove('show'), 3000);
+}
+
+function showBadge(badgeName, emoji) {
+    if(!S.badges.includes(badgeName)) {
+        S.badges.push(badgeName);
+        save();
+        updateHUD();
+        toast(`${emoji} ${badgeName} BADGE EARNED!`, 4000);
+        doConfetti();
+    }
+}
+
+function toast(msg, dur=4000) {
+    const t = document.getElementById('badge-toast');
+    document.getElementById('bt-msg').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function checkZoneBonus(zData) {
+    const p = S.zp[zData.id];
+    if(p.found.length >= zData.species.length && p.fwDone && p.crDone) {
+        if(!S.bonuses[zData.id]) {
+            S.bonuses[zData.id] = true;
+            addXP(100);
+            save();
+            toast(`${zData.name} COMPLETE! +100 BONUS XP!`, 4000);
+            doConfetti();
+            setTimeout(() => {
+                let idx = ZONES_DATA.findIndex(z => z.id === zData.id);
+                if(idx < ZONES_DATA.length - 1) toast(`${ZONES_DATA[idx+1].name} UNLOCKED!`, 4000);
+            }, 4500);
+        }
+    }
+}
+
+/* ==========================================================================
+   CONFETTI (Canvas)
+========================================================================== */
+let cAnim;
+function doConfetti() {
+    const cvs = document.getElementById('confetti-canvas');
+    const ctx = cvs.getContext('2d');
+    cvs.width = window.innerWidth;
+    cvs.height = window.innerHeight;
+    cvs.style.display = 'block';
+
+    let particles = [];
+    const colors = ['#00f0e0', '#39ff14', '#c96fff', '#ffd700', '#ff4d4d', '#4cc9f0'];
+    for(let i=0; i<110; i++) {
+        particles.push({
+            x: Math.random() * cvs.width,
+            y: Math.random() * -cvs.height,
+            r: Math.random() * 4 + 2,
+            dx: Math.random() * 4 - 2,
+            dy: Math.random() * 3 + 2,
+            c: colors[Math.floor(Math.random() * colors.length)]
+        });
+    }
+
+    let frame = 0;
+    cancelAnimationFrame(cAnim);
+    
+    function render() {
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        let active = false;
+        particles.forEach(p => {
+            p.x += p.dx;
+            p.y += p.dy;
+            p.dy += 0.05;
+            if(p.y < cvs.height) active = true;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = p.c;
+            ctx.fill();
+        });
+        frame++;
+        if(active && frame < 180) cAnim = requestAnimationFrame(render);
+        else { ctx.clearRect(0,0,cvs.width,cvs.height); cvs.style.display = 'none'; }
+    }
+    render();
+}
+
+/* ==========================================================================
+   MAP & ZONE HUB
+========================================================================== */
+function isUnlocked(idx) { return true; }
+
+function getStars(zData) {
+    const p = S.zp[zData.id];
+    let stars = 0;
+    if(p.found.length >= zData.species.length) stars++;
+    if(p.fwDone) stars++;
+    if(p.crDone) stars++;
+    return stars;
+}
+
+function renderMap() {
+    const list = document.getElementById('zones-list');
+    list.innerHTML = '';
+    ZONES_DATA.forEach((z, i) => {
+        let unlocked = isUnlocked(i);
+        let stars = getStars(z);
+        let done = stars === 3;
+        
+        let starHTML = '';
+        for(let j=0; j<3; j++) starHTML += `<span class="${j<stars ? 'gold' : ''}">★</span>`;
+
+        list.innerHTML += `
+            <div class="zone-card ${!unlocked ? 'locked' : ''} ${done ? 'done' : ''}" style="--zc: ${z.color};" onclick="if(${unlocked}) enterZone('${z.id}')">
+                ${done ? `<div class="tag-complete">✓ Complete</div>` : ''}
+                <div class="zc-emoji">${z.emoji}</div>
+                <div class="zc-info">
+                    <div class="zc-name orbitron">${z.name}</div>
+                    <div class="zc-depth orbitron">${z.alt} • ${z.depth}</div>
+                </div>
+                <div class="zc-status">
+                    ${unlocked ? `<div class="stars">${starHTML}</div><div style="font-size:0.7rem; color:var(--dim);">${stars}/3 done</div>` : `<div style="font-size:0.9rem; font-weight:bold; color:var(--red);">🔒 LOCKED</div>`}
+                </div>
+            </div>
+        `;
+    });
+}
+
+function enterZone(id) {
+    S.curZone = id;
+    renderZoneHub(id);
+    showScreen('zone');
+}
+
+let resetConfirmId = null;
+function resetZone(id) {
+    if (resetConfirmId === id) {
+        const p = S.zp[id];
+        const z = ZONES_DATA.find(x => x.id === id);
+        
+        // Calculate XP earned in this zone (assuming max potential 40 XP per species to prevent infinite farming)
+        let xpToSubtract = (p.found.length * 40) + (p.fwDone ? 60 : 0) + (p.crDone ? 80 : 0) + (S.bonuses[id] ? 100 : 0);
+        
+        // Safely subtract XP and score, clamping to minimum of 0
+        S.xp = Math.max(0, S.xp - xpToSubtract);
+        S.score = Math.max(0, S.score - (xpToSubtract * 8));
+        S.level = Math.max(1, Math.floor(S.xp / XP_PER_LEVEL) + 1);
+
+        // Reset all local zone state
+        S.zp[id] = { found: [], fwDone: false, crDone: false, crStep: 0 };
+        S.bonuses[id] = false;
+        
+        // Remove the zone's badge if it was earned
+        if(z && z.crisis && z.crisis.badge) {
+            S.badges = S.badges.filter(b => b !== z.crisis.badge);
+        }
+
+        resetConfirmId = null;
+        save();
+        updateHUD();
+        renderZoneHub(id);
+    } else {
+        resetConfirmId = id;
+        const btn = document.getElementById('reset-zone-btn');
+        if(btn) {
+            btn.innerText = "Are you sure? Click again to reset!";
+            btn.style.background = "rgba(255,77,77,0.2)";
+        }
+        setTimeout(() => { 
+            if (resetConfirmId === id) {
+                resetConfirmId = null; 
+                if(S.curZone === id) renderZoneHub(id); 
+            }
+        }, 3000);
+    }
+}
+
+function renderZoneHub(id) {
+    const z = ZONES_DATA.find(x => x.id === id);
+    const p = S.zp[id];
+    const hdr = document.getElementById('zone-hdr-div');
+    hdr.style.setProperty('--zc', z.color);
+    hdr.style.boxShadow = `0 0 20px ${z.color}33`; 
+    
+    hdr.innerHTML = `
+        <div class="zh-emoji">${z.emoji}</div>
+        <div class="zh-name orbitron">${z.name}</div>
+        <div class="zh-depth orbitron">${z.alt} • ${z.depth}</div>
+        <div style="font-size:0.9rem; color:var(--text); opacity:0.8;">Complete all 3 activities to secure this zone.</div>
+    `;
+
+    const discDone = p.found.length >= z.species.length;
+    const fwDone = p.fwDone;
+    const crDone = p.crDone;
+
+    document.getElementById('act-grid').innerHTML = `
+        <div class="act-card ${discDone ? 'done' : ''}" onclick="openDiscover('${id}')">
+            ${discDone ? '<div class="ac-badge">✓</div>' : ''}
+            <div class="ac-icon">🔍</div>
+            <div class="ac-name">DISCOVER</div>
+            <div class="ac-sub">${p.found.length} / ${z.species.length} Species</div>
+            <div class="ac-xp">+15 per species</div>
+        </div>
+        <div class="act-card ${fwDone ? 'done' : ''}" onclick="openFoodWeb('${id}')">
+            ${fwDone ? '<div class="ac-badge">✓</div>' : ''}
+            <div class="ac-icon">🕸️</div>
+            <div class="ac-name">FOOD WEB</div>
+            <div class="ac-sub">${fwDone ? 'Solved!' : 'Connect species'}</div>
+            <div class="ac-xp">+60 XP</div>
+        </div>
+        <div class="act-card ${crDone ? 'done' : ''}" onclick="openCrisis('${id}')">
+            ${crDone ? '<div class="ac-badge">✓</div>' : ''}
+            <div class="ac-icon">🚨</div>
+            <div class="ac-name">DEFEND!</div>
+            <div class="ac-sub">${crDone ? 'Zone Safe!' : 'Zone in danger!'}</div>
+            <div class="ac-xp">+80 XP</div>
+        </div>
+    `;
+
+    let actsDone = getStars(z);
+    let completeMsg = actsDone === 3 
+        ? `<span style="color:var(--green);">Zone Complete! Unlock the next zone on the map.</span>` 
+        : `${3 - actsDone} activities remaining to complete this zone.`;
+
+    document.getElementById('zone-msg').innerHTML = `
+        <div>${completeMsg}</div>
+        <button id="reset-zone-btn" class="ghost-btn" style="position: relative; top: 0; left: 0; margin-top: 15px; border-color: rgba(255,77,77,0.5); color: var(--red);" onclick="resetZone('${id}')">↺ Reset Zone Progress</button>
+    `;
+}
+
+/* ==========================================================================
+   AI CHAT INTERFACE (SIDE PANEL)
+========================================================================== */
+function toggleChat() {
+    const panel = document.getElementById('chat-panel');
+    const fabBtn = document.getElementById('global-chat-btn');
+    if(panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        if(fabBtn) fabBtn.style.display = 'flex';
+    } else {
+        panel.classList.add('open');
+        if(fabBtn) fabBtn.style.display = 'none';
+        
+        let zoneName = "the Ocean";
+        if (S.curZone) {
+            const z = ZONES_DATA.find(x => x.id === S.curZone);
+            if (z) zoneName = "the " + z.name;
+        }
+        S.curChatZoneName = zoneName;
+        
+        document.getElementById('chat-subtitle').innerText = `Ask Dr. Mariana about ${zoneName}!`;
+        const log = document.getElementById('chat-log');
+        
+        if(log.innerHTML.trim() === '') {
+            appendChatMsg('ai', `Hello, ${S.name}! 👋 I'm Dr. Mariana. What would you like to learn about ${zoneName} or any interesting creatures you just found?`);
+        }
+        
+        setTimeout(() => document.getElementById('chat-input').focus(), 300);
+    }
+}
+
+function appendChatMsg(sender, text) {
+    const log = document.getElementById('chat-log');
+    const div = document.createElement('div');
+    div.className = `cmsg ${sender}`;
+    div.innerText = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+}
+
+async function sendChat() {
+    const inputEl = document.getElementById('chat-input');
+    const btnEl = document.getElementById('chat-send-btn');
+    const val = inputEl.value.trim();
+    if(!val) return;
+
+    // UI Updates before API call
+    inputEl.value = '';
+    inputEl.disabled = true;
+    btnEl.disabled = true;
+    appendChatMsg('user', val);
+
+    // Typing indicator
+    const log = document.getElementById('chat-log');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing';
+    typingDiv.innerText = 'Dr. Mariana is typing...';
+    log.appendChild(typingDiv);
+    log.scrollTop = log.scrollHeight;
+
+    const responseText = await fetchGemini(val, S.curChatZoneName);
+
+    // Clean up typing indicator and append response
+    typingDiv.remove();
+    appendChatMsg('ai', responseText);
+    
+    inputEl.disabled = false;
+    btnEl.disabled = false;
+    inputEl.focus();
+}
+
+/* ==========================================================================
+   MODAL: DISCOVER
+========================================================================== */
+let dState = { zData: null, spIdx: 0 };
+
+function openDiscover(id) {
+    const z = ZONES_DATA.find(x => x.id === id);
+    dState.zData = z;
+    S.quizDone = false;
+    
+    let toShow = -1;
+    for(let i=0; i<z.species.length; i++) {
+        if(!S.zp[id].found.includes(i)) { toShow = i; break; }
+    }
+
+    if(toShow === -1) renderDiscoverDone();
+    else { dState.spIdx = toShow; renderSpeciesCard(); }
+    openModal('m-disc');
+}
+
+function renderSpeciesCard() {
+    const z = dState.zData;
+    const sp = z.species[dState.spIdx];
+    S.quizDone = false;
+
+    document.getElementById('disc-content').innerHTML = `
+        <div class="m-header">
+            <div class="sp-count">Species ${dState.spIdx + 1} of ${z.species.length}</div>
+            <div class="sp-emoji">${sp.emoji}</div>
+            <div class="m-title orbitron">${sp.name}</div>
+            <div class="sp-roles">
+                <span class="pill cyan">${sp.role}</span>
+                <span class="pill purple">Trophic Level ${sp.level}</span>
+            </div>
+        </div>
+        <div class="fact-box">
+            <strong style="color:var(--cyan);">Amazing Fact:</strong> ${sp.fact}
+        </div>
+        <div class="quiz-box">
+            <div class="qb-lbl">Quick Question - Answer for +25 Bonus XP!</div>
+            <div class="qb-q">${sp.q}</div>
+            <div id="q-opts">
+                ${sp.opts.map((opt, i) => `<button class="q-btn" onclick="answerQuiz(${i}, event)">${opt}</button>`).join('')}
+            </div>
+            <button id="btn-next-sp" class="btn-next" onclick="nextSpecies()">NEXT SPECIES</button>
+        </div>
+    `;
+}
+
+function answerQuiz(optIdx, e) {
+    if(S.quizDone) return;
+    S.quizDone = true;
+    
+    const sp = dState.zData.species[dState.spIdx];
+    const btns = document.querySelectorAll('.q-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    const isRight = (optIdx === sp.ans);
+    const rect = e.target.getBoundingClientRect();
+    
+    if(isRight) {
+        btns[optIdx].classList.add('right');
+        addXP(25, rect.right + 10, rect.top);
+    } else {
+        btns[optIdx].classList.add('wrong');
+        btns[sp.ans].classList.add('right');
+    }
+
+    if(!S.zp[dState.zData.id].found.includes(dState.spIdx)) {
+        S.zp[dState.zData.id].found.push(dState.spIdx);
+        addXP(15);
+        save();
+    }
+
+    document.getElementById('btn-next-sp').style.display = 'block';
+    checkZoneBonus(dState.zData);
+}
+
+function nextSpecies() {
+    const z = dState.zData;
+    let nextUnfound = -1;
+    for(let i=0; i<z.species.length; i++) {
+        if(!S.zp[z.id].found.includes(i)) { nextUnfound = i; break; }
+    }
+    
+    if(nextUnfound !== -1) { dState.spIdx = nextUnfound; renderSpeciesCard(); }
+    else renderDiscoverDone();
+}
+
+function renderDiscoverDone() {
+    document.getElementById('disc-content').innerHTML = `
+        <div class="done-screen">
+            <div class="ds-icon">✅</div>
+            <div class="ds-title orbitron">ALL SPECIES FOUND!</div>
+            <div class="ds-text">You have discovered all the known lifeforms in this zone.</div>
+            <button class="btn-primary orbitron" style="width:100%;" onclick="closeModal('m-disc')">RETURN TO HUB</button>
+        </div>
+    `;
+}
+
+/* ==========================================================================
+   MODAL: FOOD WEB
+========================================================================== */
+function openFoodWeb(id) {
+    const z = ZONES_DATA.find(x => x.id === id);
+    if(S.zp[id].fwDone) renderFwDone();
+    else {
+        S.fwState = { zoneId: id, total: z.fw.conns.length, correct: 0, made: [], selNode: null };
+        renderFoodWeb(z);
+    }
+    openModal('m-fw');
+}
+
+function renderFoodWeb(z) {
+    let nodesHtml = z.species.map((sp, i) => {
+        let pos = z.fw.nodes[i];
+        return `
+        <div class="fw-node" id="fwn-${i}" style="left:${pos.x}%; top:${pos.y}%;" onclick="fwClickNode(${i})">
+            <div class="fw-circle">${sp.emoji}</div>
+            <div class="fw-label">${sp.name}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('fw-content').innerHTML = `
+        <div class="m-header" style="margin-bottom:10px;">
+            <div class="m-title orbitron" style="color:var(--cyan);">Build the Food Web</div>
+        </div>
+        <div class="fw-hint">Click a <strong>PREY</strong> creature, then click its <strong>PREDATOR</strong></div>
+        <div class="fw-stage" id="fw-stage">
+            <svg class="fw-svg" id="fw-svg"></svg>
+            ${nodesHtml}
+        </div>
+        <div class="fw-status" id="fw-status" style="color:var(--text);">Select starting prey...</div>
+        <div class="fw-actions">
+            <button class="fw-btn" onclick="fwHint()">Stuck? Hint</button>
+            <button class="fw-btn" onclick="resetFoodWeb()">Reset Connections</button>
+        </div>
+    `;
+}
+
+function fwClickNode(idx) {
+    let st = S.fwState;
+    if(st.correct >= st.total) return;
+
+    let nodeEl = document.getElementById(`fwn-${idx}`);
+    
+    if(st.selNode === idx) {
+        st.selNode = null;
+        nodeEl.classList.remove('sel');
+        document.getElementById('fw-status').innerText = "Select starting prey...";
+        return;
+    }
+
+    if(st.selNode === null) {
+        st.selNode = idx;
+        nodeEl.classList.add('sel');
+        let spName = ZONES_DATA.find(z => z.id === st.zoneId).species[idx].name;
+        document.getElementById('fw-status').innerHTML = `Selected <span style="color:var(--gold);">${spName}</span> as PREY. Now click its PREDATOR.`;
+        return;
+    }
+
+    let preyIdx = st.selNode;
+    let predIdx = idx;
+    
+    if(st.made.find(c => c.prey === preyIdx && c.pred === predIdx)) {
+        document.getElementById('fwn-'+preyIdx).classList.remove('sel');
+        st.selNode = null;
+        document.getElementById('fw-status').innerText = "Connection already made!";
+        return;
+    }
+
+    initAudio();
+    const z = ZONES_DATA.find(x => x.id === st.zoneId);
+    let isCorrect = z.fw.conns.some(c => c[0] === preyIdx && c[1] === predIdx);
+
+    drawFwLine(preyIdx, predIdx, isCorrect);
+    document.getElementById('fwn-'+preyIdx).classList.remove('sel');
+    st.selNode = null;
+
+    if(isCorrect) {
+        st.made.push({prey: preyIdx, pred: predIdx});
+        st.correct++;
+        document.getElementById(`fwn-${preyIdx}`).classList.add('correct');
+        document.getElementById(`fwn-${predIdx}`).classList.add('correct');
+        document.getElementById('fw-status').innerHTML = `<span style="color:var(--green);">✓ Correct! ${st.correct}/${st.total} connections.</span>`;
+        
+        let spName = z.species[predIdx].name;
+        let spEmoji = z.species[predIdx].emoji;
+        playEatAnimation(`fwn-${preyIdx}`, `fwn-${predIdx}`, spEmoji, spName);
+
+        if(st.correct === st.total) {
+            S.zp[st.zoneId].fwDone = true;
+            addXP(60);
+            save();
+            document.getElementById('fw-status').innerHTML = `<span style="color:var(--green); font-size:1.2rem;">🌟 Food Web Complete! +60 XP</span>`;
+            checkZoneBonus(z);
+            setTimeout(() => {
+                if(document.getElementById('m-fw').classList.contains('active')) renderFwDone();
+            }, 2500);
+        }
+    } else {
+        document.getElementById('fw-status').innerHTML = `<span style="color:var(--red);">❌ Wrong! Try again.</span>`;
+    }
+}
+
+function playEatAnimation(preyNodeId, predNodeId, predEmoji, speciesName) {
+    const predNode = document.getElementById(predNodeId);
+    const preyNode = document.getElementById(preyNodeId);
+
+    const predRect = predNode.getBoundingClientRect();
+    const preyRect = preyNode.getBoundingClientRect();
+
+    const clone = document.createElement('div');
+    clone.innerText = predEmoji;
+    clone.style.position = 'fixed';
+    clone.style.left = `${predRect.left + predRect.width/2}px`;
+    clone.style.top = `${predRect.top + predRect.height/2}px`;
+    clone.style.transform = 'translate(-50%, -50%)';
+    clone.style.fontSize = '3.5rem';
+    clone.style.zIndex = '10000'; 
+    clone.style.pointerEvents = 'none'; 
+    clone.style.filter = 'drop-shadow(0 0 15px var(--cyan))';
+    document.body.appendChild(clone);
+
+    const dx = preyRect.left - predRect.left;
+    const dy = preyRect.top - predRect.top;
+
+    const flyAnim = clone.animate([
+        { transform: 'translate(-50%, -50%) scale(1)' },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.4)` }
+    ], { duration: 1166, easing: 'ease-in-out', fill: 'forwards' });
+
+    flyAnim.onfinish = () => {
+        playAnimalSound(speciesName);
+
+        const chompAnim = clone.animate([
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.4)` },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.8) rotate(-15deg)` },
+            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0) rotate(10deg)` }
+        ], { duration: 833, easing: 'ease-out', fill: 'forwards' });
+
+        preyNode.animate([
+            { transform: 'translate(-50%, -50%) scale(1)' },
+            { transform: 'translate(-50%, -50%) scale(0.8) rotate(10deg)' },
+            { transform: 'translate(-50%, -50%) scale(1.1) rotate(-10deg)' },
+            { transform: 'translate(-50%, -50%) scale(1) rotate(0)' }
+        ], { duration: 1000, easing: 'ease-in-out' });
+
+        chompAnim.onfinish = () => clone.remove();
+    };
+}
+
+function drawFwLine(idx1, idx2, isCorrect) {
+    const stage = document.getElementById('fw-stage').getBoundingClientRect();
+    const n1 = document.getElementById(`fwn-${idx1}`).getBoundingClientRect();
+    const n2 = document.getElementById(`fwn-${idx2}`).getBoundingClientRect();
+
+    let x1 = n1.left - stage.left + n1.width/2;
+    let y1 = n1.top - stage.top + n1.height/2;
+    let x2 = n2.left - stage.left + n2.width/2;
+    let y2 = n2.top - stage.top + n2.height/2;
+
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let len = Math.sqrt(dx*dx + dy*dy);
+    
+    let ux = dx/len; let uy = dy/len;
+    let tx = x2 - 32*ux;
+    let ty = y2 - 32*uy;
+
+    let px = -uy, py = ux;
+    let ax1 = tx - 12*ux + 7*px;
+    let ay1 = ty - 12*uy + 7*py;
+    let ax2 = tx - 12*ux - 7*px;
+    let ay2 = ty - 12*uy - 7*py;
+
+    const svg = document.getElementById('fw-svg');
+    let color = isCorrect ? '#44ff88' : '#ff4d4d';
+    
+    let g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    if(!isCorrect) g.classList.add('wrong-line');
+
+    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', tx); line.setAttribute('y2', ty);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', isCorrect ? '3' : '2');
+    if(!isCorrect) line.setAttribute('stroke-dasharray', '5,3');
+    
+    let poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    poly.setAttribute('points', `${tx},${ty} ${ax1},${ay1} ${ax2},${ay2}`);
+    poly.setAttribute('fill', color);
+
+    g.appendChild(line);
+    g.appendChild(poly);
+    svg.appendChild(g);
+
+    if(!isCorrect) setTimeout(() => g.remove(), 1000);
+}
+
+function resetFoodWeb() {
+    let st = S.fwState;
+    if(!st) return;
+    st.correct = 0;
+    st.made = [];
+    st.selNode = null;
+    document.getElementById('fw-svg').innerHTML = '';
+    document.querySelectorAll('.fw-node').forEach(n => {
+        n.classList.remove('correct');
+        n.classList.remove('sel');
+    });
+    document.getElementById('fw-status').innerText = "Connections reset. Select starting prey.";
+}
+
+function fwHint() {
+    let st = S.fwState;
+    const z = ZONES_DATA.find(x => x.id === st.zoneId);
+    let missing = z.fw.conns.find(c => !st.made.some(m => m.prey===c[0] && m.pred===c[1]));
+    if(missing) {
+        let n = document.getElementById(`fwn-${missing[0]}`);
+        n.style.animation = 'pulse-glow 0.5s 3';
+        setTimeout(() => n.style.animation = '', 1500);
+    }
+}
+
+function renderFwDone() {
+    document.getElementById('fw-content').innerHTML = `
+        <div class="done-screen">
+            <div class="ds-icon">🕸️</div>
+            <div class="ds-title orbitron">FOOD WEB SOLVED!</div>
+            <div class="ds-text">You perfectly connected the energy flow in this zone.</div>
+            <button class="btn-primary orbitron" style="width:100%;" onclick="closeModal('m-fw')">RETURN TO HUB</button>
+        </div>
+    `;
+}
+
+/* ==========================================================================
+   MODAL: CRISIS (Multi-Step)
+========================================================================== */
+function openCrisis(id) {
+    const z = ZONES_DATA.find(x => x.id === id);
+    if(S.zp[id].crDone) renderCrisisDone();
+    else renderCrisis(z);
+    openModal('m-cr');
+}
+
+function renderCrisis(z) {
+    const cr = z.crisis;
+    const step = S.zp[z.id].crStep || 0;
+    
+    if(step >= cr.questions.length) {
+        renderCrisisDone();
+        return;
+    }
+
+    S.crDone = false;
+    const qData = cr.questions[step];
+
+    document.getElementById('cr-content').innerHTML = `
+        <div class="m-header" style="margin-bottom:15px;">
+            <div class="pill red" style="margin-bottom:10px;">ZONE CRISIS: PART ${step + 1}/${cr.questions.length}</div>
+            <div class="m-title orbitron" style="color:var(--red); font-size:1.4rem;">${cr.title}</div>
+        </div>
+        ${step === 0 ? `<div class="cr-story">${cr.story}</div><div class="cr-conseq"><strong style="color:orange;">KEY CONCEPT:</strong> ${cr.concept}</div>` : ''}
+        <div class="cr-q">${qData.q}</div>
+        <div id="cr-opts">
+            ${qData.opts.map((opt, i) => `<button class="q-btn cr-btn" onclick="answerCrisis('${z.id}', ${i})">${opt}</button>`).join('')}
+        </div>
+        <div id="cr-fb" class="cr-feedback"></div>
+    `;
+}
+
+function answerCrisis(zId, optIdx) {
+    if(S.crDone) return;
+    S.crDone = true; 
+    
+    const z = ZONES_DATA.find(x => x.id === zId);
+    const cr = z.crisis;
+    let step = S.zp[zId].crStep || 0;
+    const qData = cr.questions[step];
+    
+    const btns = document.querySelectorAll('.cr-btn');
+    const fb = document.getElementById('cr-fb');
+    
+    let isRight = (optIdx === qData.ans);
+    btns.forEach(b => b.disabled = true);
+
+    if(isRight) {
+        btns[optIdx].classList.add('right');
+        step++;
+        S.zp[zId].crStep = step;
+        const isFinished = step >= cr.questions.length;
+        
+        fb.className = 'cr-feedback good';
+        fb.innerHTML = `
+            <div class="cr-fb-title">CORRECT!</div>
+            <div>${qData.fbGood}</div>
+            ${isFinished ? `<div class="vocab-chip">${cr.vocab}</div><div class="cr-fb-xp">+80 XP EARNED!</div>` : ''}
+            <button class="btn-next" style="display:block; margin-top:10px;" onclick="renderCrisis(ZONES_DATA.find(x=>x.id==='${zId}'))">${isFinished ? 'FINISH' : 'NEXT QUESTION'}</button>
+        `;
+        
+        if(isFinished && !S.zp[zId].crDone) {
+            S.zp[zId].crDone = true;
+            addXP(80);
+            showBadge(cr.badge, cr.badgemoji);
+            checkZoneBonus(z);
+        }
+        save();
+    } else {
+        btns[optIdx].classList.add('wrong');
+        btns[qData.ans].classList.add('right');
+        
+        fb.className = 'cr-feedback bad';
+        fb.innerHTML = `
+            <div class="cr-fb-title">X INCORRECT</div>
+            <div>${qData.fbBad[optIdx]}</div>
+            <div style="margin-top:8px; font-weight:bold;">Review the correct answer, then proceed.</div>
+            <button class="btn-next" style="display:block; margin-top:10px; background:var(--red);" onclick="S.crDone=false; renderCrisis(ZONES_DATA.find(x=>x.id==='${zId}'))">TRY AGAIN</button>
+        `;
+    }
+}
+
+function renderCrisisDone() {
+    document.getElementById('cr-content').innerHTML = `
+        <div class="done-screen">
+            <div class="ds-icon">🛡️</div>
+            <div class="ds-title orbitron" style="color:var(--cyan);">ZONE SECURED!</div>
+            <div class="ds-text">Your scientific actions successfully defended this ecosystem.</div>
+            <button class="btn-primary orbitron" style="width:100%;" onclick="closeModal('m-cr')">RETURN TO HUB</button>
+        </div>
+    `;
+}
+
+/* ==========================================================================
+   MASTER FOOD WEB
+========================================================================== */
+function openMasterWeb() {
+    openModal('m-master');
+    const container = document.getElementById('mfw-nodes-container');
+    const svg = document.getElementById('mfw-svg');
+    container.innerHTML = '';
+    svg.innerHTML = '';
+    
+    S.mfwState = { sel: null };
+    document.getElementById('mfw-status').innerHTML = "Select starting prey...";
+
+    const stageH = 1600;
+    const zoneH = stageH / 8;
+
+    ZONES_DATA.forEach((z, zIdx) => {
+        let lbl = document.createElement('div');
+        lbl.className = 'mfw-zone-label';
+        lbl.style.top = `${zIdx * zoneH + 10}px`;
+        lbl.style.color = z.color;
+        lbl.innerText = z.name;
+        container.appendChild(lbl);
+
+        z.species.forEach((sp, spIdx) => {
+            let pos = z.fw.nodes[spIdx];
+            let topPx = (zIdx * zoneH) + (pos.y / 100 * zoneH);
+            
+            let nodeHtml = `
+            <div class="fw-node" id="mfw-${zIdx}-${spIdx}" style="left:${pos.x}%; top:${topPx}px;" title="${sp.name}" onclick="mfwClickNode(${zIdx}, ${spIdx})">
+                <div class="fw-circle" style="width:48px; height:48px; font-size:1.5rem; border-color:${z.color}88; cursor:pointer;">${sp.emoji}</div>
+                <div class="fw-label" style="font-size:0.55rem;">${sp.name}</div>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', nodeHtml);
+        });
+    });
+
+    setTimeout(() => {
+        renderMasterLines();
+    }, 100);
+}
+
+function renderMasterLines() {
+    document.getElementById('mfw-svg').innerHTML = '';
+    ZONES_DATA.forEach((z, zIdx) => {
+        z.fw.conns.forEach(c => {
+            if (S.zp[z.id].fwDone || S.globalFw.made.some(m => m.z1===zIdx && m.s1===c[0] && m.z2===zIdx && m.s2===c[1])) {
+                drawMasterLine(zIdx, c[0], zIdx, c[1], '#ffffff44');
+            }
+        });
+    });
+
+    INTER_CONNS.forEach(c => {
+        if (S.globalFw.made.some(m => m.z1===c.z1 && m.s1===c.s1 && m.z2===c.z2 && m.s2===c.s2)) {
+            drawMasterLine(c.z1, c.s1, c.z2, c.s2, c.c);
+        }
+    });
+}
+
+function mfwClickNode(zIdx, spIdx) {
+    initAudio(); 
+    let st = S.mfwState;
+    let nodeEl = document.getElementById(`mfw-${zIdx}-${spIdx}`);
+
+    if(st.sel && st.sel.z === zIdx && st.sel.s === spIdx) {
+        st.sel = null;
+        nodeEl.classList.remove('sel');
+        document.getElementById('mfw-status').innerText = "Select starting prey...";
+        return;
+    }
+
+    if(!st.sel) {
+        st.sel = { z: zIdx, s: spIdx };
+        nodeEl.classList.add('sel');
+        let spName = ZONES_DATA[zIdx].species[spIdx].name;
+        document.getElementById('mfw-status').innerHTML = `Selected <span style="color:var(--gold);">${spName}</span> as PREY. Now click its PREDATOR.`;
+        return;
+    }
+
+    let prey = st.sel;
+    let pred = { z: zIdx, s: spIdx };
+    
+    document.getElementById(`mfw-${prey.z}-${prey.s}`).classList.remove('sel');
+    st.sel = null;
+
+    let isCorrect = false;
+    let lineCol = '#ffffff44';
+
+    if (prey.z === pred.z) {
+        let zData = ZONES_DATA[prey.z];
+        if (zData.fw.conns.some(c => c[0] === prey.s && c[1] === pred.s)) isCorrect = true;
+    } else {
+        let ic = INTER_CONNS.find(c => c.z1 === prey.z && c.s1 === prey.s && c.z2 === pred.z && c.s2 === pred.s);
+        if (ic) { isCorrect = true; lineCol = ic.c; }
+    }
+
+    if (isCorrect) {
+        let already = S.globalFw.made.some(m => m.z1===prey.z && m.s1===prey.s && m.z2===pred.z && m.s2===pred.s) ||
+                      (prey.z === pred.z && S.zp[ZONES_DATA[prey.z].id].fwDone);
+
+        if (already) {
+            document.getElementById('mfw-status').innerText = "Connection already made!";
+            return;
+        }
+
+        S.globalFw.made.push({ z1: prey.z, s1: prey.s, z2: pred.z, s2: pred.s });
+        save();
+        
+        drawMasterLine(prey.z, prey.s, pred.z, pred.s, lineCol);
+        
+        let spName = ZONES_DATA[pred.z].species[pred.s].name;
+        let spEmoji = ZONES_DATA[pred.z].species[pred.s].emoji;
+        playEatAnimation(`mfw-${prey.z}-${prey.s}`, `mfw-${pred.z}-${pred.s}`, spEmoji, spName);
+        
+        document.getElementById('mfw-status').innerHTML = `<span style="color:var(--green);">✓ Correct global connection! +10 XP</span>`;
+        addXP(10);
+    } else {
+        document.getElementById('mfw-status').innerHTML = `<span style="color:var(--red);">❌ Incorrect connection.</span>`;
+        drawMasterLine(prey.z, prey.s, pred.z, pred.s, 'var(--red)', true);
+    }
+}
+
+function drawMasterLine(z1, sp1, z2, sp2, color, isError = false) {
+    const stage = document.getElementById('mfw-stage').getBoundingClientRect();
+    const n1 = document.getElementById(`mfw-${z1}-${sp1}`);
+    const n2 = document.getElementById(`mfw-${z2}-${sp2}`);
+    if(!n1 || !n2) return;
+
+    const r1 = n1.getBoundingClientRect();
+    const r2 = n2.getBoundingClientRect();
+
+    let x1 = r1.left - stage.left + r1.width/2;
+    let y1 = r1.top - stage.top + r1.height/2;
+    let x2 = r2.left - stage.left + r2.width/2;
+    let y2 = r2.top - stage.top + r2.height/2;
+
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let len = Math.sqrt(dx*dx + dy*dy);
+    
+    let ux = dx/len; let uy = dy/len;
+    let tx = x2 - 20*ux;
+    let ty = y2 - 20*uy;
+
+    let px = -uy, py = ux;
+    let ax1 = tx - 10*ux + 6*px;
+    let ay1 = ty - 10*uy + 6*py;
+    let ax2 = tx - 10*ux - 6*px;
+    let ay2 = ty - 10*uy - 6*py;
+
+    const svg = document.getElementById('mfw-svg');
+    let g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    
+    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', tx); line.setAttribute('y2', ty);
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', '2');
+    if(z1 !== z2 || isError) line.setAttribute('stroke-dasharray', '6,4');
+    
+    let poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    poly.setAttribute('points', `${tx},${ty} ${ax1},${ay1} ${ax2},${ay2}`);
+    poly.setAttribute('fill', color);
+
+    g.appendChild(line);
+    g.appendChild(poly);
+    svg.appendChild(g);
+    
+    if(isError) setTimeout(() => g.remove(), 1000);
+}
+
+/* ==========================================================================
+   INITIALIZATION
+========================================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+    initBg();
+    initSpeech();
+    if(load() && S.name) {
+        updateHUD();
+        renderMap();
+        showScreen('map');
+    } else {
+        showScreen('welcome');
+    }
+});
+</script>
+</body>
+</html>

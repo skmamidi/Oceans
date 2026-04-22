@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Living Ocean: SciOly Edition</title>
+    <!-- Added Tailwind CDN to fix the ReferenceError -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config={theme:{extend:{fontFamily:{sans:['Nunito','sans-serif'],heading:['Poppins','sans-serif']},colors:{'ocean-surface':'#4ea8de','ocean-sunlight':'#0077b6','ocean-twilight':'#03045e','ocean-midnight':'#01012b','ocean-abyssal':'#000010','ocean-hadal':'#000000'}}}}
+    </script>
+    <style>
+        body{background-color:#f0f8ff;overflow-x:hidden;}
+        .gradient-ocean{background:linear-gradient(to bottom,#4ea8de 0%,#0077b6 15%,#03045e 35%,#01012b 60%,#000010 85%,#000000 100%);}
+        .glass-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);color:white;}
+        .glass-card-dark{background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);color:white;}
+        .float-anim{animation:float 3s ease-in-out infinite;}
+        @keyframes float{0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);}}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
+        .anim-shake{animation:shake 0.4s ease-in-out;}
+        @keyframes pop-in{0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}}
+        .anim-pop{animation:pop-in 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards;}
+        @keyframes blink-light{0%,100%{opacity:0.2;transform:scale(1);}50%{opacity:1;transform:scale(1.5);box-shadow:0 0 15px #60a5fa;}}
+        @keyframes bob-lure{0%,100%{transform:translateY(0) translateX(0);}50%{transform:translateY(-10px) translateX(-5px);box-shadow:0 0 20px #fde047;}}
+        @keyframes pulse-fast{0%,100%{opacity:0.5;}50%{opacity:1;box-shadow:0 0 10px #4ade80;}}
+        .modal-active{opacity:1 !important;pointer-events:auto !important;}
+        .modal-scale{transform:scale(1) !important;}
+        #confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;}
+        .badge-earned{filter:grayscale(0%) !important;opacity:1 !important;transform:scale(1.1);box-shadow:0 0 15px gold;}
+        .migration-entity{transition:all 2s ease-in-out;position:absolute;font-size:2rem;cursor:pointer;}
+        .migration-entity:hover{transform:scale(1.2);filter:drop-shadow(0 0 10px rgba(255,255,255,0.8));z-index:20;}
+        #migration-container.night-mode{background:linear-gradient(to bottom,#01012b,#000000);}
+        .sci-oly-box{border-left:4px solid #a855f7;background:rgba(168,85,247,0.1);}
+        .depth-marker,.depth-marker-adapt,.depth-marker-grad{transition:all 0.3s;}
+        .depth-marker.active .dot{background-color:#3b82f6;transform:scale(1.5);box-shadow:0 0 15px #60a5fa;}
+        .depth-marker.active .text-label{color:#60a5fa;font-weight:900;transform:translateX(5px);}
+        .depth-marker-adapt.active .dot{background-color:#14b8a6;transform:scale(1.5);box-shadow:0 0 15px #2dd4bf;}
+        .depth-marker-adapt.active .text-label{color:#2dd4bf;font-weight:900;transform:translateX(5px);}
+        .depth-marker-grad.active .dot{background-color:#f97316;transform:scale(1.5);box-shadow:0 0 15px #fdba74;}
+        .depth-marker-grad.active .text-label{color:#fdba74;font-weight:900;transform:translateX(5px);}
+        
+        .fish-wrapper{position:relative;width:280px;height:160px;display:flex;align-items:center;justify-content:center;transition:all 0.5s cubic-bezier(0.4,0,0.2,1);z-index:10;}
+        .f-tail{position:absolute;left:10px;width:60px;height:80px;background:#3b82f6;clip-path:polygon(0 0,100% 50%,0 100%);transition:all 0.5s;z-index:1;}
+        .f-body{position:absolute;left:60px;width:140px;height:80px;background:#3b82f6;border-radius:50%;transition:all 0.5s;z-index:2;box-shadow:inset -10px -10px 20px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.2);}
+        .f-eye{position:absolute;right:30px;top:20px;width:16px;height:16px;background:white;border-radius:50%;border:2px solid #1e3a8a;transition:all 0.5s;z-index:3;}
+        .f-eye::after{content:'';position:absolute;right:2px;top:4px;width:6px;height:6px;background:black;border-radius:50%;transition:all 0.5s;}
+        .f-jaw{position:absolute;right:-5px;bottom:0px;width:70px;height:40px;opacity:0;transition:all 0.3s;z-index:4;transform:rotate(15deg) scale(0.5);transform-origin:top left;}
+        .f-lure{position:absolute;right:30px;top:-40px;width:60px;height:50px;border-top:3px solid #cbd5e1;border-right:3px solid #cbd5e1;border-radius:0 30px 0 0;opacity:0;transition:all 0.5s;z-index:0;transform:scale(0.5);transform-origin:bottom left;}
+        .f-lure::after{content:'';position:absolute;right:-8px;top:-8px;width:16px;height:16px;background:#fef08a;border-radius:50%;box-shadow:0 0 20px 5px #fde047;animation:blink-light 1.5s infinite alternate;}
+        .f-photo{position:absolute;bottom:8px;left:10%;width:80%;height:6px;display:flex;justify-content:space-around;opacity:0;transition:opacity 0.5s;z-index:3;}
+        .f-photo div{width:6px;height:6px;background:#60a5fa;border-radius:50%;box-shadow:0 0 8px #60a5fa;animation:blink-light 2s infinite alternate;}
+        .f-tmao-aura{position:absolute;inset:-15px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,0.4) 0%,transparent 70%);opacity:0;transition:all 0.5s;z-index:0;pointer-events:none;animation:pulse-fast 2s infinite;}
+        .morph-fusiform .f-body{width:180px;height:50px;border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;left:40px;top:15px;}
+        .morph-fusiform .f-tail{height:100px;left:-10px;top:-10px;clip-path:polygon(0 10%,100% 50%,0 90%);}
+        .morph-fusiform .f-eye{right:20px;top:12px;}
+        .morph-gelatinous .f-body{width:130px;height:100px;border-radius:40% 60% 50% 40% / 50% 40% 60% 50%;background:rgba(255,255,255,0.2) !important;box-shadow:inset 0 0 20px rgba(255,255,255,0.5);border:2px dashed rgba(255,255,255,0.6);backdrop-filter:blur(4px);animation:bob-lure 4s infinite alternate;left:65px;top:-10px;}
+        .morph-gelatinous .f-tail{background:rgba(255,255,255,0.2) !important;border:2px dashed rgba(255,255,255,0.4);animation:bob-lure 4s infinite alternate-reverse;top:0px;}
+        .morph-gigantism .f-body{transform:scale(1.4);}
+        .morph-gigantism .f-tail{transform:scale(1.4) translateX(-10px);}
+        .morph-stasis .f-body{opacity:0.6;filter:grayscale(50%);}
+        .color-countershaded .f-body,.color-countershaded .f-tail{background:linear-gradient(to bottom,#1e293b 45%,#f1f5f9 55%);box-shadow:inset -10px -10px 20px rgba(0,0,0,0.2);}
+        .color-red .f-body,.color-red .f-tail{background:#b91c1c;box-shadow:inset -10px -10px 20px rgba(0,0,0,0.6);border-color:#7f1d1d;}
+        .eye-giant .f-eye{width:36px;height:36px;top:10px;right:15px;background:#fef08a;box-shadow:0 0 15px #fef08a;border-color:#ca8a04;}
+        .eye-giant .f-eye::after{width:14px;height:14px;right:6px;top:10px;}
+        .eye-tubular .f-eye{width:16px;height:30px;border-radius:8px;top:5px;right:25px;transform:rotate(-20deg);background:#fef08a;}
+        .eye-blind .f-eye{width:0;height:0;opacity:0;}
+        .spec-photophores .f-photo{opacity:1;}
+        .spec-lure .f-lure{opacity:1;transform:scale(1);}
+        .spec-jaws .f-jaw{opacity:1;transform:rotate(0deg) scale(1);}
+        .spec-tmao .f-tmao-aura{opacity:1;}
+        .spec-tmao .f-body{border:2px solid #d8b4fe;box-shadow:inset 0 0 20px #a855f7;}
+        .spec-chemosyn{filter:drop-shadow(0 0 15px #22c55e);}
+        .spec-omz{filter:sepia(0.5) hue-rotate(250deg);}
+        .spec-osmo{animation:float 1s ease-in-out infinite alternate;}
+        .spec-stilts .f-body::after{content:'';position:absolute;bottom:-30px;left:20px;width:4px;height:50px;background:rgba(255,255,255,0.5);box-shadow:60px 0 rgba(255,255,255,0.5);}
+        .spec-sealing .f-body::before{content:'';position:absolute;right:-5px;top:10px;width:12px;height:60px;background:#475569;border-radius:6px;z-index:5;}
+        
+        .equip-btn{transition:all 0.2s;border:2px solid transparent;position:relative;padding-right:2rem;}
+        .equip-btn.active{border-color:#3b82f6;background-color:#eff6ff;}
+        .stack-content{transition:max-height 0.4s ease-in-out,opacity 0.3s ease-in-out;max-height:0;opacity:0;overflow:hidden;}
+        .stack-content.open{max-height:800px;opacity:1;}
+        @keyframes implosion{0%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.2);filter:brightness(2);}100%{transform:translate(-50%,-50%) scale(1,0.1);background-color:#ef4444;border-color:#7f1d1d;}}
+        .sub-crushed{animation:implosion 0.3s cubic-bezier(0.25,0.46,0.45,0.94) forwards;}
+        .sub-hull-steel{background-color:#94a3b8;border-color:#475569;}
+        .sub-hull-titanium{background-color:#cbd5e1;border-color:#3b82f6;box-shadow:inset 0 0 15px rgba(59,130,246,0.5);}
+        .sub-hull-bio{background-color:#d8b4fe;border-color:#9333ea;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;box-shadow:0 0 20px rgba(168,85,247,0.6);}
+        .fw-node{position:absolute;transform:translate(-50%,-50%);transition:all 1s ease-in-out;cursor:pointer;z-index:20;}
+        .fw-node:hover{transform:translate(-50%,-50%) scale(1.1);filter:drop-shadow(0 0 15px rgba(255,255,255,0.5));}
+        .fw-line{stroke:rgba(255,255,255,0.3);stroke-width:3;stroke-dasharray:10;animation:fw-flow 2s linear infinite;transition:stroke 0.5s,opacity 0.5s;}
+        @keyframes fw-flow{from{stroke-dashoffset:20;}to{stroke-dashoffset:0;}}
+        .bc-fish-svg{width:100%;height:100%;filter:drop-shadow(0 10px 10px rgba(0,0,0,0.8));}
+        .bc-bulb{transition:all 0.3s ease;}
+        .bc-glow-active{fill:#60a5fa;filter:drop-shadow(0 0 15px #60a5fa);stroke:#93c5fd;stroke-width:2px;}
+        .bc-glow-lure{fill:#fde047;filter:drop-shadow(0 0 25px #fef08a);stroke:#fef08a;stroke-width:2px;}
+        .bc-glow-flash{fill:#ffffff;filter:drop-shadow(0 0 30px #ffffff);stroke:#ffffff;stroke-width:3px;}
+        .perspective-1000{perspective:1000px;}
+        .transform-style-3d{transform-style:preserve-3d;}
+        .backface-hidden{backface-visibility:hidden;}
+        .rotate-y-180{transform:rotateY(180deg);}
+        .nav-scroll::-webkit-scrollbar{height:4px;}
+        .nav-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+        #ctd-probe{transition:top 0.2s ease-out;}
+        
+        @keyframes a-shrink{0%,100%{transform:scale(1);}50%{transform:scale(0.3);}} .anim-shrink{animation:a-shrink 1.5s ease-in-out;}
+        @keyframes a-slide{0%,100%{transform:translateX(0);}50%{transform:translateX(60px) scale(0.8);opacity:0.5;}} .anim-slide{animation:a-slide 1.5s ease-in-out;}
+        @keyframes a-wobble{0%,100%{transform:rotate(0) scale(1);}25%{transform:rotate(-15deg) scale(1.1);}75%{transform:rotate(15deg) scale(0.9);}} .anim-wobble{animation:a-wobble 1.5s ease-in-out;}
+        @keyframes a-glow{0%,100%{filter:drop-shadow(0 0 0 yellow);}50%{filter:drop-shadow(0 0 25px yellow) brightness(1.5);}} .anim-glow{animation:a-glow 1.5s ease-in-out;}
+        @keyframes a-zip{0%{transform:translateX(-80px);}50%{transform:translateX(80px);}100%{transform:translateX(0);}} .anim-zip{animation:a-zip 1s ease-in-out;}
+        @keyframes a-flip{0%{transform:rotateX(0);}50%{transform:rotateX(180deg);}100%{transform:rotateX(0);}} .anim-flip{animation:a-flip 1.5s ease-in-out;}
+        @keyframes a-fade{0%,100%{opacity:1;}50%{opacity:0.1;}} .anim-fade{animation:a-fade 1.5s ease-in-out;}
+        @keyframes a-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-30px);}} .anim-float{animation:a-float 1.5s ease-in-out;}
+        @keyframes a-grow{0%,100%{transform:scale(1);}50%{transform:scale(1.8);}} .anim-grow{animation:a-grow 1.5s ease-in-out;}
+
+        .eco-line{stroke:rgba(255,255,255,0.2);stroke-width:3;transition:all 0.5s ease;}
+        .eco-line-boom{stroke:#4ade80;stroke-width:6;opacity:0.8;stroke-dasharray:10;animation:fw-flow 0.8s linear infinite;}
+        .eco-line-die{stroke:#ef4444;opacity:0.15;stroke-width:1;}
+        .eco-boom{transform:translate(-50%,-50%) scale(1.3) !important;border-color:#4ade80 !important;box-shadow:0 0 25px rgba(74,222,128,0.6) !important;z-index:30 !important;}
+        .eco-die{transform:translate(-50%,-50%) scale(0.6) !important;filter:grayscale(1) !important;opacity:0.4 !important;border-color:#ef4444 !important;}
+
+        .qz-btn{background-color:rgba(255,255,255,0.1);padding:0.5rem;border-radius:0.5rem;text-align:left;transition:all 0.2s;}
+        .qz-btn:hover{background-color:rgba(255,255,255,0.2);}
+        .qz-step{margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.1);}
+        .aq-btn{background-color:#1f2937;padding:0.5rem;border-radius:0.5rem;text-align:left;font-size:0.875rem;transition:background-color 0.2s;border:1px solid transparent;}
+        .aq-btn:hover{background-color:#374151;border-color:#4b5563;}
+        .aq-step{margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #1f2937;}
+        .mig-btn{background-color:#3730a3;padding:0.75rem;border-radius:0.75rem;text-align:left;font-weight:600;transition:background-color 0.2s;}
+        .mig-btn:hover{background-color:#4338ca;}
+        .mig-step{margin-top:1rem;padding-top:1rem;border-top:1px solid #3730a3;}
+        .lab-btn{background-color:#374151;padding:0.5rem;border-radius:0.25rem;font-size:0.75rem;position:relative;padding-right:1.5rem;transition:background-color 0.2s;border:2px solid transparent;}
+        .lab-btn:hover{background-color:#4b5563;}
+        .info-ic{position:absolute;top:8px;right:6px;color:#9ca3af;cursor:pointer;transition:color 0.2s;}
+        .info-ic:hover{color:#93c5fd;}
+        
+        .threat-radar{transition:all 0.5s ease-in-out;}
+        .threat-flee{transform:scale(0) translateX(50px);opacity:0;}
+        .threat-attack{transform:scale(3) translateX(-50px) translateY(20px);opacity:0;}
+        .bio-cloud{position:absolute;width:15px;height:15px;background:#60a5fa;border-radius:50%;filter:blur(4px);animation:a-wobble 1s infinite alternate,a-fade 2s forwards;}
+        @keyframes fall-snow{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(600px) rotate(360deg);opacity:0;}}
+        .anim-marine-snow{animation:fall-snow 3.5s linear forwards;}
+        
+        .sonar-grid { background-image: linear-gradient(rgba(74,222,128,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.15) 1px, transparent 1px) !important; background-size: 40px 40px !important; background-color: #022c22 !important; }
+        .sonar-blob { background-color: #4ade80; border-radius: 50%; filter: blur(12px); opacity: 0.85; transition: all 1s ease-in-out; }
+        @keyframes radar-sweep { 0% { transform: translateY(-100%); } 100% { transform: translateY(600px); } }
+    </style>
+</head>
+<body class="text-gray-800 antialiased font-sans">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Nav -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2 text-ocean-sunlight font-heading font-bold text-xl flex-shrink-0">
+                    <i class="fa-solid fa-water"></i><span class="hidden sm:inline">OceanExplorer</span>
+                </div>
+                <div class="hidden lg:flex space-x-1 font-bold text-sm">
+                    <button onclick="switchTab('zones')" id="btn-zones" class="tab-btn px-2 py-5 border-b-4 border-ocean-sunlight text-ocean-sunlight transition hover:bg-gray-50"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
+                    <button onclick="switchTab('adaptations')" id="btn-adaptations" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
+                    <button onclick="switchTab('migration')" id="btn-migration" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 leading-tight"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
+                    <button onclick="switchTab('gradients')" id="btn-gradients" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
+                    <button onclick="switchTab('lab')" id="btn-lab" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
+                    <button onclick="switchTab('pressure')" id="btn-pressure" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
+                    <button onclick="switchTab('foodweb')" id="btn-foodweb" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
+                    <button onclick="switchTab('biocode')" id="btn-biocode" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
+                    <button onclick="switchTab('study')" id="btn-study" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-book-open mr-1"></i> Study</button>
+                    <button onclick="switchTab('bathymetry')" id="btn-bathymetry" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+                    <button onclick="switchTab('carbonpump')" id="btn-carbonpump" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
+                    <button onclick="switchTab('plankton')" id="btn-plankton" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2 bg-blue-50 px-2 sm:px-3 py-1 rounded-full border border-blue-200 flex-shrink-0 ml-2">
+                    <div id="badge-zones" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Zone Master">🌟</div>
+                    <div id="badge-adaptations" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-teal-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Adaptation Ace">🧬</div>
+                    <div id="badge-migration" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Migration Commander">🦑</div>
+                    <div id="badge-climate" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Climate Savior">🌍</div>
+                    <div id="badge-gradients" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Gradient Guru">📊</div>
+                    <div id="badge-engineer" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Bio-Engineer">🔬</div>
+                    <div id="badge-physics" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Physics Pro">🗜️</div>
+                    <div id="badge-ecology" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Ecology Expert">🕸️</div>
+                    <div id="badge-biocode" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-cyan-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Luciferin Coder">💡</div>
+                    <div id="badge-scholar" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-purple-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="SciOly Scholar">🎓</div>
+                </div>
+            </div>
+        </div>
+        <div class="lg:hidden flex border-t border-gray-200 bg-white overflow-x-auto nav-scroll">
+            <button onclick="switchTab('zones')" id="btn-zones-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-ocean-sunlight text-ocean-sunlight flex-shrink-0"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
+            <button onclick="switchTab('adaptations')" id="btn-adaptations-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
+            <button onclick="switchTab('migration')" id="btn-migration-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0 leading-tight"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
+            <button onclick="switchTab('gradients')" id="btn-gradients-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
+            <button onclick="switchTab('lab')" id="btn-lab-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
+            <button onclick="switchTab('pressure')" id="btn-pressure-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
+            <button onclick="switchTab('foodweb')" id="btn-foodweb-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
+            <button onclick="switchTab('biocode')" id="btn-biocode-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
+            <button onclick="switchTab('study')" id="btn-study-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-book-open mr-1"></i> Study</button>
+            <button onclick="switchTab('bathymetry')" id="btn-bathymetry-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+            <button onclick="switchTab('carbonpump')" id="btn-carbonpump-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
+            <button onclick="switchTab('plankton')" id="btn-plankton-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
+        </div>
+    </nav>
+
+    <!-- Modal -->
+    <div id="interactive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="modal-content-container" class="bg-white rounded-3xl w-11/12 max-w-2xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-4"><span id="modal-emoji" class="text-4xl">🐠</span><h3 class="text-2xl font-heading font-bold text-gray-800" id="modal-title">Title</h3></div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 text-3xl transition focus:outline-none">&times;</button>
+            </div>
+            <div class="p-6 bg-white max-h-[70vh] overflow-y-auto text-lg text-gray-700" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="pt-24 lg:pt-16">
+        
+        <!-- TAB 1: ZONES -->
+        <div id="tab-zones" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="zones.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 2: ADAPTATIONS -->
+        <div id="tab-adaptations" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="adaptations.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 3: MIGRATION -->
+        <div id="tab-migration" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="migration.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 4: GRADIENTS -->
+        <div id="tab-gradients" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="gradients.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 5: BIO-LAB -->
+        <div id="tab-lab" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="biolab.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 6: PRESSURE -->
+        <div id="tab-pressure" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="pressure.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 7: ECOLOGY -->
+        <div id="tab-foodweb" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="ecology.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 8: BIO-CODE -->
+        <div id="tab-biocode" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="biocode.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 9: STUDY DECK -->
+        <div id="tab-study" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="study.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+    </main>
+
+    <script>
+        let currentGradQ=0, cardsFlipped=0, currentHullIndex=0, migProgress=0, currentBioLevel=0, currentBioSequence=[], currentATP=0;
+        let ecologyWins=[false,false,false,false,false,false];
+        let zoneProgress=[0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false];
+        let adaptProgress=[0,0,0,0,0,0], adaptCompleted=[false,false,false,false,false,false];
+        let badges={zones:false, migration:false, climate:false, adapt:false, engineer:false, gradients:false, physics:false, scholar:false, ecology:false, biocode:false};
+        const fishState={morphology:'standard', color:'standard', eyes:'standard', specials:{photophores:false, lure:false, jaws:false, tmao:false, osmo:false, omz:false, chemo:false, stilts:false, clinging:false, sealing:false, chemosyn:false}};
+        const labWins={intertidal:false, epipelagic:false, mesopelagic:false, bathypelagic:false, abyssal:false, hadal:false};
+        const hullUpgrades=[{maxAtm:50, cssClass:"sub-hull-steel"}, {maxAtm:400, cssClass:"sub-hull-titanium"}, {maxAtm:1200, cssClass:"sub-hull-bio"}];
+        const keys={l:false, r:false, u:false, d:false};
+        const tGame={active:false, surfacing:false, depth:0, x:50, max:0, dmg:0, samp:0, ents:[], id:null};
+        let dashGame={active:false, x:50, y:90, preds:[]};
+        let dielIsNight=false, dielDiscovered=[], dielSonarMode=false;
+
+        // DATA DICTIONARIES COMPRESSED
+        const DIEL_OCEAN_ZONES = [{name:'Sunlight Zone', depth:'0m - 200m', color:'text-cyan-100', border:'border-cyan-300/30'},{name:'Twilight Zone', depth:'200m - 1,000m', color:'text-blue-200', border:'border-blue-500/30'},{name:'Midnight Zone', depth:'1,000m - 4,000m', color:'text-indigo-200', border:'border-indigo-800/30'}];
+        const DIEL_SPECIES_DATA = [['copepod','Copepod','🦠','45%','10%','400m','10m','15%','text-3xl','Phytoplankton',['Most only have a single bright red eye!'],'Copepoda'],['krill','Krill','🦐','40%','15%','300m','50m','35%','text-4xl','Phytoplankton',['Baleen whales love to eat these swarms.'],'Euphausiacea'],['lanternfish','Lanternfish','🔦🐟','60%','20%','700m','100m','75%','text-5xl','Zooplankton',['Make up over 60% of all deep-sea fish!'],'Myctophidae'],['humboldt','Humboldt Squid','🦑','55%','25%','500m','150m','55%','text-6xl','Lanternfish',['Also known as the Jumbo Squid.'],'Dosidicus gigas'],['siphonophore','Siphonophore','🫧','50%','18%','400m','75m','85%','text-5xl','Small crustaceans',['A colony of tiny connected clones.'],'Siphonophorae'],['salp','Salp','🫙','65%','8%','800m','5m','25%','text-4xl','Phytoplankton',['Their heavy poop safely traps carbon!'],'Salpidae'],['pteropod','Sea Butterfly','🦋','38%','12%','250m','30m','65%','text-4xl','Microscopic plankton',['A tiny swimming snail with "wings".'],'Pteropoda'],['arrowworm','Arrow Worm','🏹','48%','22%','450m','120m','10%','text-4xl','Copepods',['Perfectly transparent ambush predators.'],'Chaetognatha'],['hatchetfish','Deep Sea Hatchetfish','🪓','75%','45%','1,200m','300m','45%','text-5xl','Copepods',['Coin-thin body makes them invisible.'],'Sternoptychidae'],['combjelly','Comb Jelly','🪼','52%','16%','480m','60m','90%','text-5xl','Other small jellies',['Cilia catch light to make rainbow colors.'],'Ctenophora'],['pyrosome','Pyrosome','🥒','68%','10%','700m','20m','30%','text-5xl','Plankton',['Giant hollow glowing tubes of zooids.'],'Pyrosomatida'],['ostracod','Ostracod','🌰','42%','14%','350m','40m','20%','text-3xl','Detritus',['Vomits bioluminescent fluid to escape.'],'Ostracoda'],['amphipod','Amphipod','🦐','46%','18%','420m','80m','80%','text-3xl','Marine Snow',['Can ride inside hollowed out salps.'],'Phronima'],['bristlemouth','Bristlemouth','🐟','80%','50%','1,500m','400m','60%','text-4xl','Copepods',['The most abundant vertebrate genus.'],'Cyclothone'],['medusa','Atolla Jellyfish','🚨','70%','30%','900m','200m','40%','text-5xl','Zooplankton',['Creates a circular flash of blue light like a siren to attract predators of its attacker.'],'Atolla wyvillei']].map(s=>({id:s[0],name:s[1],emoji:s[2],dayDepth:s[3],nightDepth:s[4],dayDepthText:s[5],nightDepthText:s[6],xPos:s[7],size:s[8],diet:s[9],funFacts:s[10],scientificName:s[11]}));
+        const eNodes = [['p', '🌿', 'Phytoplankton', 15, 10, 'Producer', 'Base of sunlight food web.'],['z', '🦐', 'Zooplankton', 35, 15, 'Primary Consumer', 'Eats phytoplankton.'],['wh', '🐋', 'Baleen Whale', 65, 8, 'Apex Consumer', 'Filter feeds massive amounts of zooplankton.'],['l', '🔦', 'Lanternfish', 45, 35, 'Secondary Consumer', 'Migrates to eat zooplankton.'],['sq', '🦑', 'Squid', 75, 40, 'Tertiary Consumer', 'Hunts lanternfish in the twilight zone.'],['t', '🐟', 'Tuna', 85, 20, 'Tertiary Consumer', 'Fast open-ocean predator.'],['s', '🦈', 'Apex Shark', 95, 10, 'Apex Predator', 'Top of the pelagic food chain.'],['m', '❄️', 'Marine Snow', 20, 60, 'Detritus', 'Dead organic matter sinking to the deep.'],['v', '🧛', 'Vampire Squid', 45, 65, 'Detritivore', 'Eats marine snow using sticky filaments.'],['c', '🥒', 'Sea Cucumber', 20, 85, 'Benthic Scavenger', 'Crawls on the mud eating marine snow.'],['i', '🪲', 'Giant Isopod', 50, 85, 'Benthic Scavenger', 'Scavenges large carcasses.'],['b', '🦠', 'Chemo-Bacteria', 70, 95, 'Producer', 'Uses H2S from vents for energy.'],['w', '🩸', 'Tubeworm', 85, 85, 'Primary Consumer', 'Hosts chemo-bacteria.'],['vc', '🦀', 'Vent Crab', 95, 95, 'Secondary Consumer', 'Predator of the vent ecosystem.']];
+        let eLinks = [['p','z'], ['z','wh'], ['z','l'], ['l','sq'], ['l','t'], ['sq','t'], ['sq','s'], ['t','s'], ['m','v'], ['m','c'], ['m','i'], ['b','w'], ['w','vc']]; ['p','z','wh','l','sq','t','s'].forEach(id => eLinks.push([id, 'm', 1]));
+        const eMissions = [{ id:'bot', n:'Algal Die-off (Bottom-Up)', d:'Ocean warming kills Phytoplankton.', eff:{'p':-1,'z':-1,'wh':-1,'l':-1,'sq':-1,'t':-1,'s':-1}, log:['Phytoplankton perish.','Zooplankton starve.','Whales migrate away.','Pelagic food web collapses!'], q:'Why did the Shark starve?', o:['No Phytoplankton = no energy base','Sharks are vegetarian'], a:0 },{ id:'top', n:'Shark Finning (Top-Down)', d:'Apex Sharks removed.', eff:{'s':-1,'t':1,'sq':1,'l':-1,'z':-1,'p':1}, log:['Sharks removed!','Tuna & Squid overpopulate!','Lanternfish decimated.','Zooplankton heavily grazed.'], q:'Why did Phytoplankton ultimately boom?', o:['Zooplankton were eaten by Squid','Lanternfish ate them'], a:0 },{ id:'all', n:'Whale Fall (Allochthonous)', d:'Dead whale sinks to the abyss.', eff:{'wh':0,'m':1,'v':1,'c':1,'i':1}, log:['Whale carcass reaches the seafloor.','Marine snow/detritus spikes!','Benthic scavengers feast!'], q:'Energy from OUTSIDE the abyssal zone is called:', o:['Autochthonous','Allochthonous'], a:1 },{ id:'aut', n:'Vent Shutoff (Autochthonous)', d:'Hydrothermal flow stops.', eff:{'b':-1,'w':-1,'vc':-1}, log:['H2S flow stops.','Chemo-bacteria die.','Tubeworms starve.','Vent Crabs scatter or die.'], q:'Energy produced LOCALLY in the dark is called:', o:['Autochthonous','Allochthonous'], a:0 },{ id:'pla', n:'Microplastic Pollution', d:'Toxins enter the base of the web.', eff:{'z':-1,'wh':-1,'l':-1}, log:['Zooplankton ingest plastics.','Toxins bioaccumulate.','Filter-feeding Whales poisoned!','Lanternfish populations sicken.'], q:'What is the term for toxins building up in predators?', o:['Bioaccumulation','Eutrophication'], a:0 },{ id:'min', n:'Deep-Sea Mining', d:'Seabed bulldozed for minerals.', eff:{'c':-1,'i':-1,'w':-1,'vc':-1}, log:['Abyssal plain disturbed.','Vent habitats destroyed.','Benthic scavengers wiped out.','Endemic tubeworms crushed.'], q:'Which oceanic zones are directly impacted?', o:['Abyssal & Hadal','Epipelagic & Mesopelagic'], a:0 }];
+        const gradQuestions=[{q:"Sharp change in salinity?", a:"Halocline"}, {q:"Strong chemical boundary?", a:"Chemocline"}, {q:"Migrating layer reflecting sonar?", a:"Deep Scattering Layer"}, {q:"Rapid increase of nitrates?", a:"Nutricline"}, {q:"Upper uniform layer above thermocline?", a:"Mixed Layer"}, {q:"Rapid drop in oxygen?", a:"Oxycline"}];
+        const allGradOptions=["Halocline", "Chemocline", "Oxycline", "Nutricline", "Mixed Layer", "Deep Scattering Layer", "Thermocline", "Pycnocline"];
+        const bioCmds = [{id:'Belly', n:'Ventral Photophores', d:'Counter-illuminate bottom', c:1}, {id:'Flash', n:'Full Body Strobe', d:'Startle or Alarm', c:2}, {id:'Lure', n:'Esca Pulse', d:'Attract prey', c:1}, {id:'Tail', n:'Caudal Signal', d:'Intraspecies comms', c:1}, {id:'Cloud', n:'Bio-Vomit', d:'Glowing decoy cloud', c:2}];
+        const bioLevels=[['Shadow Hide', 'A shark is swimming below you. Erase your silhouette so it doesn\'t look up and see you against the surface light!', '🦈', 'Great White', ['Belly'], 'Glow your ventral side.', 'Perfect! Your belly matched the surface light, hiding you completely.'],['Burglar Alarm', 'A Vampire Squid grabbed you! Create a massive light show to attract a larger predator to eat the squid.', '🦑', 'Vampire Squid', ['Flash','Flash','Flash'], 'Execute a rapid strobe effect.', 'Success! The flashing alarm attracted a whale which ate the squid.'],['The Decoy', 'A fast predator is rushing you! Spit out a glowing cloud of bioluminescent mucus to confuse it while you escape.', '🐋', 'Toothed Whale', ['Cloud'], 'Use the Bio-Vomit.', 'The glowing cloud blinded the predator and you got away!'],['Fatal Attraction', 'You are an Anglerfish. You are hungry, but can\'t waste energy chasing prey. Bring them to you.', '🐟', 'Small Fish', ['Lure','Lure'], 'Pulse the Esca on your head twice.', 'Chomp! The prey approached your twitching lure and you easily swallowed it.']].map(l=>({title:l[0],desc:l[1],te:l[2],tn:l[3],target:l[4],hint:l[5],successMsg:l[6]}));
+
+        window.addEventListener('keydown', e => { if(e.key === 'ArrowLeft') keys.l = true; if(e.key === 'ArrowRight') keys.r = true; if(e.key === 'ArrowUp') keys.u = true; if(e.key === 'ArrowDown') keys.d = true; });
+        window.addEventListener('keyup', e => { if(e.key === 'ArrowLeft') keys.l = false; if(e.key === 'ArrowRight') keys.r = false; if(e.key === 'ArrowUp') keys.u = false; if(e.key === 'ArrowDown') keys.d = false; });
+
+        function renderZoneQuizzes() {
+            const q = [
+                [["To survive the hot sun during low tide, what do barnacles do?","Walk to water","Close shells tightly",1],["What is the scientific term for an animal fatally drying out?","Desiccation","Osmosis",0],["Mussels anchor using strong protein cables called:","Nematocysts","Byssal threads",1],["A transition area between two biological communities (like Intertidal) is a(n):","Ecotone","Estuary",0],["What type of tide provides maximum water movement for spawning?","Neap Tide","Spring Tide",1],["Intertidal snails scrape algae off rocks using a conveyor-belt-like tongue called a:","Radula","Esca",0]],
+                [["Why do open-ocean predators use countershading?","Blend with deep ocean below/sunlight above","Absorb heat",0],["Which color is absorbed first, disappearing by 10m?","Blue","Red",1],["Torpedo-like body shape to reduce drag is called:","Fusiform","Sagittal",0],["Below what depth does photosynthesis become impossible?","1,000m","200m",1],["Fish that pull O2 from blood to fill their bladder use a:","Physostomous bladder","Physoclistous bladder",1],["Stinging cells used by jellyfish are called:","Nematocysts","Photophores",0]],
+                [["How do Lanternfish hide their shadows?","Swim faster","Counter-illumination",1],["What invisible barrier features a rapid drop in temp?","Thermocline","Halocline",0],["The layer where oxygen depletion is highest is the:","Anoxic Benthic Zone","Oxygen Minimum Zone (OMZ)",1],["Why do predators here have massive, upward-pointing eyes?","Spot silhouettes above","See mud below",0],["Why are deep-sea shrimp bright red?","Toxic warning","Red light doesn't penetrate here (appears black)",1],["Animals track specific dim light levels called:","Isolumes","Isobars",0]],
+                [["How do animals adapt to scarce food?","Huge mouths, slow metabolism","Swim to surface to eat",0],["What two chemicals create bioluminescence?","Chlorophyll & ATP","Luciferin & Luciferase",1],["What do many deep sea fish lack entirely due to high pressure?","A Swim Bladder","Gills",0],["How does the male Anglerfish guarantee he never loses his mate?","Singing a mating call","Sexual parasitism",1],["What was the 19th-century theory that claimed no life existed below 1,800 feet?","Azoic Hypothesis","Abyssal Void Theory",0],["Which 1870s voyage disproved the Azoic Hypothesis?","Beagle Expedition","Challenger Expedition",1]],
+                [["How does the Tripod Fish adapt to soft mud?","Rolls like a ball","Uses long fins as stilts",1],["Organisms living ON the seafloor are called:","Benthic","Pelagic",0],["Giant Isopods growing very large due to cold temps is called:","Bathypelagic Swelling","Abyssal Gigantism",1],["A massive food source like a dead whale falling is called:","A Whale Fall","A Pelagic Graveyard",0],["Because the Abyss relies entirely on external energy (marine snow), it is a(n) ________ ecosystem.","Autochthonous","Allochthonous",1],["Hydrostatic pressure increases 1 atm every ____ meters.","10m","100m",0]],
+                [["Tubeworms lack a stomach. How do they get energy?","Chemosynthesis via bacteria","Flashlights to grow plants",0],["What chemical compound acts as a shield (piezolyte)?","NaCl","TMAO",1],["Slow-leaking areas where methanotrophic mussels live are:","Cold Seeps","Brine Pools",0],["What is the specialized organ inside a Riftia tubeworm for bacteria?","Operculum","Trophosome",1],["Bacteria thriving >100°C at vents are classified as:","Hyperthermophiles","Cryophiles",0],["Vent ecosystems produce energy locally. This is a(n) ________ ecosystem.","Allochthonous","Autochthonous",1]]
+            ];
+            q.forEach((z, zi) => { let h = ''; z.forEach((qq, qi) => { h += `<div id="qz-${zi}-${qi}" class="${qi>0?'qz-step hidden':''}"><p class="mb-3 font-semibold text-sm">Level ${qi+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkZ(${zi},${qi},${qq[3]===0},this)" class="qz-btn">A) ${qq[1]}</button><button onclick="checkZ(${zi},${qi},${qq[3]===1},this)" class="qz-btn">B) ${qq[2]}</button></div></div>`; }); const b = document.getElementById(`qz-body-${zi}`); if(b) b.innerHTML = h; });
+        }
+
+        function renderAdaptQuizzes() {
+            const q = [
+                [["Snail trapdoors are called:","Radula","Operculum",1],["Drying out is called:","Hypoxia","Desiccation",1],["Mussels anchor using:","Byssal threads","Lipids",0],["Maintaining cell volume during salinity shifts:","Osmoregulation","Bioluminescence",0],["Molecules that refold proteins:","Luciferins","HSPs",1]],
+                [["Sharks lack swim bladders. They use:","Squalene","Cellulose",0],["Torpedo-shape is called:","Fusiform","Sagittal",0],["Countershading effect:","Disruptive Coloration","Obliteration of 3D shadows",1],["Near-invisibility in open ocean:","Refractive index matching","Absorbing red light",0],["Fish using a gas gland from blood:","Physostomous","Physoclistous",1]],
+                [["Reflective eye layer?","Tapetum Lucidum","Cornea",0],["Why tubular eyes point up?","Seafloor predators","Spot prey silhouettes",1],["Why are shrimp red here?","Toxic","Red light is gone (appears black)",1],["Matching downwelling light?","Disruptive Color","Counter-illumination",1],["OMZ survival biochem:","High O2 affinity hemoglobin","Photosynthesis",0]],
+                [["Reduced ossification purpose?","Conserve energy","Crevice squeezing",0],["Watery, flabby muscles allow:","Burst speed","Metabolic stasis",1],["Mate scarcity solution:","Asexual","Parasitic fusion",1],["Chemicals for bioluminescence:","Luciferin & Luciferase","Melanin & ATP",0],["Gulper Eel unhinged jaws:","Intimidation","Swallow larger prey",1]],
+                [["Tripod Fish rigid fins purpose?","Hover above soft mud","Stab prey",0],["Living ON the seafloor mud is called:","Benthic","Pelagic",0],["Primary energy source falling down?","Upwelling","Marine Snow",1],["Isopods growing massive is called:","Abyssal Gigantism","Bathypelagic Swelling",0],["Why gelatinous bodies instead of gas bladders?","Store fresh water","Liquids are incompressible",1]],
+                [["Piezolyte preventing protein crush?","TMAO","NaCl",0],["Tubeworm energy source?","Filter marine snow","Chemosynthesis",1],["Vent chemosynthesis uses what toxic molecule?","Hydrogen Sulfide (H2S)","CO2",0],["Tubeworm organ housing bacteria:","Operculum","Trophosome",1],["Bacteria at >100°C vents are:","Hyperthermophiles","Cryophiles",0]]
+            ];
+            q.forEach((z, zi) => { let h = ''; z.forEach((qq, qi) => { h += `<div id="aq-${zi}-${qi}" class="${qi>0?'aq-step hidden':''}"><p class="mb-3 font-semibold text-sm">Q${qi+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkA(${zi},${qi},${qq[3]===0},this)" class="aq-btn">A) ${qq[1]}</button><button onclick="checkA(${zi},${qi},${qq[3]===1},this)" class="aq-btn">B) ${qq[2]}</button></div></div>`; }); const b = document.getElementById(`aq-body-${zi}`); if(b) b.innerHTML = h; });
+        }
+
+        function renderMigQuiz() {
+            const q = [["Primary reason zooplankton wait for nightfall to migrate?","Phytoplankton only exist at night","Hide from visual predators",1],["Navy technology that accidentally discovered DSL?","Sonar / Acoustics","Radar",0],["Migrators pooping carbon in deep ocean regulates climate via:","Ocean Acidification","Biological Carbon Pump",1],["Specific light intensity levels organisms track:","Isolumes","Thermoclines",0],["In polar winters (no sunlight), how do they migrate?","Magnetic fields","Internal Circadian Clocks",1],['"Hunger/Satiation Hypothesis" - what if stomach is full?',"Stay deep to save energy","Migrate anyway",0],["Reverse Migration (migrating DOWN at night) is used to:","Find warm water","Avoid larger predators migrating up",1],["Squid delay upward migration if they hear:","Risso's Dolphins echolocation","Shark fin beats",0],["How is carbon physically transported down?","Carried in claws","Fast-sinking dense fecal pellets",1],["Why hide in the OMZ during the day?","Apex predators can't breathe there","It's warmer",0],["Order of migration at sunset:","Large fish first","Small zooplankton first; large fish last",1],["Energy expended by all migrating zooplankton annually?","Total energy consumption of US in a year","Single hurricane",0],["Why don't Phytoplankton migrate deep?","Too heavy","Must remain in sunlight to photosynthesize",1]];
+            let h = ''; q.forEach((qq, i) => { h += `<div id="quiz-block-mig-${i}" class="mig-step ${i>0?'hidden':''}"><p class="mb-4 font-semibold text-lg text-${i%2===0?'white':'yellow-200'}">Q${i+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-3"><button onclick="handleMigQuiz(${i}, ${qq[3]===0}, this)" class="mig-btn">A) ${qq[1]}</button><button onclick="handleMigQuiz(${i}, ${qq[3]===1}, this)" class="mig-btn">B) ${qq[2]}</button></div></div>`; });
+            const b = document.getElementById('mig-quiz-body'); if(b) b.innerHTML = h;
+        }
+
+        // --- CORE LOGIC ---
+        function switchTab(id) {
+            document.querySelectorAll('.tab-pane').forEach(el=>el.classList.add('hidden'));
+            document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('block'));
+            document.getElementById('tab-'+id).classList.remove('hidden');
+            document.getElementById('tab-'+id).classList.add('block');
+            document.querySelectorAll('.tab-btn, .tab-btn-mob').forEach(el=>{
+                el.classList.remove('border-ocean-sunlight','text-ocean-sunlight');
+                el.classList.add('border-transparent','text-gray-500');
+            });
+            const btn=document.getElementById('btn-'+id), mobBtn=document.getElementById('btn-'+id+'-mob');
+            if(btn) {btn.classList.remove('border-transparent','text-gray-500'); btn.classList.add('border-ocean-sunlight','text-ocean-sunlight');}
+            if(mobBtn) {mobBtn.classList.remove('border-transparent','text-gray-500'); mobBtn.classList.add('border-ocean-sunlight','text-ocean-sunlight');}
+            window.scrollTo(0,0);
+            // migration renders inside its own iframe
+            // Game tabs load via src= — iframe is ready when tab is shown
+        }
+
+        function closeModal() { document.getElementById('interactive-modal').classList.remove('modal-active'); document.getElementById('modal-content-container').classList.remove('modal-scale'); }
+        function openModal(t, e, c) {
+            document.getElementById('modal-title').innerText=t; document.getElementById('modal-emoji').innerText=e; document.getElementById('modal-body').innerHTML=c;
+            document.getElementById('interactive-modal').classList.add('modal-active'); document.getElementById('modal-content-container').classList.add('modal-scale');
+        }
+
+        function awardBadge(id) {
+            if(!badges[id]) { badges[id]=true; const b=document.getElementById('badge-'+id); if(b) b.classList.add('badge-earned'); checkAllBadges(); }
+        }
+
+        function checkAllBadges() {
+            if(Object.values(badges).every(v=>v)) {
+                const c=document.getElementById('confetti-canvas'); c.style.display='block'; const ctx=c.getContext('2d');
+                c.width=window.innerWidth; c.height=window.innerHeight; let pts=[];
+                for(let i=0;i<150;i++) pts.push({x:Math.random()*c.width, y:Math.random()*c.height, r:Math.random()*6+2, d:Math.random()*10});
+                function draw() {
+                    ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle="gold"; ctx.beginPath();
+                    pts.forEach(p=>{ctx.moveTo(p.x, p.y); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);}); ctx.fill();
+                    pts.forEach(p=>{ p.y+=Math.cos(p.d)+1+p.r/2; if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;} });
+                    requestAnimationFrame(draw);
+                }
+                draw(); setTimeout(()=>c.style.display='none',8000);
+            }
+        }
+
+        // --- ZONES LOGIC ---
+        function checkZ(z, q, isC, btn) {
+            if(isC) {
+                btn.classList.add('bg-green-500','text-white');
+                if(zoneProgress[z]===q) {
+                    zoneProgress[z]++; document.getElementById(`q-tracker-${z}`).innerText=zoneProgress[z];
+                    if(zoneProgress[z]<=5) {
+                        const nextStep = document.getElementById(`qz-${z}-${zoneProgress[z]}`);
+                        if(nextStep) nextStep.classList.remove('hidden');
+                    }
+                    else { zoneCompleted[z]=true; if(zoneCompleted.every(v=>v)){document.getElementById('zone-master-celebration').classList.remove('hidden'); awardBadge('zones');} }
+                }
+            } else {
+                btn.classList.add('bg-red-500','text-white','anim-shake'); setTimeout(()=>btn.classList.remove('anim-shake','bg-red-500','text-white'),400);
+            }
+        }
+
+        const SP_DICT = {
+            'crab':['Shore Crab','🦀','Crabs have tough exoskeletons to prevent water loss. They wedge deeply into damp crevices.'],
+            'barnacle':['Acorn Barnacle','🐚','They glue their heads to rocks! Close plates to trap seawater inside.'],
+            'starfish':['Sea Star','⭐','Uses a unique water vascular system and tube feet to powerfully grip rocks.'],
+            'anemone':['Sea Anemone','🌸','Retracts its tentacles and closes up into a tight, water-filled blob to survive desiccation.'],
+            'tuna':['Bluefin Tuna','🐟','A master of the Epipelagic! Fusiform body shape and strongly countershaded.'],
+            'shark':['Great White Shark','🦈','Apex predator relying on keen eyesight, electroreception, and immense burst speed.'],
+            'turtle':['Sea Turtle','🐢','Pelagic cruiser. Streamlined shell reduces drag, uses internal counter-current heat exchange.'],
+            'manta':['Manta Ray','🦇','A gentle giant! Uses large cephalic fins to funnel plankton-rich water into its mouth.'],
+            'lanternfish':['Lanternfish','🔦','Uses bioluminescent photophores on its belly to counter-illuminate.'],
+            'squid':['Vampire Squid','🦑','Not a true squid! Turns inside out like a spiky umbrella when threatened in the Twilight Zone.'],
+            'hatchetfish':['Hatchetfish','🪓','Coin-thin body and tubular eyes pointing straight up to spot silhouettes.'],
+            'bristlemouth':['Bristlemouth','🐟','Thought to be the most abundant vertebrate genus on Earth!'],
+            'anglerfish':['Anglerfish','🎣','Uses a glowing esca (lure) filled with symbiotic bioluminescent bacteria to attract prey.'],
+            'gulper':['Gulper Eel','🐍','Massive, loosely-hinged jaws to swallow prey much larger than itself.'],
+            'vampire':['Vampire Squid','🧛','Despite the name, a peaceful detritivore! Eats marine snow using sticky filaments.'],
+            'dumbo':['Dumbo Octopus','🐙','Flaps ear-like fins to hover. Completely lacks an ink sac.'],
+            'cucumber':['Sea Cucumber','🥒','A benthic vacuum cleaner! Crawls along the mud eating organic marine snow.'],
+            'tripod':['Tripod Fish','🐡','Uses elongated fin rays to stand like a tripod above the soft mud to sense vibrations.'],
+            'isopod':['Giant Isopod','🪲','Abyssal Gigantism! Extreme cold delays maturity, allowing them to grow massive.'],
+            'rattail':['Rattail Fish','🐀','Benthic scavengers with a massive head containing highly sensitive lateral lines.'],
+            'snailfish':['Mariana Snailfish','👻','The deepest known fish! Has a gelatinous body and massive amounts of TMAO.'],
+            'tubeworm':['Riftia Tubeworm','🩸','Lacks a mouth and stomach! Houses chemosynthetic bacteria in its trophosome organ.'],
+            'amphipod':['Supergiant Amphipod','🦐','A trench scavenger! Uses specialized aluminum shields and TMAO to survive.'],
+            'cuskeel':['Cusk Eel','🐟','Found near the bottom of trenches alongside snailfish. Gelatinous and highly adapted.']
+        };
+
+        function openSpecies(t) { const d=SP_DICT[t]; if(d) openModal(d[0],d[1],`<p class="font-medium text-gray-700 leading-relaxed">${d[2]}</p>`); }
+
+        // --- ADAPTATIONS LOGIC (Task 1 animations) ---
+        const ADAPT_ANIMS = {
+            'adapt-sealing': ['🐌', 'anim-shrink'], 'adapt-clinging': ['⭐', 'anim-shake'], 'adapt-hiding': ['🦀', 'anim-slide'], 'adapt-osmo': ['💧', 'anim-wobble'], 'adapt-hsp': ['🔥', 'anim-glow'],
+            'adapt-speed': ['🐟', 'anim-zip'], 'adapt-countershading': ['🦈', 'anim-flip'], 'adapt-refraction': ['🪼', 'anim-fade'], 'adapt-swimbladder': ['🐡', 'anim-float'],
+            'adapt-tubular': ['🪓', 'anim-glow'], 'adapt-counterillumination': ['🔦', 'anim-glow'], 'adapt-omz': ['🦑', 'anim-wobble'],
+            'adapt-stasis': ['💤', 'anim-float'], 'adapt-lures': ['🎣', 'anim-glow'], 'adapt-polyandry': ['👩‍❤️‍👨', 'anim-shrink'], 'adapt-jaws': ['🐍', 'anim-grow'],
+            'adapt-gelatinous': ['👻', 'anim-wobble'], 'adapt-gigantism': ['🪲', 'anim-grow'], 'adapt-chemoreception': ['👃', 'anim-slide'], 'adapt-stilts': ['🐡', 'anim-float'],
+            'adapt-piezolytes': ['🛡️', 'anim-wobble'], 'adapt-chemosynthesis': ['🩸', 'anim-glow'], 'adapt-enzyme': ['🧬', 'anim-flip']
+        };
+
+        function attachAdaptAnims() {
+            Object.keys(ADAPT_ANIMS).forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.classList.add('cursor-pointer', 'relative', 'overflow-hidden', 'hover:border-teal-400', 'transition');
+                    el.innerHTML += `<div class="anim-overlay hidden absolute inset-0 bg-teal-900/95 z-10 flex items-center justify-center text-6xl"></div>`;
+                    el.onclick = () => {
+                        const ol = el.querySelector('.anim-overlay');
+                        ol.innerText = ADAPT_ANIMS[id][0]; ol.classList.remove('hidden'); ol.classList.add(ADAPT_ANIMS[id][1]);
+                        setTimeout(() => { ol.classList.add('hidden'); ol.classList.remove(ADAPT_ANIMS[id][1]); }, 1500);
+                    }
+                }
+            });
+        }
+
+        function checkA(z, q, isC, btn) {
+            if(isC) {
+                btn.classList.add('bg-green-600','text-white'); btn.classList.remove('bg-gray-800');
+                if(adaptProgress[z]===q) {
+                    adaptProgress[z]++; document.getElementById(`a-tracker-${z}`).innerText=adaptProgress[z];
+                    if(adaptProgress[z]<5) {
+                        const nextStep = document.getElementById(`aq-${z}-${adaptProgress[z]}`);
+                        if(nextStep) nextStep.classList.remove('hidden');
+                    }
+                    else { adaptCompleted[z]=true; if(adaptCompleted.every(v=>v)){document.getElementById('adapt-master-celebration').classList.remove('hidden'); awardBadge('adaptations');} }
+                }
+            } else {
+                btn.classList.add('bg-red-600','text-white','anim-shake'); setTimeout(()=>btn.classList.remove('anim-shake','bg-red-600','text-white'),400);
+            }
+        }
+
+        // --- DIEL MIGRATION APP LOGIC ---
+        function renderDielZones() {
+            const c=document.getElementById('diel-zones'); if(!c) return; c.innerHTML='';
+            DIEL_OCEAN_ZONES.forEach(z => {
+                const el=document.createElement('div'); el.className=`flex-1 border-b border-dashed flex items-start p-2 md:p-4 ${z.border}`;
+                el.innerHTML=`<span class="text-xs md:text-sm font-bold opacity-50 ${z.color}">${z.name}</span>`; c.appendChild(el);
+            });
+        }
+
+        function renderDielAnimals() {
+            const c=document.getElementById('diel-animals-container'); if(!c) return; c.innerHTML='';
+            DIEL_SPECIES_DATA.forEach(s => {
+                const isD=dielDiscovered.includes(s.id), d=dielIsNight?s.nightDepth:s.dayDepth;
+                const el=document.createElement('div');
+                el.className=`absolute transition-all duration-1000 ease-in-out cursor-pointer flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 z-20 ${s.size}`;
+                el.style.left=s.xPos; el.style.top=d;
+                el.innerHTML= dielSonarMode ? `<div class="sonar-blob" style="width:${4+Math.random()*3}rem; height:${2+Math.random()*2}rem;"></div>` : `<div class="relative group"><span class="filter drop-shadow-md transition-all duration-300 ${!dielIsNight&&s.id==='lanternfish'?'opacity-70':'opacity-100'} ${isD?'':'grayscale opacity-80'}">${s.emoji}</span>${!isD?'<div class="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping opacity-75"></div><div class="absolute -top-2 -right-2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center"><i class="fa-solid fa-search text-[8px] text-white"></i></div>':''}</div>`;
+                el.onclick=()=>openDielModal(s); c.appendChild(el);
+            });
+            const f=document.getElementById('diel-tracker-footer'); f.innerHTML='';
+            DIEL_SPECIES_DATA.forEach(s => {
+                const t=document.createElement('div');
+                t.className=`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all duration-500 ${dielDiscovered.includes(s.id)?'bg-white/20 scale-110 opacity-100':'bg-black/50 opacity-30 grayscale'}`;
+                t.title=dielDiscovered.includes(s.id)?s.name:'Unknown'; t.innerHTML=s.emoji; f.appendChild(t);
+            });
+            document.getElementById('diel-score-text').innerText=`Animals Discovered: ${dielDiscovered.length} / ${DIEL_SPECIES_DATA.length}`;
+            if(dielDiscovered.length===DIEL_SPECIES_DATA.length) document.getElementById('diel-success-banner').classList.remove('hidden');
+        }
+
+        function triggerMarineSnow() {
+            const c = document.getElementById('diel-ocean-area');
+            let snowHtml = '';
+            for(let i=0; i<30; i++) {
+                snowHtml += `<div class="absolute text-xl anim-marine-snow" style="left:${Math.random()*100}%; top:${Math.random()*20+10}%; animation-delay:${Math.random()*0.5}s;">❄️</div>`;
+            }
+            const sDiv = document.createElement('div');
+            sDiv.className = 'absolute inset-0 pointer-events-none z-40 overflow-hidden';
+            sDiv.innerHTML = snowHtml;
+            c.appendChild(sDiv);
+
+            carbonSeq += 250;
+            const cc = document.getElementById('carbon-counter');
+            if(cc) {
+                cc.innerText = `${carbonSeq} / 1000 Tons`;
+                cc.classList.add('text-green-300', 'scale-125');
+                setTimeout(()=>cc.classList.remove('scale-125', 'text-green-300'), 300);
+                if(carbonSeq >= 1000 && !badges['climate']) {
+                    awardBadge('climate');
+                    cc.innerText = `${carbonSeq} Tons (Max!)`;
+                }
+            }
+            setTimeout(() => sDiv.remove(), 4000);
+        }
+
+        function startDash() {
+            dashGame.active = true; dashGame.x = 50; dashGame.y = 90; dashGame.preds = [];
+            for(let i=0; i<8; i++) {
+                dashGame.preds.push({
+                    x: Math.random()*100, y: 20 + Math.random()*50,
+                    s: (Math.random()*0.6 + 0.3) * (Math.random()>0.5?1:-1),
+                    e: ['🐟','🦈','🦑'][Math.floor(Math.random()*3)]
+                });
+            }
+            document.getElementById('dash-layer').classList.remove('hidden');
+            requestAnimationFrame(dashLoop);
+        }
+
+        function dashLoop() {
+            if(!dashGame.active) return;
+            if(keys.l) dashGame.x = Math.max(2, dashGame.x - 1);
+            if(keys.r) dashGame.x = Math.min(95, dashGame.x + 1);
+            if(keys.u) dashGame.y = Math.max(5, dashGame.y - 1);
+            if(keys.d) dashGame.y = Math.min(95, dashGame.y + 1);
+
+            let h = '';
+            dashGame.preds.forEach(p => {
+                p.x += p.s;
+                if(p.x > 110) p.x = -10;
+                if(p.x < -10) p.x = 110;
+                h += `<div class="absolute text-4xl" style="left:${p.x}%; top:${p.y}%; transform: ${p.s>0?'scaleX(-1)':'scaleX(1)'}">${p.e}</div>`;
+                if(Math.abs(p.x - dashGame.x) < 6 && Math.abs(p.y - dashGame.y) < 6) {
+                    dashGame.y = 90; // Hit!
+                    const dl = document.getElementById('dash-layer');
+                    dl.classList.add('bg-red-500/50');
+                    setTimeout(()=>dl.classList.remove('bg-red-500/50'), 200);
+                }
+            });
+
+            h += `<div class="absolute text-3xl z-50 filter drop-shadow-[0_0_10px_white]" style="left:${dashGame.x}%; top:${dashGame.y}%; transition: none;">🦠</div>`;
+            document.getElementById('dash-ents').innerHTML = h;
+
+            if(dashGame.y <= 10) {
+                dashGame.active = false;
+                document.getElementById('dash-layer').classList.add('hidden');
+                finishToggleToNight();
+                return;
+            }
+            requestAnimationFrame(dashLoop);
+        }
+
+        function toggleDielTime() {
+            if(dielIsNight) {
+                dielIsNight = false;
+                updateDielUI();
+                triggerMarineSnow();
+            } else {
+                startDash();
+            }
+        }
+
+        function toggleSonarMode() {
+            dielSonarMode = !dielSonarMode;
+            const btn = document.getElementById('sonar-toggle-btn'), area = document.getElementById('diel-ocean-area'), sweep = document.getElementById('sonar-sweep-line');
+            if(dielSonarMode) {
+                btn.innerHTML = '<i class="fa-solid fa-camera"></i> Camera'; btn.classList.replace('bg-slate-700', 'bg-green-600');
+                area.classList.add('sonar-grid'); sweep.classList.remove('hidden');
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Sonar'; btn.classList.replace('bg-green-600', 'bg-slate-700');
+                area.classList.remove('sonar-grid'); sweep.classList.add('hidden');
+            }
+            renderDielAnimals();
+        }
+
+        function finishToggleToNight() {
+            dielIsNight = true;
+            updateDielUI();
+        }
+
+        function updateDielUI() {
+            const cnt=document.getElementById('diel-app-container'), hdr=document.getElementById('diel-header'), thm=document.getElementById('diel-toggle-thumb');
+            const icn=document.getElementById('diel-toggle-icon'), tBtn=document.getElementById('diel-toggle-btn'), aLt=document.getElementById('diel-ambient-light');
+            const strs=document.querySelectorAll('.diel-star'), clds=document.querySelectorAll('.diel-cloud'), pTx=document.getElementById('diel-phyto-text');
+            if(dielIsNight) {
+                cnt.className='mb-12 relative rounded-3xl overflow-hidden shadow-xl transition-colors duration-1000 bg-gradient-to-b from-indigo-950 via-slate-900 to-black border border-gray-700';
+                hdr.className='p-4 z-50 flex flex-col md:flex-row justify-between items-center transition-colors duration-1000 bg-indigo-950/80 text-indigo-100 backdrop-blur-md border-b border-white/10';
+                thm.style.transform='translateX(1.75rem)'; icn.className='fa-solid fa-moon text-indigo-400'; tBtn.classList.replace('bg-sky-400','bg-indigo-800');
+                aLt.classList.replace('opacity-100','opacity-0'); strs.forEach(s=>s.classList.replace('opacity-0','opacity-100')); clds.forEach(c=>c.classList.replace('opacity-100','opacity-0')); pTx.classList.remove('hidden');
+            } else {
+                cnt.className='mb-12 relative rounded-3xl overflow-hidden shadow-xl transition-colors duration-1000 bg-gradient-to-b from-sky-300 via-blue-600 to-slate-900 border border-gray-200/20';
+                hdr.className='p-4 z-50 flex flex-col md:flex-row justify-between items-center transition-colors duration-1000 bg-cyan-100/80 text-cyan-900 backdrop-blur-md border-b border-white/20';
+                thm.style.transform='translateX(0)'; icn.className='fa-solid fa-sun text-yellow-500'; tBtn.classList.replace('bg-indigo-800','bg-sky-400');
+                aLt.classList.replace('opacity-0','opacity-100'); strs.forEach(s=>s.classList.replace('opacity-100','opacity-0')); clds.forEach(c=>c.classList.replace('opacity-0','opacity-100')); pTx.classList.add('hidden');
+            }
+            renderDielAnimals();
+        }
+
+        function openDielModal(s) {
+            if(!dielDiscovered.includes(s.id)) { dielDiscovered.push(s.id); renderDielAnimals(); }
+            const m=document.getElementById('diel-modal'), c=document.getElementById('diel-modal-content');
+            const fH=s.funFacts.map(f=>`<li class="flex items-start gap-2"><i class="fa-solid fa-check-circle text-sky-400 mt-1"></i><span class="text-sm opacity-90">${f}</span></li>`).join('');
+            c.className=`w-full max-w-md bg-gradient-to-br ${dielIsNight?'from-indigo-900 to-slate-900 text-white border-indigo-500':'from-sky-50 to-white text-slate-800 border-sky-300'} rounded-3xl shadow-2xl overflow-hidden border-4 transform transition-transform duration-300 scale-95 opacity-0`;
+            c.innerHTML=`<div class="relative h-32 ${dielIsNight?'bg-indigo-950/50':'bg-sky-200/50'} flex items-center justify-center border-b ${dielIsNight?'border-indigo-800':'border-sky-200'}"><span class="text-7xl filter drop-shadow-xl animate-bounce">${s.emoji}</span><button onclick="closeDielModal()" class="absolute top-4 right-4 ${dielIsNight?'text-indigo-300 hover:text-white':'text-sky-500 hover:text-sky-700'} transition-colors"><i class="fa-solid fa-times text-2xl"></i></button></div><div class="p-6"><div class="flex items-center justify-between mb-2"><h2 class="text-2xl font-black">${s.name}</h2><span class="text-xs font-mono opacity-60 bg-black/10 px-2 py-1 rounded">${s.scientificName}</span></div><div class="grid grid-cols-2 gap-4 mb-6"><div class="p-3 rounded-2xl ${dielIsNight?'bg-indigo-800/40 border-indigo-700':'bg-sky-100 border-sky-200'} border"><div class="flex items-center gap-2 mb-1 opacity-70"><i class="fa-solid fa-sun text-yellow-500"></i><span class="text-xs font-bold uppercase tracking-wider">Day</span></div><div class="font-mono font-medium">${s.dayDepthText}</div></div><div class="p-3 rounded-2xl ${dielIsNight?'bg-indigo-800/40 border-indigo-700':'bg-sky-100 border-sky-200'} border"><div class="flex items-center gap-2 mb-1 opacity-70"><i class="fa-solid fa-moon text-indigo-400"></i><span class="text-xs font-bold uppercase tracking-wider">Night</span></div><div class="font-mono font-medium">${s.nightDepthText}</div></div></div><div class="mb-4"><h3 class="text-sm font-bold uppercase tracking-wider opacity-60 mb-2 flex items-center gap-2"><i class="fa-solid fa-utensils"></i> Diet</h3><p class="font-medium bg-black/5 p-3 rounded-xl">${s.diet}</p></div><div><h3 class="text-sm font-bold uppercase tracking-wider opacity-60 mb-2 flex items-center gap-2"><i class="fa-solid fa-info-circle"></i> Facts</h3><ul class="space-y-3">${fH}</ul></div></div>`;
+            m.classList.remove('hidden'); void m.offsetWidth; c.classList.replace('scale-95','scale-100'); c.classList.replace('opacity-0','opacity-100');
+        }
+        function closeDielModal() {
+            const m=document.getElementById('diel-modal'), c=document.getElementById('diel-modal-content');
+            c.classList.replace('scale-100','scale-95'); c.classList.replace('opacity-100','opacity-0'); setTimeout(()=>m.classList.add('hidden'),300);
+        }
+
+        function handleMigQuiz(q, isC, btn) {
+            if(isC) {
+                btn.classList.add('bg-green-500');
+                if(migProgress===q) {
+                    migProgress++; document.getElementById('q-tracker-mig').innerText=migProgress;
+                    if(migProgress<13) {
+                        const nxt = document.getElementById('quiz-block-mig-'+migProgress);
+                        if(nxt) nxt.classList.remove('hidden');
+                    }
+                    else { document.getElementById('migration-victory').classList.remove('hidden'); awardBadge('migration'); }
+                }
+            } else { btn.classList.add('bg-red-500','anim-shake'); setTimeout(()=>btn.classList.remove('anim-shake','bg-red-500'),400); }
+        }
+
+        // --- GRADIENTS LOGIC ---
+        function toggleStack(id) {
+            const el=document.getElementById('content-'+id);
+            if(el.classList.contains('open')) el.classList.remove('open');
+            else { document.querySelectorAll('.stack-content').forEach(e=>e.classList.remove('open')); el.classList.add('open'); }
+        }
+        function loadGradQuiz() {
+            if(currentGradQ>=gradQuestions.length) { document.getElementById('grad-quiz-container').classList.add('hidden'); document.getElementById('grad-victory').classList.remove('hidden'); awardBadge('gradients'); return; }
+            const q=gradQuestions[currentGradQ]; document.getElementById('grad-quiz-num').innerText=currentGradQ+1; document.getElementById('grad-quiz-q').innerText=q.q;
+            let opts=[q.a]; while(opts.length<4) { const r=allGradOptions[Math.floor(Math.random()*allGradOptions.length)]; if(!opts.includes(r)) opts.push(r); }
+            opts.sort(()=>Math.random()-0.5);
+            const c=document.getElementById('grad-quiz-options'); c.innerHTML='';
+            opts.forEach(o=>{
+                const b=document.createElement('button'); b.className="bg-gray-800 text-white p-3 rounded-xl border border-gray-600 hover:bg-orange-500 transition font-bold text-sm shadow-md"; b.innerText=o;
+                b.onclick=()=>{ if(o===q.a){currentGradQ++; loadGradQuiz();} else{b.classList.add('bg-red-500','anim-shake'); setTimeout(()=>b.classList.remove('bg-red-500','anim-shake'),400);} };
+                c.appendChild(b);
+            });
+        }
+
+        function renderGradients() {
+            const gD = [
+                ['g-mix', 'Mixed Layer (Surface Waters)', '0m - 200m', 'orange', 'wind', 'Uniform layer caused by wind/wave mixing.', '🌊🌬️', 'anim-wobble'],
+                ['g-thermo', 'Thermocline (Temperature Gradient)', '200m - 1,000m', 'red', 'temperature-arrow-down', 'Rapid temperature drop creating a physical barrier.', '🌡️⬇️', 'anim-shake'],
+                ['g-halo', 'Halocline (Salinity Gradient)', '200m - 1,000m', 'teal', 'water', 'Sharp change in saltiness (salinity).', '🧂🌊', 'anim-wobble'],
+                ['g-pycno', 'Pycnocline (Density Gradient)', '200m - 1,000m', 'purple', 'layer-group', 'Rapid density increase (combination of Temp + Salinity).', '🧱⚖️', 'anim-float'],
+                ['g-oxy', 'Oxycline (Oxygen Gradient)', '200m - 1,000m', 'sky', 'lungs', 'Rapid drop in oxygen defining the Oxygen Minimum Zone.', '🫧📉', 'anim-fade'],
+                ['g-nutri', 'Nutricline (Nutrient Gradient)', 'Deep', 'green', 'seedling', 'Rapid increase of nitrates/phosphates essential for life.', '🌱📈', 'anim-float'],
+                ['g-chemo', 'Chemocline (Chemical Gradient)', 'Deep', 'fuchsia', 'flask', 'Strong chemical boundary (e.g. hydrogen sulfide).', '🧪⚠️', 'anim-shake'],
+                ['g-dsl', 'Deep Scattering Layer (Migrating Organisms)', 'Variable', 'indigo', 'fish', 'Dense layer of vertically migrating organisms reflecting sonar.', '🐟📡', 'anim-slide'],
+                ['g-circ', 'Thermohaline Circulation', 'Global', 'blue', 'earth-americas', 'Deep ocean currents driven by density.', '🌍🔄', 'anim-float']
+            ];
+            const acc = document.getElementById('grad-accordion'); if(!acc) return;
+            acc.innerHTML = gD.map(g => `<div class="grad-section bg-gray-800 rounded-xl overflow-hidden border border-gray-700 mb-4"><button onclick="toggleStack('${g[0]}')" class="w-full text-left p-4 flex justify-between items-center hover:bg-gray-700/50"><div><span class="text-${g[3]}-300 text-xs font-bold bg-${g[3]}-900/40 px-2 py-1 rounded">${g[2]}</span><h3 class="text-white font-bold text-xl mt-1"><i class="fa-solid fa-${g[4]} text-${g[3]}-400 mr-2"></i> ${g[1]}</h3></div></button><div id="content-${g[0]}" class="stack-content bg-gray-900/50"><div class="p-5 border-t border-gray-700 flex items-center justify-between"><p class="text-gray-300 w-3/4">${g[5]}</p><div class="text-4xl w-1/4 text-right ${g[7]}">${g[6]}</div></div></div></div>`).join('');
+            
+            const ml = document.getElementById('grad-markers-list'); if(!ml) return;
+            const mD = [['g-mix','0m','Mixed'],['g-thermo','200m','Temp'],['g-halo','300m','Salinity'],['g-pycno','400m','Density'],['g-oxy','500m','Oxygen'],['g-nutri','700m','Nutrients'],['g-chemo','800m','Chemical'],['g-dsl','1000m','DSL']];
+            ml.innerHTML = mD.map(m => `<div class="depth-marker-grad text-right relative mb-[40px]" data-grad-zone="${m[0]}"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-orange-400 rounded-full transition-all"></div><div class="text-label text-orange-300 transition-all"><span class="text-sm md:text-lg font-bold block">${m[1]}</span><span class="text-xs opacity-70">${m[2]}</span></div></div>`).join('');
+        }
+
+        // --- LAB LOGIC ---
+        function showLabInfo(t) { const d=labInfoData[t]; openModal(d[0],d[1],`<p class="font-medium text-gray-700 leading-relaxed">${d[2]}</p>`); }
+
+        function equipTrait(c, v) { fishState[c]=v; updateFishVisuals(); logTel(`Mutated ${c} -> ${v}`); }
+        function toggleSpecial(t) {
+            fishState.specials[t] = !fishState.specials[t];
+            const b = document.querySelector(`button[data-trait="${t}"]`);
+            if(fishState.specials[t]) b.classList.add('border-blue-500','bg-blue-900/50'); else b.classList.remove('border-blue-500','bg-blue-900/50');
+            updateFishVisuals(); logTel(`Toggled ${t} -> ${fishState.specials[t]}`);
+        }
+        function updateFishVisuals() {
+            const f=document.getElementById('fish-model'); f.className='fish-wrapper';
+            f.classList.add(`morph-${fishState.morphology}`, `color-${fishState.color}`, `eye-${fishState.eyes}`);
+            if(fishState.specials.photophores) f.classList.add('spec-photophores');
+            if(fishState.specials.lure) f.classList.add('spec-lure');
+            if(fishState.specials.jaws) f.classList.add('spec-jaws');
+            if(fishState.specials.tmao) f.classList.add('spec-tmao');
+            if(fishState.specials.chemosyn) f.classList.add('spec-chemosyn');
+            if(fishState.specials.omz) f.classList.add('spec-omz');
+            if(fishState.specials.stilts) f.classList.add('spec-stilts');
+            if(fishState.specials.osmo) f.classList.add('spec-osmo');
+            if(fishState.specials.sealing) f.classList.add('spec-sealing');
+        }
+        function logTel(m) { const l=document.getElementById('telemetry-log'); l.innerHTML+=`<div class="border-b border-gray-800 pb-1">> ${m}</div>`; l.scrollTop=l.scrollHeight; }
+        
+        function deployFish() {
+            const z=document.getElementById('deploy-zone').value; logTel(`Deploying to ${z}...`);
+            let s=false, m=""; const f=fishState, sp=f.specials;
+            
+            if(z==='intertidal') {
+                if(sp.osmo && (sp.clinging || sp.sealing)) { s=true; m="Survived the crashing waves and survived the hot sun during low tide!"; }
+                else m="Washed away or dried out! Intertidal organisms absolutely need Clinging/Sealing mechanisms AND Osmoregulation.";
+            } else if(z==='epipelagic') { 
+                if(f.morphology==='fusiform' && f.color==='countershaded'){s=true; m="Fusiform speed & Countershading made it an apex predator!";} 
+                else m="Too slow/visible! Predators easily spotted and ate your fish in the bright sunlight."; 
+            } else if(z==='mesopelagic') { 
+                if(sp.photophores && (f.eyes==='giant' || f.eyes==='tubular') && sp.omz){s=true; m="Invisible shadows, spots prey easily, and breathes fine in the OMZ!";} 
+                else m="Died! Without Photophores, giant eyes, and OMZ tolerance, you were either seen from below, starved, or suffocated."; 
+            } else if(z==='bathypelagic') { 
+                if(sp.lure && sp.jaws && f.morphology==='stasis'){s=true; m="Energy conserved in stasis, lured scarce prey, and unhinged jaws swallowed them whole!";} 
+                else m="Starved! It's too dark to hunt without a lure, meals are too rare for small jaws, or you burned too much energy swimming."; 
+            } else if(z==='abyssal') {
+                if(sp.stilts && sp.chemo && f.morphology==='gigantism') { s=true; m="Scavenged huge whale falls using chemoreception while standing perfectly still on the mud!"; }
+                else m="Sank into the soft silty mud or couldn't smell the rare food sources miles away.";
+            } else if(z==='hadal') { 
+                if(f.morphology==='gelatinous' && sp.tmao && sp.chemosyn){s=true; m="TMAO protected its proteins, a gelatinous body survived the crush, and it ate vent bacteria!";} 
+                else m="Implosion! Hydrostatic pressure crushed its rigid body, unraveled proteins, or it starved without vent chemosynthesis."; 
+            }
+            
+            if(s) { logTel(`<span class="text-green-400 font-bold">SUCCESS: ${m}</span>`); labWins[z]=true; if(Object.values(labWins).every(v=>v)){document.getElementById('lab-victory').classList.remove('hidden'); awardBadge('engineer');} }
+            else logTel(`<span class="text-red-400 font-bold">CRITICAL FAILURE: ${m}</span>`);
+        }
+
+        // --- TRENCH RUN (PRESSURE) LOGIC ---
+        function equipHull(i) {
+            currentHullIndex=i; document.querySelectorAll('.hull-btn').forEach(b=>b.classList.remove('border-blue-500','bg-blue-900/50'));
+            document.getElementById(`hull-btn-${i}`).classList.add('border-blue-500','bg-blue-900/50');
+            document.getElementById('dash-max-atm').innerText=hullUpgrades[i].maxAtm; 
+            if(!tGame.active) resetTrench();
+        }
+        function resetTrench() {
+            tGame.active = false; tGame.surfacing = false; tGame.depth = 0; tGame.x = 50; tGame.dmg = 0; tGame.samp = 0; tGame.ents = [];
+            tGame.max = hullUpgrades[currentHullIndex].maxAtm;
+            document.getElementById('dive-shaft-ents').innerHTML = '';
+            document.getElementById('sub-vessel').classList.remove('sub-crushed');
+            updateTUI();
+        }
+        function resetTBtn(t) {
+            const sd = document.getElementById('btn-start-dive'), db = document.getElementById('btn-drop-ballast');
+            sd.innerText = t; sd.classList.remove('hidden'); db.classList.add('hidden');
+        }
+        function startTrenchDive() {
+            resetTrench(); tGame.active = true;
+            document.getElementById('btn-start-dive').classList.add('hidden');
+            document.getElementById('btn-drop-ballast').classList.remove('hidden');
+            document.getElementById('implosion-screen').classList.add('hidden');
+            document.getElementById('trench-victory').classList.add('hidden');
+            tGame.id = requestAnimationFrame(trenchLoop);
+        }
+        function dropBallast() {
+            if(!tGame.active || tGame.surfacing) return;
+            tGame.surfacing = true;
+        }
+        function trenchLoop() {
+            if(!tGame.active) return;
+            if(keys.l) tGame.x = Math.max(5, tGame.x - 1);
+            if(keys.r) tGame.x = Math.min(95, tGame.x + 1);
+            const sub = document.getElementById('sub-vessel');
+            sub.style.left = tGame.x + '%';
+
+            if(tGame.surfacing) {
+                tGame.depth = Math.max(0, tGame.depth - 40);
+                tGame.ents = []; 
+                if(tGame.depth <= 0) {
+                    tGame.active = false;
+                    document.getElementById('trench-victory').innerHTML = `<i class="fa-solid fa-ship text-6xl text-blue-400 mb-4"></i><h3 class="text-3xl font-black text-white">Surfaced Safely!</h3><p class="text-blue-200 mt-2 font-bold">You brought back ${tGame.samp} samples!</p>`;
+                    document.getElementById('trench-victory').classList.remove('hidden');
+                    resetTBtn("DIVE AGAIN"); return;
+                }
+            } else { tGame.depth += 8; }
+
+            const atm = 1 + (tGame.depth / 10), cMax = tGame.max - tGame.dmg;
+            
+            if (atm > cMax && !tGame.surfacing) {
+                tGame.active = false; sub.classList.add('sub-crushed');
+                document.getElementById('implode-msg').innerText = `Hull breached at ${atm.toFixed(1)} atm! (Integrity limit: ${cMax.toFixed(0)})`;
+                document.getElementById('implosion-screen').classList.remove('hidden');
+                resetTBtn("REBUILD & RETRY"); return;
+            }
+
+            if (tGame.depth >= 11000 && !tGame.surfacing) {
+                tGame.active = false;
+                document.getElementById('trench-victory').innerHTML = `<i class="fa-solid fa-medal text-6xl text-yellow-400 mb-4"></i><h3 class="text-3xl font-black text-white">Mariana Trench Reached!</h3><p class="text-green-200 mt-2 font-bold">Survived ${atm.toFixed(0)} ATM and collected ${tGame.samp} samples.</p>`;
+                document.getElementById('trench-victory').classList.remove('hidden');
+                resetTBtn("DIVE AGAIN"); awardBadge('physics'); return;
+            }
+
+            if(!tGame.surfacing && Math.random() < 0.08) {
+                const isObs = Math.random() < 0.6, t = isObs ? (Math.random()<0.5?'🪨':'🦑') : (Math.random()<0.5?'💎':'🧬');
+                tGame.ents.push({ x: Math.random()*90+5, y: 100, isObs: isObs, txt: t, dead: false });
+            }
+
+            let html = ''; const sY = Math.max(2, (tGame.depth/11000)*85);
+            for(let i=tGame.ents.length-1; i>=0; i--) {
+                let e = tGame.ents[i]; e.y -= 1.5;
+                if(e.y < -10) { tGame.ents.splice(i, 1); continue; }
+                if(!e.dead && Math.abs(e.y - sY) < 8 && Math.abs(e.x - tGame.x) < 10) {
+                    e.dead = true;
+                    if(e.isObs) {
+                        tGame.dmg += (hullUpgrades[currentHullIndex].maxAtm * 0.1);
+                        sub.classList.add('anim-shake'); setTimeout(()=>sub.classList.remove('anim-shake'), 400);
+                    } else { tGame.samp++; }
+                }
+                if(!e.dead) html += `<div class="absolute transform -translate-x-1/2 -translate-y-1/2 text-3xl transition-none" style="left:${e.x}%; top:${e.y}%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));">${e.txt}</div>`;
+            }
+            document.getElementById('dive-shaft-ents').innerHTML = html;
+            updateTUI(); if(tGame.active) requestAnimationFrame(trenchLoop);
+        }
+
+        function updateTUI() {
+            const d = tGame.depth, atm = 1 + (d / 10), m = tGame.max - tGame.dmg, p = (atm / m) * 100;
+            document.getElementById('dash-depth-m').innerText = Math.floor(d);
+            document.getElementById('dash-pressure').innerText = atm.toFixed(1);
+            document.getElementById('dash-samples').innerText = tGame.samp;
+            document.getElementById('dash-max-atm').innerText = m.toFixed(0);
+            
+            const b = document.getElementById('hull-bar'); b.style.width = Math.min(p, 100) + '%';
+            if(p < 50) { b.className="h-full bg-green-500 transition-all"; document.getElementById('hull-warning').classList.add('hidden'); }
+            else if(p < 90) { b.className="h-full bg-yellow-500 transition-all"; document.getElementById('hull-warning').classList.add('hidden'); }
+            else { b.className="h-full bg-red-500 transition-all"; document.getElementById('hull-warning').classList.remove('hidden'); }
+
+            const v = document.getElementById('sub-vessel');
+            if(!v.classList.contains('sub-crushed')) v.style.top = Math.max(2, (d/11000)*85) + '%';
+        }
+
+        // --- ECOLOGY LOGIC ---
+        function ecoNodeClick(idx) {
+            const n = eNodes[idx], log = document.getElementById('eco-log');
+            log.innerHTML += `<div class="border-b border-slate-700 pb-2 mt-2"><strong class="text-teal-300 text-sm">${n[1]} ${n[2]}</strong><br/><span class="text-blue-300 text-xs">Role: ${n[5]}</span><br/><span class="text-gray-400 text-[10px]">${n[6]}</span></div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function renderEcology() {
+            const ev = document.getElementById('eco-visualizer'); if(!ev) return;
+            let bg = `
+            <div class="absolute w-full h-[20%] top-0 border-b border-blue-400/30 text-blue-200/50 text-xs p-1 font-bold z-0">Epipelagic (0-200m)</div>
+            <div class="absolute w-full h-[30%] top-[20%] border-b border-indigo-400/30 text-indigo-200/50 text-xs p-1 font-bold z-0">Mesopelagic (200-1000m)</div>
+            <div class="absolute w-full h-[25%] top-[50%] border-b border-purple-400/30 text-purple-200/50 text-xs p-1 font-bold z-0">Bathypelagic (1000-4000m)</div>
+            <div class="absolute w-full h-[15%] top-[75%] border-b border-slate-400/30 text-slate-200/50 text-xs p-1 font-bold z-0">Abyssopelagic (4000-6000m)</div>
+            <div class="absolute w-full h-[10%] top-[90%] text-red-200/50 text-xs p-1 font-bold z-0">Hadal Zone (6000m+)</div>
+            `;
+            let svg = '<svg class="absolute inset-0 w-full h-full pointer-events-none z-10">';
+            eLinks.forEach(l => {
+                const s = eNodes.find(n=>n[0]===l[0]), t = eNodes.find(n=>n[0]===l[1]);
+                if(s && t) svg += `<line id="el-${l[0]}-${l[1]}" x1="${s[3]}%" y1="${s[4]}%" x2="${t[3]}%" y2="${t[4]}%" class="eco-line" ${l[2]?'stroke-dasharray="5,5" opacity="0.3"':''} />`;
+            });
+            svg += '</svg>';
+            let ns = '';
+            eNodes.forEach((n, i) => {
+                ns += `<div id="en-${n[0]}" onclick="ecoNodeClick(${i})" class="eco-node absolute transform -translate-x-1/2 -translate-y-1/2 bg-slate-800 border-2 border-slate-500 hover:border-emerald-400 hover:bg-slate-700 rounded-2xl p-2 md:p-3 text-center z-20 transition-all duration-500 shadow-lg cursor-pointer" style="left:${n[3]}%; top:${n[4]}%;">
+                    <span class="text-2xl md:text-3xl drop-shadow-md">${n[1]}</span>
+                    <div class="text-[9px] md:text-[10px] text-white font-bold mt-1 leading-tight">${n[2]}</div>
+                </div>`;
+            });
+            ev.innerHTML = bg + svg + ns;
+
+            const em = document.getElementById('eco-missions');
+            if (em) {
+                em.innerHTML = eMissions.map((m,i) => `<button onclick="startEcoMission(${i})" class="w-full bg-slate-800 hover:bg-slate-700 border border-emerald-500/30 p-2 rounded-xl text-left transition active:scale-95 mb-2">
+                <h4 class="font-bold text-emerald-400 text-xs">${m.n}</h4><p class="text-[10px] text-gray-400 mt-1">${m.d}</p>
+                </button>`).join('');
+            }
+        }
+
+        function resetEcoSim() {
+            ecologyWins=[false,false,false,false,false,false];
+            document.getElementById('ecology-victory').classList.add('hidden');
+            document.getElementById('eco-log').innerHTML='<span class="opacity-50">> System rebooted... Awaiting scenario...</span>';
+            renderEcology();
+            document.getElementById('eco-quiz').classList.add('hidden');
+        }
+
+        function startEcoMission(idx) {
+            const m = eMissions[idx], l = document.getElementById('eco-log'), qz = document.getElementById('eco-quiz');
+            qz.classList.add('hidden');
+            l.innerHTML = `<div class="text-emerald-400 font-bold mb-2">Executing: ${m.n}...</div>`;
+            
+            eNodes.forEach(n => { const el=document.getElementById(`en-${n[0]}`); if(el) el.className = "eco-node absolute transform -translate-x-1/2 -translate-y-1/2 bg-slate-800 border-2 border-slate-500 hover:border-emerald-400 hover:bg-slate-700 rounded-2xl p-2 md:p-3 text-center z-20 transition-all duration-500 shadow-lg cursor-pointer"; });
+            eLinks.forEach(lnk => { const el=document.getElementById(`el-${lnk[0]}-${lnk[1]}`); if(el) el.className = "eco-line"; });
+
+            let step = 0;
+            const iv = setInterval(() => {
+                if(step < m.log.length) {
+                    l.innerHTML += `<div class="text-gray-300 animate-fade-in">> ${m.log[step]}</div>`;
+                    l.scrollTop = l.scrollHeight;
+                    step++;
+                } else {
+                    clearInterval(iv);
+                    Object.keys(m.eff).forEach(k => {
+                        const el = document.getElementById(`en-${k}`);
+                        if(el) {
+                            if(m.eff[k] === 1) el.classList.add('eco-boom');
+                            else if(m.eff[k] === -1) el.classList.add('eco-die');
+                        }
+                    });
+                    eLinks.forEach(lnk => {
+                        const el = document.getElementById(`el-${lnk[0]}-${lnk[1]}`);
+                        if(el) {
+                            if(m.eff[lnk[0]] === -1 || m.eff[lnk[1]] === -1) el.classList.add('eco-line-die');
+                            else if(m.eff[lnk[0]] === 1 && m.eff[lnk[1]] === 1) el.classList.add('eco-line-boom');
+                        }
+                    });
+                    
+                    document.getElementById('eco-q-text').innerText = m.q;
+                    document.getElementById('eco-q-opts').innerHTML = m.o.map((opt, oi) => `<button onclick="checkEco(${idx}, ${oi===m.a}, this)" class="bg-slate-700 hover:bg-emerald-600 p-2 rounded-lg text-xs font-bold text-white transition">${opt}</button>`).join('');
+                    qz.classList.remove('hidden');
+                    l.scrollTop = l.scrollHeight;
+                }
+            }, 1200);
+        }
+
+        function checkEco(idx, isC, btn) {
+            if(isC) {
+                btn.classList.add('bg-green-600'); btn.classList.remove('bg-slate-700','hover:bg-emerald-600');
+                ecologyWins[idx] = true;
+                document.getElementById('eco-log').innerHTML += `<div class="text-green-400 font-bold mt-4">> ECOSYSTEM STABILIZED.</div>`;
+                document.getElementById('eco-log').scrollTop = document.getElementById('eco-log').scrollHeight;
+                setTimeout(() => {
+                    document.getElementById('eco-quiz').classList.add('hidden');
+                    eNodes.forEach(n => { const el=document.getElementById(`en-${n[0]}`); if(el) el.className = "eco-node absolute transform -translate-x-1/2 -translate-y-1/2 bg-slate-800 border-2 border-slate-500 hover:border-emerald-400 hover:bg-slate-700 rounded-2xl p-2 md:p-3 text-center z-20 transition-all duration-500 shadow-lg cursor-pointer"; });
+                    eLinks.forEach(lnk => { const el=document.getElementById(`el-${lnk[0]}-${lnk[1]}`); if(el) el.className = "eco-line"; });
+                    if(ecologyWins.every(v=>v)) { document.getElementById('ecology-victory').classList.remove('hidden'); awardBadge('ecology'); }
+                }, 1500);
+            } else { btn.classList.add('bg-red-600', 'anim-shake'); setTimeout(()=>btn.classList.remove('bg-red-600', 'anim-shake'), 400); }
+        }
+
+        // --- BIO CODE LOGIC ---
+        function renderBioCodeButtons() {
+            const bcContainer = document.getElementById('bc-btn-container'); if(!bcContainer) return;
+            bcContainer.innerHTML = bioCmds.map(c => `<button onclick="addBioCode('${c.id}', ${c.c})" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 p-3 rounded-xl text-white font-bold transition active:scale-95 shadow-md flex justify-between items-center group"><div class="text-left"><span>${c.n}</span><br/><span class="text-xs text-gray-400 font-normal group-hover:text-cyan-300 transition">${c.d}</span></div><div class="bg-black/50 px-2 py-1 rounded text-cyan-400 text-xs">-${c.c} ATP</div></button>`).join('');
+        }
+
+        function loadBioLevel() {
+            if(currentBioLevel>=bioLevels.length) { document.getElementById('biocode-victory').classList.remove('hidden'); awardBadge('biocode'); return; }
+            const lvl=bioLevels[currentBioLevel];
+            document.getElementById('bc-title').innerText=`Scenario ${currentBioLevel+1}: ${lvl.title}`;
+            document.getElementById('bc-desc').innerText=`${lvl.desc} Hint: ${lvl.hint}`;
+            document.getElementById('bc-threat-icon').innerText=lvl.te;
+            document.getElementById('bc-threat-icon').className="text-4xl threat-radar";
+            document.getElementById('bc-threat-name').innerText=lvl.tn;
+            clearBioCode();
+        }
+
+        function addBioCode(c, cost) {
+            if(currentATP + cost > 5) {
+                const box = document.getElementById('bc-sequence-box');
+                box.classList.add('border-red-500', 'anim-shake');
+                setTimeout(()=>box.classList.remove('border-red-500', 'anim-shake'), 400);
+                return;
+            }
+            currentBioSequence.push(c);
+            currentATP += cost;
+            renderBioCodeBox();
+        }
+
+        function clearBioCode() {
+            currentBioSequence=[]; currentATP=0;
+            renderBioCodeBox(); resetFishSVG();
+        }
+
+        function renderBioCodeBox() {
+            const b=document.getElementById('bc-sequence-box');
+            document.getElementById('bc-atp-text').innerText = `ATP: ${currentATP} / 5`;
+            if(currentBioSequence.length===0) b.innerHTML=`<span class="text-gray-600 font-mono text-sm">awaiting_input...</span>`;
+            else b.innerHTML=currentBioSequence.map(c=>`<span class="bg-cyan-700 text-white px-3 py-1 rounded-md text-sm shadow-md">${c}</span>`).join('<i class="fa-solid fa-arrow-right text-cyan-800 text-xs"></i>');
+        }
+
+        function resetFishSVG() {
+            document.querySelectorAll('.bc-bulb').forEach(b=>{ b.classList.remove('bc-glow-active','bc-glow-flash','bc-glow-lure'); b.setAttribute('fill','#334155'); });
+            document.getElementById('bc-clouds').innerHTML = '';
+        }
+
+        function executeBioCode() {
+            resetFishSVG(); let d=0;
+            currentBioSequence.forEach((c, idx) => {
+                setTimeout(()=>{
+                    if(c==='Belly') ['bc-p-belly1','bc-p-belly2','bc-p-belly3','bc-p-belly4'].forEach(id=>document.getElementById(id).classList.add('bc-glow-active'));
+                    else if(c==='Tail') document.getElementById('bc-p-tail').classList.add('bc-glow-active');
+                    else if(c==='Lure') { const l=document.getElementById('bc-p-lure'); l.classList.add('bc-glow-lure'); setTimeout(()=>l.classList.remove('bc-glow-lure'),500); }
+                    else if(c==='Flash') ['bc-p-belly1','bc-p-belly2','bc-p-belly3','bc-p-belly4','bc-p-tail','bc-p-lure'].forEach(id=>{ const l=document.getElementById(id); l.classList.add('bc-glow-flash'); setTimeout(()=>l.classList.remove('bc-glow-flash'),200); });
+                    else if(c==='Cloud') {
+                        const cl = document.getElementById('bc-clouds');
+                        for(let i=0; i<15; i++) {
+                            cl.innerHTML += `<div class="bio-cloud" style="left:${40+Math.random()*20}%; top:${40+Math.random()*20}%;"></div>`;
+                        }
+                    }
+                }, d); d+=800;
+            });
+            setTimeout(()=>{
+                const o=document.getElementById('bc-result-overlay'); o.classList.remove('hidden');
+                const tIcon = document.getElementById('bc-threat-icon');
+                if(JSON.stringify(bioLevels[currentBioLevel].target)===JSON.stringify(currentBioSequence)) {
+                    document.getElementById('bc-res-title').innerText="Sequence Accepted!"; document.getElementById('bc-res-title').className="text-4xl font-black text-green-400 mb-4";
+                    document.getElementById('bc-res-desc').innerText=bioLevels[currentBioLevel].successMsg;
+                    document.getElementById('bc-next-btn').classList.remove('hidden'); document.getElementById('bc-retry-btn').classList.add('hidden');
+                    if(currentBioLevel===3) tIcon.innerText="❤️"; else tIcon.classList.add('threat-flee');
+                } else {
+                    document.getElementById('bc-res-title').innerText="Sequence Failed!"; document.getElementById('bc-res-title').className="text-4xl font-black text-red-500 mb-4";
+                    document.getElementById('bc-res-desc').innerText="The light sequence did not produce the desired adaptation.";
+                    document.getElementById('bc-next-btn').classList.add('hidden'); document.getElementById('bc-retry-btn').classList.remove('hidden');
+                    tIcon.classList.add('threat-attack');
+                }
+            }, d+500);
+        }
+        function nextBioLevel() { document.getElementById('bc-result-overlay').classList.add('hidden'); currentBioLevel++; loadBioLevel(); }
+        function retryBioLevel() { document.getElementById('bc-result-overlay').classList.add('hidden'); document.getElementById('bc-threat-icon').className="text-4xl threat-radar"; clearBioCode(); }
+
+        // --- STUDY DECK LOGIC ---
+        const studyCards=[
+            ["What is an Ecotone?", "Transition area between two biological communities (e.g. Intertidal Zone)."],
+            ["What is Desiccation?", "Fatal drying out of organisms exposed to air."],
+            ["Benthic vs Pelagic?", "Benthic = ON the bottom. Pelagic = IN the water column."],
+            ["What is the Azoic Hypothesis?", "Disproved 19th-century theory that no life existed below 1,800 feet."],
+            ["Allochthonous vs Autochthonous", "Allochthonous = external energy. Autochthonous = internal energy."],
+            ["What is a Piezolyte?", "Molecule (like TMAO) preventing proteins from crushing under pressure."],
+            ["Deep Scattering Layer (DSL)?", "Dense layer of migrating organisms that reflects sonar pulses."],
+            ["Physostomous vs Physoclistous?", "Physostomous = gulps air. Physoclistous = pulls gas from blood."],
+            ["What is a Trophosome?", "Organ in Tubeworms that houses chemosynthetic bacteria."],
+            ["Counter-illumination?", "Producing light on belly to match downwelling light."]
+        ].map(c=>({q:c[0],a:c[1]}));
+
+        function renderFlashcards() {
+            const c=document.getElementById('flashcard-container');
+            studyCards.forEach((cd, i) => {
+                const el=document.createElement('div'); el.className="perspective-1000 h-64 cursor-pointer"; el.dataset.f="0";
+                el.innerHTML=`<div class="relative w-full h-full transition-transform duration-700 transform-style-3d text-center"><div class="absolute w-full h-full bg-white border-2 border-purple-200 rounded-3xl p-6 shadow-lg flex flex-col justify-center items-center backface-hidden"><span class="text-purple-400 text-sm font-bold mb-2 uppercase tracking-widest">Question</span><h3 class="text-xl font-bold text-gray-800">${cd.q}</h3></div><div class="absolute w-full h-full bg-purple-600 rounded-3xl p-6 shadow-lg flex flex-col justify-center items-center backface-hidden rotate-y-180 text-white"><span class="text-purple-300 text-sm font-bold mb-2 uppercase tracking-widest">Answer</span><p class="text-lg font-semibold">${cd.a}</p></div></div>`;
+                el.onclick=()=>{ el.querySelector('.transform-style-3d').classList.toggle('rotate-y-180'); if(el.dataset.f==="0"){el.dataset.f="1"; cardsFlipped++; if(cardsFlipped===studyCards.length){document.getElementById('scholar-victory').classList.remove('hidden'); awardBadge('scholar');}} };
+                c.appendChild(el);
+            });
+        }
+
+        window.onload = () => {
+            switchTab('zones');
+        };
+    </script>
+
+    <!-- TAB: BATHYMETRY MAPPER -->
+    <div id="tab-bathymetry" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <iframe id="iframe-bathymetry" src="bathymetry.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+    </div>
+    <!-- TAB: CARBON PUMP TYCOON -->
+    <div id="tab-carbonpump" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <iframe id="iframe-carbonpump" src="carbon_pump.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+    </div>
+    <!-- TAB: INTERACTIVE PLANKTON -->
+    <div id="tab-plankton" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <iframe id="iframe-plankton" src="plankton.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+    </div>
+</body>
+</html>

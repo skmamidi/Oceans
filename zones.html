@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Self-Contained CDNs for CSS, Fonts, and Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Configuration for Custom Theme Elements -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              heading: ['Nunito', 'sans-serif'],
+            },
+            colors: {
+              ocean: {
+                sunlight: '#4ea8de',
+                twilight: '#0077b6',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <title>Ocean Zones | The Living Ocean</title>
+    <style>
+        body{background-color:#f0f8ff;overflow-x:hidden;}
+        .gradient-ocean{background:linear-gradient(to bottom,#4ea8de 0%,#0077b6 15%,#03045e 35%,#01012b 60%,#000010 85%,#000000 100%);}
+        .glass-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);color:white;}
+        .glass-card-dark{background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);color:white;}
+        .float-anim{animation:float 3s ease-in-out infinite;}
+        @keyframes float{0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);}}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
+        .anim-shake{animation:shake 0.4s ease-in-out;}
+        @keyframes pop-in{0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}}
+        .anim-pop{animation:pop-in 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards;}
+        .sci-oly-box{border-left:4px solid #a855f7;background:rgba(168,85,247,0.1);}
+        .depth-marker{transition:all 0.3s;}
+        .depth-marker.active .dot{background-color:#3b82f6;transform:scale(1.5);box-shadow:0 0 15px #60a5fa;}
+        .depth-marker.active .text-label{color:#60a5fa;font-weight:900;transform:translateX(5px);}
+        .qz-btn{background-color:rgba(255,255,255,0.1);padding:0.5rem;border-radius:0.5rem;text-align:left;transition:all 0.2s;}
+        .qz-btn:hover{background-color:rgba(255,255,255,0.2);}
+        .qz-step{margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.1);}
+        #interactive-modal{transition:opacity 0.3s;}
+        #modal-content-container{transition:transform 0.3s;}
+        .btn-correct { background-color: #10b981 !important; color: #ffffff !important; border-color: #059669 !important; }
+        .btn-wrong { background-color: #ef4444 !important; color: #ffffff !important; border-color: #b91c1c !important; }
+        .tag-benthic { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(234, 179, 8, 0.2); color: #fde047; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(234, 179, 8, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
+        .tag-benthopelagic { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(167, 139, 250, 0.2); color: #d8b4fe; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(167, 139, 250, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
+        .tag-multi { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(56, 189, 248, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
+        .tag-pelagic { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(59, 130, 246, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased font-sans">
+    <div id="global-score-tracker" class="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 bg-black/50 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_25px_rgba(6,182,212,0.3)] text-white px-5 py-2 md:px-6 md:py-3 rounded-2xl flex items-center gap-4 transition-all duration-300 hover:scale-105 hover:border-cyan-400/60 hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] group">
+        <div class="relative flex items-center justify-center">
+            <div class="absolute inset-0 bg-cyan-400 blur-md opacity-40 group-hover:opacity-80 transition-opacity rounded-full"></div>
+            <i class="fa-solid fa-gem text-cyan-300 relative z-10 text-2xl float-anim"></i>
+        </div>
+        <div class="flex flex-col leading-tight">
+            <span class="text-[0.65rem] md:text-xs font-bold uppercase tracking-widest text-cyan-200/80">Explorer Score</span>
+            <div class="font-black text-xl md:text-2xl font-heading text-white">
+                <span id="global-score" class="text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">0</span>
+                <span class="opacity-40 text-sm md:text-base font-medium">/ 50</span>
+            </div>
+        </div>
+    </div>
+    <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+    <div id="interactive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" style="">
+        <div id="modal-content-container" class="bg-white rounded-3xl w-11/12 max-w-2xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center gap-4"><span id="modal-emoji" class="w-12 h-12 md:w-16 md:h-16 inline-block"></span><h3 class="text-2xl font-heading font-bold text-gray-800" id="modal-title">Title</h3></div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 text-3xl transition focus:outline-none">&times;</button>
+            </div>
+            <div class="p-6 bg-white max-h-[70vh] overflow-y-auto text-lg text-gray-700" id="modal-body"></div>
+        </div>
+    </div>
+    <div id="badge-celebration" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-yellow-400 text-yellow-900 px-8 py-4 rounded-full shadow-2xl font-bold text-lg anim-pop">🌟 Zone Master Badge Earned!</div>
+            <section class="pt-16 pb-12 px-4 max-w-5xl mx-auto text-center relative z-10">
+                <div class="inline-block bg-purple-100 text-purple-800 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-purple-300 animate-pulse"><i class="fa-solid fa-microscope"></i> Science Olympiad Edition</div>
+                <h1 class="text-5xl md:text-6xl font-heading font-black text-ocean-sunlight mb-6 float-anim">The Living Ocean</h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">The ocean is stacked like a layer cake of alien worlds dictated by physical gradients. Read the SciOly Pro-Tips in each section and pass all levels of the Captain's Quiz to earn your Zone Master Badge!</p>
+            </section>
+
+            <section class="gradient-ocean w-full pb-20 relative">
+                <div class="max-w-7xl mx-auto px-4 pt-12 flex flex-row mb-20">
+                    <div class="w-24 md:w-40 flex-shrink-0 relative hidden sm:block">
+                        <div class="sticky top-28 h-[75vh] border-r-4 border-blue-400/30 pr-4 md:pr-6 flex flex-col justify-between py-10 z-20">
+                            <div class="depth-marker text-right relative" data-zone="z-inter"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-gray-500 rounded-full transition-all"></div><div class="text-label text-blue-100 transition-all"><span class="text-sm md:text-lg font-bold block">0m</span><span class="text-xs opacity-70">0 ft</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-neritic"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-teal-300 rounded-full transition-all"></div><div class="text-label text-teal-200 transition-all"><span class="text-sm md:text-lg font-bold block">Shelf</span><span class="text-xs opacity-70">Neritic</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-epi"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-blue-300 rounded-full transition-all"></div><div class="text-label text-blue-200 transition-all"><span class="text-sm md:text-lg font-bold block">200m</span><span class="text-xs opacity-70">656 ft</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-meso"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-indigo-300 rounded-full transition-all"></div><div class="text-label text-indigo-200 transition-all"><span class="text-sm md:text-lg font-bold block">1,000m</span><span class="text-xs opacity-70">3,280 ft</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-bathy"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-purple-400 rounded-full transition-all"></div><div class="text-label text-purple-300 transition-all"><span class="text-sm md:text-lg font-bold block">4,000m</span><span class="text-xs opacity-70">13,123 ft</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-abyssal"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-gray-400 rounded-full transition-all"></div><div class="text-label text-gray-400 transition-all"><span class="text-sm md:text-lg font-bold block">6,000m</span><span class="text-xs opacity-70">19,685 ft</span></div></div>
+                            <div class="depth-marker text-right relative" data-zone="z-hadal"><div class="dot absolute top-2 right-[-24px] md:right-[-28px] w-4 h-4 bg-red-500 rounded-full transition-all"></div><div class="text-label text-red-400 transition-all"><span class="text-sm md:text-lg font-bold block">11,000m</span><span class="text-xs opacity-70">36,089 ft</span></div></div>
+                        </div>
+                    </div>
+
+                    <div class="flex-grow space-y-24 sm:pl-8 lg:pl-12 w-full">
+                        <div id="z-inter" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden">
+                            <div class="inline-block bg-white text-ocean-sunlight font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm">Zone 1 &bull; 0m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2">Intertidal Zone <span class="text-2xl text-blue-200 font-normal block sm:inline">(The Coast)</span></h2>
+                            <p class="text-xl font-semibold text-blue-100 mb-6">The dynamic ecotone between high and low tide.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4">Animals here live a bipolar life: drowning in crashing waves at high tide, and baking in the hot sun at low tide.</p><div class="sci-oly-box p-4 rounded-xl text-white"><h4 class="font-bold text-purple-300 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Organisms exposed to air face severe <strong>desiccation</strong>. Mussels excrete <strong>byssal threads</strong>. They use <strong>Circadian-Tidal rhythms</strong> for spawning.</p></div></div>
+                                <div class="glass-card-dark p-6 rounded-xl border border-white/20"><h4 class="font-bold text-lg mb-3 border-b border-white/20 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('limpet')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="limpet" title="Limpet"></span>
+                                        <span onclick="openSpecies('sculpin')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="sculpin" title="Tidepool Sculpin"></span>
+                                        <span onclick="openSpecies('crab')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="crab" title="Shore Crab"></span>
+                                        <span onclick="openSpecies('barnacle')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="barnacle" title="Acorn Barnacle"></span>
+                                        <span onclick="openSpecies('starfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="starfish" title="Ochre Sea Star"></span>
+                                        <span onclick="openSpecies('anemone')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="anemone" title="Sea Anemone"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-0">
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 1/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-0">1</span>/6 Done</span></h3>
+                                <div id="qz-body-0"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-neritic" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden">
+                            <div class="inline-block bg-white text-teal-600 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm">Zone 2 &bull; Continental Shelf</div>
+                            <h2 class="text-4xl font-heading font-black mb-2">Neritic Zone <span class="text-2xl text-teal-200 font-normal block sm:inline">(Coastal Seas)</span></h2>
+                            <p class="text-xl font-semibold text-teal-100 mb-6">The shallow, sunlit waters over the continental shelf.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4">Rich in nutrients from land runoff and upwelling, this zone supports the highest biodiversity in the ocean, including coral reefs and kelp forests.</p><div class="sci-oly-box p-4 rounded-xl text-white"><h4 class="font-bold text-teal-300 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">High productivity is driven by <strong>Upwelling</strong> and land runoff. Corals have a mutualistic relationship with photosynthetic <strong>Zooxanthellae</strong>.</p></div></div>
+                                <div class="glass-card-dark p-6 rounded-xl border border-white/20"><h4 class="font-bold text-lg mb-3 border-b border-white/20 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('otter')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="otter" title="Sea Otter"></span>
+                                        <span onclick="openSpecies('phytoplankton')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="phytoplankton" title="Phytoplankton"></span>
+                                        <span onclick="openSpecies('coral')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="coral" title="Reef-Building Coral"></span>
+                                        <span onclick="openSpecies('kelp')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="kelp" title="Giant Kelp"></span>
+                                        <span onclick="openSpecies('clownfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="clownfish" title="Clownfish"></span>
+                                        <span onclick="openSpecies('parrotfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="parrotfish" title="Parrotfish"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-black/40 p-6 rounded-2xl border border-teal-300/30" id="quiz-container-1">
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 2/7</span><span class="text-sm font-normal text-teal-200"><span id="q-tracker-1">1</span>/6 Done</span></h3>
+                                <div id="qz-body-1"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-epi" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden">
+                            <div class="inline-block bg-white text-ocean-sunlight font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm">Zone 3 &bull; 0 - 200m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2">Epipelagic Zone <span class="text-2xl text-blue-200 font-normal block sm:inline">(Sunlight Zone)</span></h2>
+                            <p class="text-xl font-semibold text-blue-100 mb-6">The bright, uppermost layer.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4">The biological engine of the ocean! Sunlight penetrates here allowing photosynthesis.</p><div class="sci-oly-box p-4 rounded-xl text-white"><h4 class="font-bold text-purple-300 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Red light absorbs first. Predators use <strong>Fusiform morphology</strong>. Bony fish use <strong>Physostomous</strong> or <strong>Physoclistous</strong> swim bladders.</p></div></div>
+                                <div class="glass-card-dark p-6 rounded-xl border border-white/20"><h4 class="font-bold text-lg mb-3 border-b border-white/20 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('sunfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="sunfish" title="Ocean Sunfish"></span>
+                                        <span onclick="openSpecies('mahimahi')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="mahimahi" title="Mahi-Mahi"></span>
+                                        <span onclick="openSpecies('tuna')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="tuna" title="Bluefin Tuna"></span>
+                                        <span onclick="openSpecies('shark')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="shark" title="Great White Shark"></span>
+                                        <span onclick="openSpecies('turtle')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="turtle" title="Sea Turtle"></span>
+                                        <span onclick="openSpecies('manta')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="manta" title="Manta Ray"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-2">
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 3/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-2">1</span>/6 Done</span></h3>
+                                <div id="qz-body-2"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-meso" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden">
+                            <div class="inline-block bg-white text-ocean-twilight font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm">Zone 4 &bull; 200 - 1,000m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2">Mesopelagic Zone <span class="text-2xl text-blue-200 font-normal block sm:inline">(Twilight Zone)</span></h2>
+                            <p class="text-xl font-semibold text-blue-200 mb-6">The dimly lit middle ocean.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4">Only faint blue light makes it here. Animals use large eyes and counter-illumination.</p><div class="sci-oly-box p-4 rounded-xl text-white"><h4 class="font-bold text-purple-300 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Contains the <strong>Oxygen Minimum Zone (OMZ)</strong> where bacterial respiration of marine snow depletes oxygen.</p></div></div>
+                                <div class="glass-card-dark p-6 rounded-xl border border-white/20"><h4 class="font-bold text-lg mb-3 border-b border-white/20 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('swordfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="swordfish" title="Swordfish"></span>
+                                        <span onclick="openSpecies('ctenophore')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="ctenophore" title="Comb Jelly"></span>
+                                        <span onclick="openSpecies('lanternfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="lanternfish" title="Lanternfish"></span>
+                                        <span onclick="openSpecies('squid')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="squid" title="Vampire Squid"></span>
+                                        <span onclick="openSpecies('hatchetfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="hatchetfish" title="Hatchetfish"></span>
+                                        <span onclick="openSpecies('bristlemouth')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="bristlemouth" title="Bristlemouth"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-3">
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 4/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-3">1</span>/6 Done</span></h3>
+                                <div id="qz-body-3"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-bathy" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden border-gray-600">
+                            <div class="inline-block bg-gray-800 text-white font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-gray-600">Zone 5 &bull; 1,000 - 4,000m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2 text-gray-100">Bathypelagic & Bathyal <span class="text-2xl text-gray-400 font-normal block sm:inline">(Midnight Zone)</span></h2>
+                            <p class="text-xl font-semibold text-gray-400 mb-6">Total darkness, crushing pressure, and hydrothermal vents.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4 text-gray-200">The <strong>Bathypelagic</strong> is the open water where food mostly comes from falling <strong>Marine Snow</strong>. The <strong>Bathyal</strong> zone is the seafloor beneath it, home to benthic scavengers and hydrothermal vent communities.</p><div class="sci-oly-box p-4 rounded-xl text-gray-200"><h4 class="font-bold text-purple-400 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Bioluminescence relies on <strong>Luciferin</strong> and <strong>Luciferase</strong>. In the 1870s, the <strong>Challenger Expedition</strong> disproved the <strong>Azoic Hypothesis</strong> (theory of no deep life).</p></div></div>
+                                <div class="bg-black/80 border border-gray-700 p-6 rounded-xl text-white"><h4 class="font-bold text-lg mb-3 border-b border-gray-700 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('dragonfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="dragonfish" title="Deep Sea Dragonfish"></span>
+                                        <span onclick="openSpecies('snipeeel')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="snipeeel" title="Snipe Eel"></span>
+                                        <span onclick="openSpecies('anglerfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="anglerfish" title="Humpback Anglerfish"></span>
+                                        <span onclick="openSpecies('gulper')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="gulper" title="Gulper Eel"></span>
+                                        <span onclick="openSpecies('vampire')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="vampire" title="Vampire Squid"></span>
+                                        <span onclick="openSpecies('dumbo')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="dumbo" title="Dumbo Octopus"></span>
+                                        <span onclick="openSpecies('isopod')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="isopod" title="Giant Isopod"></span>
+                                        <span onclick="openSpecies('rattail')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="rattail" title="Rattail Fish"></span>
+                                        <span onclick="openSpecies('tubeworm')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="tubeworm" title="Tubeworms"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-800/80 p-6 rounded-2xl border border-gray-600" id="quiz-container-4">
+                                <h3 class="font-heading font-bold text-yellow-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 5/7</span><span class="text-sm font-normal text-gray-400"><span id="q-tracker-4">1</span>/6 Done</span></h3>
+                                <div id="qz-body-4"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-abyssal" class="zone-section glass-card rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden border-gray-700" style="background: rgba(0,0,0,0.4);">
+                            <div class="inline-block bg-gray-900 text-gray-300 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-gray-700">Zone 6 &bull; 4,000 - 6,000m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2 text-gray-300">Abyssopelagic & Abyssal <span class="text-2xl text-gray-500 font-normal block sm:inline">(The Abyss)</span></h2>
+                            <p class="text-xl font-semibold text-gray-500 mb-6">The vast, muddy, featureless plains.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4 text-gray-300">The pressure here is crushing! While the <strong>Abyssopelagic</strong> water column is sparse, most life here is <strong>benthic</strong> (living on the seafloor mud).</p><div class="sci-oly-box p-4 rounded-xl text-gray-300"><h4 class="font-bold text-purple-400 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Organisms living in mud are <strong>Benthic</strong>. The Abyss relies entirely on external energy (marine snow), making it an <strong>Allochthonous</strong> ecosystem. Hydrostatic pressure increases <strong>1 atm every 10m</strong>.</p></div></div>
+                                <div class="bg-black border border-gray-800 p-6 rounded-xl text-white"><h4 class="font-bold text-lg mb-3 border-b border-gray-800 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('seaspider')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="seaspider" title="Sea Spider"></span>
+                                        <span onclick="openSpecies('basketstar')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="basketstar" title="Basket Star"></span>
+                                        <span onclick="openSpecies('cucumber')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="cucumber" title="Sea Cucumber"></span>
+                                        <span onclick="openSpecies('tripod')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="tripod" title="Tripod Fish"></span>
+                                        <span onclick="openSpecies('seapig')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="seapig" title="Sea Pig"></span>
+                                        <span onclick="openSpecies('swimcucumber')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="swimcucumber" title="Swimming Sea Cucumber"></span>
+                                        <span onclick="openSpecies('arrowworm')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="arrowworm" title="Arrow Worm"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-700" id="quiz-container-5">
+                                <h3 class="font-heading font-bold text-yellow-600 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 6/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-5">1</span>/6 Done</span></h3>
+                                <div id="qz-body-5"></div>
+                            </div>
+                        </div>
+
+                        <div id="z-hadal" class="zone-section bg-black rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden border border-gray-800 text-white">
+                            <div class="inline-block bg-red-900 text-red-100 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-red-800">Zone 7 &bull; 6,000 - 11,000m</div>
+                            <h2 class="text-4xl font-heading font-black mb-2 text-red-500">Hadalpelagic & Hadal Benthic <span class="text-2xl text-red-400 font-normal block sm:inline">(The Trenches)</span></h2>
+                            <p class="text-xl font-semibold text-red-400 mb-6">Deepest scars in the earth's crust.</p>
+                            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                <div><p class="mb-4 text-gray-400">Conditions are so extreme that standard proteins naturally unravel! Most life is concentrated on the trench floor (benthic).</p><div class="sci-oly-box p-4 rounded-xl text-gray-400"><h4 class="font-bold text-red-400 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Vents produce local energy (<strong>Autochthonous</strong>). Bacteria here are <strong>Hyperthermophiles</strong> (>100°C). <strong>TMAO</strong> piezolytes prevent protein crushing. <strong>Cold Seeps</strong> use Methane (CH4).</p></div></div>
+                                <div class="bg-gray-900 border border-gray-800 p-6 rounded-xl text-white"><h4 class="font-bold text-lg mb-3 border-b border-gray-800 pb-2">Species</h4>
+                                    <div class="flex flex-wrap gap-4 text-4xl">
+                                        <span onclick="openSpecies('foraminifera')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="foraminifera" title="Foraminifera"></span>
+                                        <span onclick="openSpecies('snailfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="snailfish" title="Snailfish"></span>
+                                        <span onclick="openSpecies('amphipod')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="amphipod" title="Supergiant Amphipod"></span>
+                                        <span onclick="openSpecies('cuskeel')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="cuskeel" title="Cusk Eel"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 p-6 rounded-2xl border border-red-900" id="quiz-container-6">
+                                <h3 class="font-heading font-bold text-red-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 7/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-6">1</span>/6 Done</span></h3>
+                                <div id="qz-body-6"></div>
+                            </div>
+                        </div>
+
+                        <div id="zone-master-celebration" class="hidden text-center bg-yellow-400 text-yellow-900 p-8 rounded-3xl shadow-[0_0_30px_gold] transform scale-105 font-bold text-2xl anim-pop"><i class="fa-solid fa-medal text-5xl mb-4"></i><br>Congratulations! You earned the Zone Master Badge!</div>
+                    </div>
+                </div>
+
+                <!-- Creature Match Game Section -->
+                <div class="w-full mt-10 relative z-20">
+                    <div class="max-w-4xl mx-auto px-4 text-center">
+                        <h2 class="text-4xl font-heading font-black text-white mb-4"><i class="fa-solid fa-gamepad text-blue-400"></i> Creature Match Game!</h2>
+                        <p class="text-gray-400 mb-10 text-lg">Test your knowledge! Can you figure out which Ocean Zone these real creatures belong to?</p>
+
+                        <div class="glass-card-dark p-6 md:p-8 rounded-3xl border border-blue-500/30 max-w-2xl mx-auto shadow-2xl relative overflow-hidden" id="match-game-container">
+                            <!-- Game Content dynamically generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unique Species Summary Table -->
+                <div class="w-full mt-24 mb-10 relative z-20">
+                    <div class="max-w-5xl mx-auto px-4 text-center">
+                        <h2 class="text-4xl font-heading font-black text-white mb-8"><i class="fa-solid fa-list-check text-purple-400"></i> Zone Species Summary</h2>
+                        
+                        <div class="glass-card-dark rounded-3xl overflow-hidden border border-purple-500/30 shadow-2xl">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-purple-900/50 text-purple-200 border-b border-purple-500/30">
+                                        <th class="p-4 md:p-6 font-bold text-xl w-1/3">Ocean Zone</th>
+                                        <th class="p-4 md:p-6 font-bold text-xl">Unique/Common Species Found Here</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-300 divide-y divide-gray-700/50">
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-inter" class="text-blue-300 hover:text-white transition block"><i class="fa-solid fa-water mr-2 opacity-50"></i>Intertidal Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('limpet')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Limpet <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('sculpin')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Tidepool Sculpin <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('crab')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Shore Crab <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('barnacle')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Acorn Barnacle <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('starfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Ochre Sea Star <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('anemone')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Anemone <span class="tag-benthic">Benthic</span></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-neritic" class="text-teal-300 hover:text-white transition block"><i class="fa-solid fa-fish-fins mr-2 opacity-50"></i>Neritic Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('otter')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Otter</span>, 
+                                            <span onclick="openSpecies('phytoplankton')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Phytoplankton</span>, 
+                                            <span onclick="openSpecies('coral')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Reef-Building Coral <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('kelp')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Giant Kelp <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('clownfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Clownfish</span>, 
+                                            <span onclick="openSpecies('parrotfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Parrotfish</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-epi" class="text-blue-400 hover:text-white transition block"><i class="fa-solid fa-sun mr-2 opacity-50"></i>Epipelagic Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('sunfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Ocean Sunfish</span>, 
+                                            <span onclick="openSpecies('mahimahi')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Mahi-Mahi</span>, 
+                                            <span onclick="openSpecies('tuna')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Bluefin Tuna</span>, 
+                                            <span onclick="openSpecies('shark')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Great White Shark</span>, 
+                                            <span onclick="openSpecies('turtle')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Turtle</span>, 
+                                            <span onclick="openSpecies('manta')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Manta Ray</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-meso" class="text-indigo-300 hover:text-white transition block"><i class="fa-solid fa-moon mr-2 opacity-50"></i>Mesopelagic Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('swordfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Swordfish</span>, 
+                                            <span onclick="openSpecies('ctenophore')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Comb Jelly</span>, 
+                                            <span onclick="openSpecies('lanternfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Lanternfish</span>, 
+                                            <span onclick="openSpecies('squid')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Vampire Squid</span>, 
+                                            <span onclick="openSpecies('hatchetfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Hatchetfish</span>, 
+                                            <span onclick="openSpecies('bristlemouth')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Bristlemouth</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-bathy" class="text-purple-400 hover:text-white transition block"><i class="fa-solid fa-droplet mr-2 opacity-50"></i>Bathypelagic Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('dragonfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Deep Sea Dragonfish</span>, 
+                                            <span onclick="openSpecies('snipeeel')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Snipe Eel</span>, 
+                                            <span onclick="openSpecies('anglerfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Humpback Anglerfish</span>, 
+                                            <span onclick="openSpecies('gulper')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Gulper Eel</span>, 
+                                            <span onclick="openSpecies('vampire')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Vampire Squid</span>, 
+                                            <span onclick="openSpecies('dumbo')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Dumbo Octopus <span class="tag-benthopelagic">Benthopelagic</span></span>, <span onclick="openSpecies('isopod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Giant Isopod <span class="tag-benthic">Benthic</span></span>, <span onclick="openSpecies('rattail')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Rattail Fish <span class="tag-benthopelagic">Benthopelagic</span></span>, <span onclick="openSpecies('tubeworm')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Riftia Tubeworm <span class="tag-benthic">Benthic</span></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-abyssal" class="text-gray-400 hover:text-white transition block"><i class="fa-solid fa-anchor mr-2 opacity-50"></i>Abyssopelagic Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('seaspider')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Spider <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('basketstar')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Basket Star <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('cucumber')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Cucumber <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('tripod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Tripod Fish <span class="tag-benthic">Benthic</span></span>, <span onclick="openSpecies('seapig')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Pig <span class="tag-benthic">Benthic</span></span>,
+                                            <span onclick="openSpecies('swimcucumber')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Swimming Sea Cucumber <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('arrowworm')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Arrow Worm <span class="tag-pelagic">Pelagic</span></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-white/5 transition duration-200">
+                                        <td class="p-4 md:p-6 font-semibold"><a href="#z-hadal" class="text-red-400 hover:text-white transition block"><i class="fa-solid fa-skull-crossbones mr-2 opacity-50"></i>Hadal Zone</a></td>
+                                        <td class="p-4 md:p-6 leading-relaxed">
+                                            <span onclick="openSpecies('foraminifera')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Foraminifera <span class="tag-multi">Benthic & Planktonic</span></span>, 
+                                            <span onclick="openSpecies('snailfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Mariana Snailfish <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('amphipod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Supergiant Amphipod <span class="tag-benthic">Benthic</span></span>, 
+                                            <span onclick="openSpecies('cuskeel')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Cusk Eel <span class="tag-benthopelagic">Benthopelagic</span></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    <script>
+        const SVGS = {
+            'limpet': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path fill="#A0AEC0" d="M10,80 Q50,10 90,80 Z"/><path fill="#718096" d="M30,80 Q50,40 70,80 Z"/></svg>',
+            'sculpin': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="40" ry="25" fill="#8B4513"/><path d="M10,50 L30,30 M10,50 L30,70 M80,30 L100,50 L80,70" stroke="#8B4513" stroke-width="5" fill="none"/><circle cx="35" cy="40" r="4" fill="white"/><circle cx="35" cy="40" r="2" fill="black"/></svg>',
+            'crab': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="55" rx="35" ry="25" fill="#E53E3E"/><path d="M20,40 Q10,20 25,15 M80,40 Q90,20 75,15" stroke="#E53E3E" stroke-width="6" fill="none"/><circle cx="25" cy="15" r="8" fill="#E53E3E"/><circle cx="75" cy="15" r="8" fill="#E53E3E"/><circle cx="35" cy="45" r="3" fill="black"/><circle cx="65" cy="45" r="3" fill="black"/></svg>',
+            'barnacle': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><polygon points="20,80 40,40 60,40 80,80" fill="#CBD5E0"/><polygon points="40,40 50,50 60,40" fill="#2D3748"/></svg>',
+            'starfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><polygon points="50,10 61,35 88,35 67,52 75,79 50,62 25,79 33,52 12,35 39,35" fill="#ED8936"/></svg>',
+            'anemone': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M20,90 Q50,70 80,90 Z" fill="#D53F8C"/><path d="M30,75 Q20,30 35,20 M40,75 Q40,20 50,10 M50,75 Q60,20 65,20 M60,75 Q80,30 70,25" stroke="#F687B3" stroke-width="8" stroke-linecap="round" fill="none"/></svg>',
+            'otter': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="35" ry="15" fill="#744210"/><circle cx="80" cy="45" r="12" fill="#975A16"/><circle cx="85" cy="42" r="2" fill="black"/><path d="M20,50 L5,45" stroke="#744210" stroke-width="6"/><path d="M20,60 L90,60" stroke="#4299E1" stroke-width="4"/></svg>',
+            'phytoplankton': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><circle cx="50" cy="50" r="20" fill="#48BB78"/><path d="M50,10 L50,30 M50,70 L50,90 M10,50 L30,50 M70,50 L90,50 M20,20 L35,35 M80,80 L65,65 M20,80 L35,65 M80,20 L65,35" stroke="#48BB78" stroke-width="4"/></svg>',
+            'coral': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50,90 L50,50 M50,50 L30,20 M50,50 L70,30 M70,30 L80,10 M30,20 L10,15 M30,20 L40,5" stroke="#F56565" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
+            'kelp': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50,100 Q30,75 50,50 Q70,25 50,0" stroke="#38A169" stroke-width="8" fill="none"/><ellipse cx="40" cy="70" rx="15" ry="5" fill="#48BB78" transform="rotate(30 40 70)"/><ellipse cx="60" cy="40" rx="15" ry="5" fill="#48BB78" transform="rotate(-30 60 40)"/></svg>',
+            'clownfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="35" ry="20" fill="#DD6B20"/><path d="M35,32 L35,68 M60,35 L60,65" stroke="white" stroke-width="8"/><polygon points="15,50 5,35 5,65" fill="#DD6B20"/><circle cx="75" cy="45" r="3" fill="black"/></svg>',
+            'parrotfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="35" ry="20" fill="#38B2AC"/><polygon points="15,50 5,30 5,70" fill="#319795"/><path d="M75,45 Q85,50 75,55" fill="#D53F8C"/><circle cx="70" cy="42" r="2" fill="black"/></svg>',
+            'sunfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="40" cy="50" rx="25" ry="30" fill="#A0AEC0"/><polygon points="35,20 45,5 55,20" fill="#718096"/><polygon points="35,80 45,95 55,80" fill="#718096"/><path d="M15,25 L5,50 L15,75 Z" fill="#A0AEC0"/><circle cx="55" cy="45" r="2" fill="black"/></svg>',
+            'mahimahi': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M80,50 Q80,20 60,30 Q30,40 20,50 Q30,60 60,70 Q80,80 80,50 Z" fill="#48BB78"/><path d="M60,30 Q40,25 20,50 Z" fill="#F6E05E"/><polygon points="20,50 5,40 5,60" fill="#ECC94B"/><circle cx="70" cy="40" r="2" fill="black"/></svg>',
+            'tuna': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="40" ry="15" fill="#2B6CB0"/><polygon points="10,50 0,30 5,50 0,70" fill="#2C5282"/><polygon points="60,35 70,20 65,35" fill="#2B6CB0"/><polygon points="60,65 70,80 65,65" fill="#2B6CB0"/><circle cx="80" cy="45" r="2" fill="black"/></svg>',
+            'shark': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M90,50 Q70,20 20,50 Q70,80 90,50 Z" fill="#718096"/><polygon points="60,35 50,10 45,38" fill="#4A5568"/><polygon points="20,50 5,35 5,65" fill="#718096"/><circle cx="75" cy="45" r="2" fill="black"/></svg>',
+            'turtle': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="30" ry="25" fill="#2F855A"/><ellipse cx="85" cy="50" rx="10" ry="8" fill="#68D391"/><ellipse cx="60" cy="20" rx="15" ry="8" fill="#68D391" transform="rotate(30 60 20)"/><ellipse cx="60" cy="80" rx="15" ry="8" fill="#68D391" transform="rotate(-30 60 80)"/></svg>',
+            'manta': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><polygon points="50,20 90,50 50,80 10,50" fill="#1A202C"/><path d="M90,50 Q100,40 85,35 M90,50 Q100,60 85,65" stroke="#1A202C" stroke-width="4" fill="none"/><path d="M10,50 L0,50" stroke="#1A202C" stroke-width="4"/></svg>',
+            'swordfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="45" cy="50" rx="30" ry="12" fill="#4A5568"/><path d="M70,50 L95,50" stroke="#2D3748" stroke-width="4"/><polygon points="15,50 5,40 5,60" fill="#4A5568"/><polygon points="50,38 40,20 35,39" fill="#2D3748"/><circle cx="60" cy="48" r="2" fill="white"/></svg>',
+            'ctenophore': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="20" ry="35" fill="rgba(66,153,225,0.4)" stroke="#63B3ED" stroke-width="2"/><path d="M40,20 L40,80 M50,15 L50,85 M60,20 L60,80" stroke="#F6E05E" stroke-width="2" stroke-dasharray="4,4"/><path d="M30,50 Q10,70 20,90 M70,50 Q90,70 80,90" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none"/></svg>',
+            'lanternfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="25" ry="10" fill="#1A202C"/><polygon points="25,50 15,40 15,60" fill="#1A202C"/><circle cx="65" cy="48" r="2" fill="white"/><circle cx="40" cy="58" r="2" fill="#F6E05E"/><circle cx="50" cy="58" r="2" fill="#F6E05E"/><circle cx="60" cy="58" r="2" fill="#F6E05E"/></svg>',
+            'squid': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M40,20 L60,20 L65,60 L35,60 Z" fill="#C53030"/><polygon points="35,30 20,20 40,20" fill="#9B2C2C"/><polygon points="65,30 80,20 60,20" fill="#9B2C2C"/><path d="M40,60 L30,90 M45,60 L45,95 M55,60 L55,95 M60,60 L70,90" stroke="#C53030" stroke-width="4" fill="none"/><circle cx="45" cy="50" r="3" fill="white"/><circle cx="55" cy="50" r="3" fill="white"/></svg>',
+            'hatchetfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M60,30 Q80,40 70,60 L30,60 Q20,40 40,30 Z" fill="#E2E8F0"/><circle cx="60" cy="35" r="6" fill="#1A202C"/><circle cx="40" cy="58" r="2" fill="#63B3ED"/><circle cx="50" cy="58" r="2" fill="#63B3ED"/><circle cx="60" cy="58" r="2" fill="#63B3ED"/></svg>',
+            'bristlemouth': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="30" ry="8" fill="#2D3748"/><polygon points="20,50 10,45 10,55" fill="#2D3748"/><path d="M60,50 L80,50" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="1,2"/></svg>',
+            'dragonfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M10,50 Q50,70 80,50 Q70,40 60,45" fill="none" stroke="#1A202C" stroke-width="8"/><path d="M80,50 Q90,55 85,65" fill="none" stroke="#F56565" stroke-width="2"/><circle cx="85" cy="65" r="3" fill="#F56565"/><path d="M75,45 L80,50 M72,48 L78,52" stroke="white" stroke-width="1"/></svg>',
+            'snipeeel': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M10,50 Q40,30 70,50 Q85,60 95,45 M70,50 Q85,40 95,55" fill="none" stroke="#4A5568" stroke-width="4"/></svg>',
+            'anglerfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><circle cx="50" cy="60" r="25" fill="#1A202C"/><path d="M60,40 Q60,20 80,30" fill="none" stroke="#4A5568" stroke-width="2"/><circle cx="80" cy="30" r="5" fill="#F6E05E"/><path d="M65,55 L75,55 M65,65 L75,65" stroke="white" stroke-width="2"/><circle cx="55" cy="45" r="2" fill="white"/></svg>',
+            'gulper': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M10,50 Q40,50 60,40 L90,40 Q60,80 40,50" fill="#1A202C"/><path d="M40,50 L10,50" stroke="#1A202C" stroke-width="2"/><circle cx="8" cy="50" r="2" fill="#F56565"/><circle cx="65" cy="45" r="2" fill="white"/></svg>',
+            'vampire': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50,20 L80,80 Q50,60 20,80 Z" fill="#742A2A"/><polygon points="40,30 25,25 35,40" fill="#742A2A"/><polygon points="60,30 75,25 65,40" fill="#742A2A"/><circle cx="45" cy="40" r="4" fill="#63B3ED"/><circle cx="55" cy="40" r="4" fill="#63B3ED"/></svg>',
+            'dumbo': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M30,50 Q50,20 70,50 Q80,80 50,80 Q20,80 30,50 Z" fill="#FED7E2"/><ellipse cx="25" cy="45" rx="10" ry="15" fill="#FBB6CE" transform="rotate(-30 25 45)"/><ellipse cx="75" cy="45" rx="10" ry="15" fill="#FBB6CE" transform="rotate(30 75 45)"/><circle cx="40" cy="55" r="3" fill="#1A202C"/><circle cx="60" cy="55" r="3" fill="#1A202C"/></svg>',
+            'seaspider': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><circle cx="50" cy="50" r="5" fill="#C53030"/><path d="M50,50 L20,20 M50,50 L80,20 M50,50 L20,80 M50,50 L80,80 M50,50 L10,50 M50,50 L90,50 M50,50 L35,10 M50,50 L65,90" stroke="#E53E3E" stroke-width="2" fill="none"/></svg>',
+            'basketstar': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><circle cx="50" cy="50" r="10" fill="#DD6B20"/><path d="M50,40 Q30,20 20,30 M50,40 Q70,20 80,30 M50,60 Q30,80 20,70 M50,60 Q70,80 80,70" stroke="#ED8936" stroke-width="3" fill="none"/><path d="M30,25 Q20,10 10,20 M70,25 Q80,10 90,20" stroke="#FBD38D" stroke-width="1.5" fill="none"/></svg>',
+            'cucumber': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><rect x="20" y="35" width="60" height="30" rx="15" fill="#744210"/><circle cx="30" cy="40" r="3" fill="#975A16"/><circle cx="50" cy="45" r="3" fill="#975A16"/><circle cx="70" cy="50" r="3" fill="#975A16"/><circle cx="40" cy="55" r="3" fill="#975A16"/><circle cx="60" cy="38" r="3" fill="#975A16"/></svg>',
+            'tripod': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="40" rx="20" ry="8" fill="#A0AEC0"/><path d="M40,45 L20,90 M60,45 L80,90 M30,40 L10,45" stroke="#718096" stroke-width="3" fill="none"/><circle cx="60" cy="38" r="1.5" fill="black"/></svg>',
+            'isopod': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="20" ry="35" fill="#E2E8F0"/><path d="M30,35 L70,35 M30,50 L70,50 M30,65 L70,65" stroke="#A0AEC0" stroke-width="4"/><path d="M40,25 L35,10 M60,25 L65,10" stroke="#CBD5E0" stroke-width="3"/></svg>',
+            'rattail': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M70,40 Q80,50 70,60 L20,55 Q10,50 20,45 Z" fill="#4A5568"/><circle cx="65" cy="45" r="5" fill="#A0AEC0"/><circle cx="65" cy="45" r="2" fill="black"/><path d="M30,45 L10,50 L30,55" fill="#2D3748"/></svg>',
+            'seapig': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="25" ry="15" fill="#FBB6CE"/><path d="M35,60 L30,75 M50,65 L50,80 M65,60 L70,75" stroke="#F687B3" stroke-width="4" stroke-linecap="round"/><path d="M60,35 L65,20 M70,40 L80,25" stroke="#F687B3" stroke-width="3" stroke-linecap="round"/></svg>',
+            'foraminifera': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50,50 M50,30 A20,20 0 1,1 30,50 A15,15 0 1,1 45,35 A10,10 0 1,1 55,45 A5,5 0 1,1 50,50" stroke="#E2E8F0" stroke-width="8" fill="none" stroke-linecap="round"/></svg>',
+            'snailfish': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M70,40 Q85,50 70,60 L30,55 Q10,50 30,45 Z" fill="#FED7E2" opacity="0.8"/><circle cx="65" cy="48" r="2" fill="black"/></svg>',
+            'tubeworm': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><rect x="40" y="40" width="20" height="60" fill="#E2E8F0"/><path d="M40,40 L60,40 L55,10 L45,10 Z" fill="#E53E3E"/></svg>',
+            'amphipod': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M30,70 Q50,20 70,70" fill="none" stroke="#E2E8F0" stroke-width="15" stroke-linecap="round"/><path d="M40,55 L40,75 M50,45 L50,65 M60,55 L60,75" stroke="#CBD5E0" stroke-width="3"/></svg>',
+            'cuskeel': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M80,45 Q90,50 80,55 L20,55 Q10,50 20,45 Z" fill="#CBD5E0"/><path d="M75,55 L70,70 M80,55 L75,70" stroke="#A0AEC0" stroke-width="2"/><circle cx="78" cy="48" r="1" fill="black"/></svg>',
+            'swimcucumber': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="20" ry="30" fill="rgba(244, 114, 182, 0.6)" stroke="#f472b6" stroke-width="2"/><path d="M30,30 Q50,10 70,30 Q80,40 50,40 Q20,40 30,30 Z" fill="rgba(244, 114, 182, 0.8)"/><path d="M30,70 Q50,90 70,70 Q60,60 50,60 Q40,60 30,70 Z" fill="rgba(244, 114, 182, 0.8)"/><path d="M45,35 Q55,50 45,75" stroke="#9d174d" stroke-width="4" fill="none"/></svg>',
+            'arrowworm': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50,10 L50,90" stroke="rgba(226, 232, 240, 0.8)" stroke-width="8" stroke-linecap="round"/><path d="M45,20 Q40,10 50,5 Q60,10 55,20" stroke="#94a3b8" stroke-width="2" fill="none"/><circle cx="50" cy="15" r="4" fill="#cbd5e1"/><path d="M50,40 Q65,50 50,60 M50,40 Q35,50 50,60" fill="rgba(226, 232, 240, 0.4)" stroke="none"/><path d="M50,80 Q60,95 50,95 Q40,95 50,80" fill="rgba(226, 232, 240, 0.4)"/><path d="M50,20 L50,75" stroke="#94a3b8" stroke-width="2" fill="none"/></svg>'
+        };
+
+        function closeModal() {
+            document.getElementById('interactive-modal').style.opacity='0';
+            document.getElementById('interactive-modal').style.pointerEvents='none';
+            document.getElementById('modal-content-container').style.transform='scale(0.95)';
+        }
+        function openModal(t, key, c) {
+            document.getElementById('modal-title').innerHTML=t;
+            document.getElementById('modal-emoji').innerHTML=SVGS[key];
+            document.getElementById('modal-body').innerHTML=c;
+            document.getElementById('interactive-modal').style.opacity='1';
+            document.getElementById('interactive-modal').style.pointerEvents='auto';
+            document.getElementById('modal-content-container').style.transform='scale(1)';
+        }
+        function awardBadge(id) {
+            const celebration = document.getElementById('badge-celebration');
+            if(celebration) { celebration.classList.remove('hidden'); }
+        }
+        function checkAllBadges() {
+            const c=document.getElementById('confetti-canvas');
+            if(!c) return;
+            c.style.display='block'; const ctx=c.getContext('2d');
+            c.width=window.innerWidth; c.height=window.innerHeight; let pts=[];
+            for(let i=0;i<150;i++) pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*6+2,d:Math.random()*10});
+            function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='gold';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+1+p.r/2;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}});requestAnimationFrame(draw);}
+            draw(); setTimeout(()=>c.style.display='none',8000);
+        }
+        function setupIntersectionObserver(markerClass, dataAttr) {
+            const ob = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    if(e.isIntersecting) {
+                        const m = document.querySelector(`.${markerClass}[${dataAttr}="${e.target.id}"]`);
+                        if(m){ Array.from(m.parentNode.children).forEach(c=>c.classList.remove('active')); m.classList.add('active'); }
+                    }
+                });
+            }, { rootMargin: "-30% 0px -30% 0px" });
+            return ob;
+        }
+
+        let zoneProgress=[0,0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false,false];
+        let globalScore = 0;
+        let attemptedQuizzes = new Set();
+
+        function renderZoneQuizzes() {
+            const q = [
+                [["To survive the hot sun during low tide, what do barnacles do?","Walk to water","Close shells tightly",1],["What is the scientific term for an animal fatally drying out?","Desiccation","Osmosis",0],["Mussels anchor using strong protein cables called:","Nematocysts","Byssal threads",1],["A transition area between two biological communities (like Intertidal) is a(n):","Ecotone","Estuary",0],["What type of tide provides maximum water movement for spawning?","Neap Tide","Spring Tide",1],["Intertidal snails scrape algae off rocks using a conveyor-belt-like tongue called a:","Radula","Esca",0]],
+                [["What physical feature defines the bottom of the Neritic Zone?","The Continental Shelf","The Abyssal Plain",0],["Which of these is a highly productive ecosystem found in cold Neritic waters?","Coral Reefs","Kelp Forests",1],["What process brings cold, nutrient-rich water from the deep to the Neritic Zone?","Upwelling","Downwelling",0],["Corals rely on symbiotic algae called what to produce food?","Zooxanthellae","Phytoplankton",0],["Compared to the open ocean, the Neritic Zone has:","Lower biodiversity","Higher biomass and nutrients",1],["Land runoff supplies the Neritic zone with important:","Toxic gases","Nutrients like nitrogen and phosphorus",1]],
+                [["Why do open-ocean predators use countershading?","Blend with deep ocean below/sunlight above","Absorb heat",0],["Which color is absorbed first, disappearing by 10m?","Blue","Red",1],["Torpedo-like body shape to reduce drag is called:","Fusiform","Sagittal",0],["Below what depth does photosynthesis become impossible?","1,000m","200m",1],["Fish that pull O2 from blood to fill their bladder use a:","Physostomous bladder","Physoclistous bladder",1],["Stinging cells used by jellyfish are called:","Nematocysts","Photophores",0]],
+                [["How do Lanternfish hide their shadows?","Swim faster","Counter-illumination",1],["What invisible barrier features a rapid drop in temp?","Thermocline","Halocline",0],["The layer where oxygen depletion is highest is the:","Anoxic Benthic Zone","Oxygen Minimum Zone (OMZ)",1],["Why do predators here have massive, upward-pointing eyes?","Spot silhouettes above","See mud below",0],["Why are deep-sea shrimp bright red?","Toxic warning","Red light doesn't penetrate here (appears black)",1],["Animals track specific dim light levels called:","Isolumes","Isobars",0]],
+                [["How do animals adapt to scarce food?","Huge mouths, slow metabolism","Swim to surface to eat",0],["What two chemicals create bioluminescence?","Chlorophyll & ATP","Luciferin & Luciferase",1],["What do many deep sea fish lack entirely due to high pressure?","A Swim Bladder","Gills",0],["How does the male Anglerfish guarantee he never loses his mate?","Singing a mating call","Sexual parasitism",1],["What was the 19th-century theory that claimed no life existed below 1,800 feet?","Azoic Hypothesis","Abyssal Void Theory",0],["Which 1870s voyage disproved the Azoic Hypothesis?","Beagle Expedition","Challenger Expedition",1]],
+                [["How does the Tripod Fish adapt to soft mud?","Rolls like a ball","Uses long fins as stilts",1],["Organisms living ON the seafloor are called:","Benthic","Pelagic",0],["Deep-sea creatures growing very large due to cold temps is called:","Bathypelagic Swelling","Abyssal Gigantism",1],["A massive food source like a dead whale falling is called:","A Whale Fall","A Pelagic Graveyard",0],["Because the Abyss relies entirely on external energy (marine snow), it is a(n) ________ ecosystem.","Autochthonous","Allochthonous",1],["Hydrostatic pressure increases 1 atm every ____ meters.","10m","100m",0]],
+                [["Which crustacean uses an aluminum shield to survive trench pressure?","Supergiant Amphipod","Giant Isopod",0],["What chemical compound acts as a shield (piezolyte)?","NaCl","TMAO",1],["Slow-leaking areas where methanotrophic mussels live are:","Cold Seeps","Brine Pools",0],["What is the deepest known living fish?","Mariana Snailfish","Cusk Eel",0],["Bacteria thriving >100°C at vents are classified as:","Hyperthermophiles","Cryophiles",0],["Vent ecosystems produce energy locally. This is a(n) ________ ecosystem.","Allochthonous","Autochthonous",1]]
+            ];
+            q.forEach((z,zi)=>{let h='';z.forEach((qq,qi)=>{let opts=[{t:qq[1],c:qq[3]===0},{t:qq[2],c:qq[3]===1}].sort(()=>Math.random()-0.5);h+=`<div id="qz-${zi}-${qi}" class="${qi>0?'qz-step hidden':''}"><p class="mb-3 font-semibold text-sm">Level ${qi+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkZ(${zi},${qi},${opts[0].c},this)" class="qz-btn">A) ${opts[0].t}</button><button onclick="checkZ(${zi},${qi},${opts[1].c},this)" class="qz-btn">B) ${opts[1].t}</button></div></div>`;});const b=document.getElementById(`qz-body-${zi}`);if(b)b.innerHTML=h;});
+        }
+        function checkZ(z,q,isC,btn){
+            const qKey = `${z}-${q}`;
+            const isFirstAttempt = !attemptedQuizzes.has(qKey);
+            attemptedQuizzes.add(qKey);
+
+            if(isC){
+                if (!btn.disabled) {
+                    btn.classList.add('btn-correct');
+                    btn.innerHTML += ' <i class="fa-solid fa-check text-white ml-2"></i>';
+                    btn.parentNode.querySelectorAll('button').forEach(b => b.disabled = true);
+                    
+                    if(zoneProgress[z]===q){
+                        zoneProgress[z]++;
+                        if(isFirstAttempt) {
+                            globalScore++;
+                            document.getElementById('global-score').innerText = globalScore;
+                        }
+                        document.getElementById(`q-tracker-${z}`).innerText=zoneProgress[z];
+                        
+                        if(zoneProgress[z]<=5){
+                            const n=document.getElementById(`qz-${z}-${zoneProgress[z]}`);
+                            if(n)n.classList.remove('hidden');
+                        }else{
+                            zoneCompleted[z]=true;
+                            if(zoneCompleted.every(v=>v)){
+                                document.getElementById('zone-master-celebration').classList.remove('hidden');
+                                awardBadge('zones');
+                                checkAllBadges();
+                            }
+                        }
+                    }
+                }
+            } else {
+                btn.classList.add('btn-wrong','anim-shake','opacity-75','cursor-not-allowed');
+                btn.disabled=true;
+                setTimeout(()=>btn.classList.remove('anim-shake'),400);
+            }
+        }
+        
+        // Dictionary Format: ['Name', '', 'Description', 'Diet', 'Predators', ['Fact 1', 'Fact 2', 'Fact 3']]
+        const SP_DICT={
+            'limpet':['Limpet <span class="tag-benthic">Benthic</span>','','Cone-shaped snails that clamp down incredibly hard onto rocks to trap moisture and resist wave action.','Algae scraped from rocks.','Oystercatchers, starfish, crabs.',['Teeth are made of goethite (the strongest known biological material).','Return to the exact same home scar on a rock every day.','Can live for over 10 years in the wild.']],
+            'sculpin':['Tidepool Sculpin <span class="tag-benthic">Benthic</span>','','Small, camouflaged fish that can survive in warm, oxygen-poor tidepools during low tide.','Small invertebrates, amphipods, worms.','Larger fish, coastal birds.',['Can breathe air briefly if stranded.','Camouflages perfectly with tidepool rocks by changing its coloration slightly.','Can quickly dart and freeze to avoid detection by predators.']],
+            'crab':['Shore Crab <span class="tag-benthic">Benthic</span>','','Crabs have tough exoskeletons to prevent water loss. They wedge deeply into damp crevices.','Scavenger (dead fish, algae, detritus).','Birds, octopuses, larger crabs.',['Walk sideways due to the articulation of their leg joints.','Can regenerate lost limbs over successive molts.','Have a complex social hierarchy based heavily on claw size.']],
+            'barnacle':['Acorn Barnacle <span class="tag-benthic">Benthic</span>','','They glue their heads to rocks! Close plates to trap seawater inside.','Plankton and detritus (filter feeder).','Whelks, starfish, some fish.',['They are crustaceans, making them closer relatives to crabs than to snails.','Have the longest penis relative to body size of any animal.','Secrete a cement that is among the most powerful natural glues known to science.']],
+            'starfish':['Ochre Sea Star <span class="tag-benthic">Benthic</span>','','Uses a unique water vascular system and tube feet to powerfully grip rocks.','Mussels, clams, oysters.','Sea otters, seagulls, other starfish.',['Pushes its stomach out of its mouth to digest prey externally.','Can regenerate its entire body from a single severed arm (if part of the central disc remains).','Has absolutely no brain or blood.']],
+            'anemone':['Sea Anemone <span class="tag-benthic">Benthic</span>','','Retracts its tentacles and closes up into a tight, water-filled blob to survive desiccation.','Small fish, plankton, shrimp.','Sea slugs (nudibranchs), sea turtles.',['They are carnivorous animals, not plants.','Closely related to jellyfish and corals.','Can clone themselves by literally tearing their bodies in half.']],
+            'otter':['Sea Otter','','A keystone marine mammal that uses tools to crack open sea urchins, keeping kelp forests healthy.','Sea urchins, crabs, clams, mussels.','Great white sharks, killer whales.',['Have the densest fur in the animal kingdom (up to 1 million hairs per square inch).','Use rocks as anvils on their chests to break open hard shells.','Hold hands while sleeping in the water to avoid drifting apart.']],
+            'phytoplankton':['Phytoplankton','','Microscopic algae that form the base of the marine food web and produce half of the oxygen on Earth.','Photosynthesis (sunlight and nutrients).','Zooplankton, small fish, filter-feeding whales.',['Produce 50% of the world’s oxygen.','Responsible for the marine "snow" that eventually feeds the deep sea.','Form the foundational base of almost all marine food webs.']],
+            'coral':['Reef-Building Coral <span class="tag-benthic">Benthic</span>','','Form massive calcium carbonate structures and host symbiotic zooxanthellae algae for energy.','Photosynthetic byproducts from zooxanthellae, microscopic plankton.','Parrotfish, crown-of-thorns starfish.',['Coral reefs support roughly 25% of all marine life.','A single coral branch is actually a colony of thousands of tiny animals called polyps.','They expel their symbiotic algae (coral bleaching) when stressed by warming temperatures.']],
+            'kelp':['Giant Kelp <span class="tag-benthic">Benthic</span>','','Fast-growing macroalgae that creates dense underwater forests supporting huge biodiversity.','Photosynthesis (sunlight and nutrients).','Sea urchins, kelp crabs.',['Can grow up to 2 feet in a single day under ideal conditions.','Forms massive underwater forests that buffer coastlines from storm waves.','Extracts iodine from seawater, concentrating it up to 100,000 times the ocean level.']],
+            'clownfish':['Clownfish','','Lives symbiotically among the stinging tentacles of sea anemones on shallow coral reefs.','Algae, zooplankton, leftover anemone meals.','Larger reef fish, reef sharks.',['All are born male; the largest, most dominant fish in a group becomes female.','Develop immunity to anemone stings by constantly rubbing a protective mucus on their bodies.','Communicate by making distinct popping and clicking noises.']],
+            'parrotfish':['Parrotfish','','Uses its beak-like teeth to scrape algae off coral, excreting fine white sand.','Algae growing on coral reefs.','Moray eels, reef sharks.',['Excrete fine white sand after digesting coral rocks (creating many tropical beaches).','Sleep in a protective mucus cocoon at night to hide their scent from predators.','Their teeth constantly grow to replace the wear from scraping hard rocks.']],
+            'sunfish':['Ocean Sunfish','','The heaviest bony fish in the world, often seen basking at the surface to warm up after deep dives.','Jellyfish, zooplankton, small fish.','Sea lions, killer whales, large sharks.',['Can lay up to 300 million eggs at once, more than any other vertebrate.','Lacks a true tail fin, using a scalloped pseudo-tail called a "clavus" to steer.','Often get infested with skin parasites, which birds and small fish pick off while they bask.']],
+            'mahimahi':['Mahi-Mahi','','A fast, surface-dwelling predator known for its brilliant colors and blunt forehead.','Flying fish, squid, crabs.','Marlin, sailfish, large tuna.',['Grow incredibly fast, reaching up to 3 feet in length in a single year.','Mature males have prominent, blunt, square foreheads.','Flash bright neon blue and green colors when excited or actively hunting.']],
+            'tuna':['Bluefin Tuna','','A master of the Epipelagic! Fusiform body shape and strongly countershaded.','Smaller fish (mackerel, herring), squid.','Killer whales, great white sharks.',['Warm-blooded, allowing them to swim quickly in extremely cold waters.','Must swim constantly with their mouths open to breathe (ram ventilation).','Can reach burst speeds of up to 43 mph.']],
+            'shark':['Great White Shark','','Apex predator relying on keen eyesight, electroreception, and immense burst speed.','Seals, sea lions, large fish.','Killer whales (rarely).',['Can detect one drop of blood in 100 liters of water.','Have a special sensory organ (Ampullae of Lorenzini) to detect the electric fields of prey.','Roll their eyes completely backward into their head to protect them when striking.']],
+            'turtle':['Sea Turtle','','Pelagic cruiser. Streamlined shell reduces drag, uses internal counter-current heat exchange.','Jellyfish, sponges, seagrass.','Tiger sharks, killer whales.',['Unlike land turtles, they cannot retract their heads or flippers into their shells.','Females return to the exact beach they were born to lay their own eggs.','Have special salt glands near their eyes to excrete excess ocean salt, making them look like they are crying.']],
+            'manta':['Manta Ray','','A gentle giant! Uses large cephalic fins to funnel plankton-rich water into its mouth.','Zooplankton, small fish.','Large sharks, killer whales.',['Have the largest brain-to-body ratio of any fish.','Are one of the few fish that can recognize themselves in a mirror, indicating self-awareness.','The spot patterns on their bellies are completely unique to each individual, like fingerprints.']],
+            'swordfish':['Swordfish','','Fast predators that migrate into the twilight zone during the day to hunt, using special organs to heat their eyes.','Squid, pelagic fish.','Mako sharks, killer whales.',['Have a specialized heating organ near their eyes to keep their brain warm and improve vision in deep, cold water.','Do not actually spear prey with their sword, but use it to rapidly slash and stun them.','Lose all their teeth and scales as they grow into adults.']],
+            'ctenophore':['Comb Jelly','','Translucent predators found across almost all ocean zones, from sunlit surfaces down to the deep abyss.','Copepods, small larvae.','Sea turtles, various fish, other ctenophores.',['Do not sting; instead, they use sticky cells called colloblasts to capture prey.','Represent one of the oldest known animal lineages on Earth.','While featured in the Twilight Zone here, they live at virtually every depth.']],
+            'lanternfish':['Lanternfish','','Uses bioluminescent photophores on its belly to counter-illuminate.','Zooplankton, small crustaceans.','Tuna, squid, penguins, dolphins.',['Make up a huge portion of global fish biomass (up to 65% of all deep-sea fish).','Perform the largest daily mass animal migration on Earth, rising to the surface at night.','Different species have unique arrangements of light organs to identify each other in the dark.']],
+            'squid':['Vampire Squid','','Not a true squid! Turns inside out like a spiky umbrella when threatened in the Twilight Zone.','Marine snow (dead plankton, fecal matter, detritus).','Deep-diving whales, large fish.',['The only cephalopod known to not eat live prey (it is a detritivore).','Has the largest eyes relative to body size of any animal in the world.','Does not ink; instead, it ejects glowing bioluminescent mucus to confuse predators.']],
+            'hatchetfish':['Hatchetfish','','Coin-thin body and tubular eyes pointing straight up to spot silhouettes.','Copepods, small crustaceans.','Viperfish, lanternfish, larger predators.',['Extremely flat, resembling a silver coin or a hatchet blade.','Eyes point strictly upward to spot silhouettes of prey against the faint surface light.','Belly has light organs perfectly matching the downwelling sunlight to erase their shadow (counter-illumination).']],
+            'bristlemouth':['Bristlemouth','','Thought to be the most abundant vertebrate genus on Earth!','Tiny crustaceans, copepods.','Dragonfish, larger squid.',['Believed to be the most numerous vertebrate genus on the planet (numbering in the trillions).','Incredibly tiny, usually measuring less than 3 inches long.','Can unhinge their jaws to eat prey nearly their own size.']],
+            'dragonfish':['Deep Sea Dragonfish','','Fierce predators with oversized jaws and a bioluminescent barbel attached to their chin to lure prey.','Small fish, lanternfish.','Larger deep-sea fish.',['Has black stomach tissue to hide the glowing light of swallowed bioluminescent prey.','Their massive teeth are transparent so prey cannot see them coming.','Produces a red bioluminescence to hunt, a color invisible to almost all other deep-sea creatures.']],
+            'snipeeel':['Snipe Eel','','Slender fish with curving, beak-like jaws that range widely across both the Mesopelagic and Bathypelagic zones.','Small shrimp, tiny crustaceans.','Deep-sea sharks, larger fish.',['Swims backwards while trailing its jaws open to snag the antennae of deep-sea shrimp.','Has more vertebrae than almost any other animal (up to 750).','Their depth range spans from 300m down to over 4,000m.']],
+            'anglerfish':['Humpback Anglerfish','','Uses a glowing esca (lure) filled with symbiotic bioluminescent bacteria to attract prey.','Fish, crustaceans.','Rarely preyed upon due to depth and isolation.',['Males are tiny parasites that bite the female and permanently fuse into her bloodstream.','The glowing lure on the female’s head is filled with symbiotic glowing bacteria.','Can consume prey twice their own size due to a highly expandable stomach.']],
+            'gulper':['Gulper Eel','','Massive, loosely-hinged jaws to swallow prey much larger than itself.','Small fish, squid, occasional large prey.','Deep-sea sharks, lancetfish.',['The tip of its tail has a tiny glowing organ to attract prey or potential mates in the dark.','Its skull is incredibly tiny compared to its massive, pelican-like jaw.','Lacks a swim bladder, scales, and pelvic fins entirely.']],
+            'vampire':['Vampire Squid','','A peaceful detritivore that spans both the Mesopelagic and Bathypelagic zones, often resting in the Oxygen Minimum Zone.','Marine snow (dead plankton, fecal matter).','Sperm whales, deep-diving sharks.',['Capable of slowing its metabolism to incredibly low rates to survive in the OMZ.','"Cloak" is made of webbed arms covered in fleshy, non-stinging spines called cirri.','Uses two extremely long, sticky filaments to gather falling debris like a net.']],
+            'dumbo':['Dumbo Octopus <span class="tag-benthopelagic">Benthopelagic</span>','','Flaps ear-like fins to hover. Completely lacks an ink sac.','Polychaete worms, bivalves, crustaceans.','Deep-sea sharks, other cephalopods.',['The deepest-living octopus known to science.','Swims by flapping its ear-like fins rather than using jet propulsion like shallow-water octopuses.','Swallows its prey whole instead of tearing it with a beak.']],
+            'seaspider':['Sea Spider <span class="tag-benthic">Benthic</span>','','Benthic marine arthropods with incredibly long legs; their bodies are so small that organs are located in their legs!','Anemones, sponges (sucks their juices).','Deep-sea crabs.',['Breathes directly by diffusion through the surface of its legs.','Male sea spiders are the ones who carry the eggs until they hatch.','Digestion and reproduction occur inside their legs due to their incredibly tiny central body cavity.']],
+            'basketstar':['Basket Star <span class="tag-benthic">Benthic</span>','','A complex benthic brittle star mostly found on the seafloor at bathyal depths, though some species reach down into the Abyssal zone.','Zooplankton, marine snow.','Bottom-dwelling fish, crabs.',['Can fully regenerate their incredibly complex, branching arms if damaged.','Uses microscopic hooks on its arms to snare prey passing by in the dark.','Curls up into a tight, knotted ball when disturbed to protect its vulnerable central disk.']],
+            'cucumber':['Sea Cucumber <span class="tag-benthic">Benthic</span>','','A benthic vacuum cleaner! Crawls along the abyssal mud eating organic marine snow.','Detritus, organic matter sifted from mud.','Deep-sea fish, crabs.',['Breathe through their anus using internal respiratory trees.','Can expel their internal organs out of their body to distract predators, and then fully regenerate them.','Make up the vast majority of the biological mass on the deep ocean floor.']],
+            'tripod':['Tripod Fish <span class="tag-benthic">Benthic</span>','','A benthic fish that uses elongated fin rays to stand like a tripod above the soft mud to sense vibrations.','Small crustaceans drifting in currents.','Larger bottom-dwelling fish.',['Essentially "blind," relying entirely on vibration-sensing pectoral fins to find food.','Hermaphroditic; can actually fertilize its own eggs if it cannot find a mate in the deep ocean.','"Stands" perfectly still facing the current to effortlessly catch floating prey.']],
+            'isopod':['Giant Isopod <span class="tag-benthic">Benthic</span>','','Benthic scavengers exhibiting Abyssal Gigantism! Extreme cold delays maturity, allowing them to grow massive in the bathyal zone.','Carrion (whale falls, dead fish).','Deep-sea sharks, octopuses.',['Can survive for up to 5 years without eating a single meal.','Have four sets of powerful jaws to tear apart dead animals that fall from above.','Can roll themselves into a tight, armored ball when threatened by predators.']],
+            'rattail':['Rattail Fish <span class="tag-benthopelagic">Benthopelagic</span>','','Benthic and demersal scavengers mostly found in the bathyal zone, with a massive head containing highly sensitive lateral lines.','Crustaceans, small fish, carrion.','Deep-sea sharks.',['Also known as "grenadiers," they have extremely sensitive snouts to smell food buried deep in the mud.','Emit drumming sounds using muscles attached to their swim bladder.','Extremely slow-growing and can live for over 70 years.']],
+            'seapig':['Sea Pig <span class="tag-benthic">Benthic</span>','','A specialized, benthic sea cucumber that walks on the muddy abyssal plain using enlarged tube feet.','Organic detritus found in deep-sea mud.','Deep-sea crabs, larger scavengers.',['A type of sea cucumber that actually "walks" using water-inflated legs.','Often found in massive herds, all facing the exact same direction into the current.','Have "antennae" on their heads which are actually modified legs used to sense food in the mud.']],
+            'foraminifera':['Foraminifera <span class="tag-multi">Benthic & Planktonic</span>','','Single-celled protists that construct complex shells; they thrive in extreme trench pressures.','Dissolved organic matter, bacteria.','Deep-sea snails, small crustaceans.',['Single-celled organisms that manage to build complex, incredibly beautiful shells.','Shells in the hadal zone are made of organic material or glued sand, as regular calcium shells dissolve at high pressure.','Their ancient fossils are heavily used by scientists to reconstruct prehistoric ocean temperatures.']],
+            'snailfish':['Mariana Snailfish <span class="tag-benthic">Benthic</span>','','The deepest known fish! Has a gelatinous body and massive amounts of TMAO.','Small amphipods and crustaceans.','Larger amphipods, rarely other deep-sea fish.',['Current record holder for the deepest living fish ever discovered by humans.','Have soft, translucent bodies with almost completely uncalcified bones to survive the pressure.','Lay incredibly large eggs (up to 1cm in diameter) for a fish of their size.']],
+            'tubeworm':['Riftia Tubeworm <span class="tag-benthic">Benthic</span>','','A purely benthic creature that lacks a mouth and stomach! Houses chemosynthetic bacteria in its trophosome organ near bathyal hydrothermal vents.','Energy produced internally by symbiotic chemosynthetic bacteria.','Vent crabs, blind shrimp.',['The fastest-growing marine invertebrates known to science.','Their bright red plumes are filled with hemoglobin to transport toxic hydrogen sulfide to their bacteria.','Thrive in water temperatures bordering on boiling, right next to hydrothermal vents.']],
+            'amphipod':['Supergiant Amphipod <span class="tag-benthic">Benthic</span>','','A trench scavenger! Uses specialized aluminum shields and TMAO to survive.','Carrion (dead animals sinking into the trench).','Snailfish.',['Extract aluminum from the deep-sea mud to build a protective pressure shield around their bodies.','Contain special enzymes that allow them to break down and eat wood that falls into the ocean trenches.','Can grow up to 10 times larger than their shallow-water amphipod relatives.']],
+            'cuskeel':['Cusk Eel <span class="tag-benthopelagic">Benthopelagic</span>','','Specifically the species Abyssobrotula galatheae, an iconic hadal dweller that held the record for deepest fish for decades.','Small invertebrates, amphipods.','Larger deep-sea scavengers.',['This specific species was collected at an astonishing depth of 8,370 meters (27,460 feet) in the Puerto Rico Trench.','Have pelvic fins modified into feeler-like barbels under their chin to sense the muddy bottom.','Possess extremely small eyes, as sight is completely useless in the pitch-black trench.']],
+            'swimcucumber':['Swimming Sea Cucumber <span class="tag-pelagic">Pelagic</span>','','A true abyssopelagic animal! Unlike most sea cucumbers that crawl, this species actively swims through the deep water column.','Sifts fine organic matter (marine snow) from mud when touching down briefly.','Deep-sea fish, larger scavengers.',['Often called the "headless chicken monster" because of its plump, pink, wing-like swimming appendages.','Its body is highly transparent, making its internal digestive tract completely visible.','Spending most of its time swimming allows it to easily relocate and avoid benthic predators.']],
+            'arrowworm':['Arrow Worm <span class="tag-pelagic">Pelagic</span>','','Small, highly abundant predators that dart through the water column like tiny glass arrows at almost all depths, including the Abyss.','Copepods, tiny crustaceans, and other zooplankton.','Lanternfish, bristlemouths, jellyfish.',['They are fierce ambush predators that use vibration-sensing hairs to detect prey in total darkness.','Their heads are armed with terrifying, grasping hooks made of chitin to snag their meals.','They are found in massive numbers throughout the ocean, making them a crucial part of the pelagic food web.']]
+        };
+
+        function openSpecies(t){
+            const d=SP_DICT[t];
+            if(d){
+                const name = d[0];
+                const desc = d[2];
+                const diet = d[3];
+                const predators = d[4];
+                const facts = d[5];
+
+                const content = `
+                    <p class="font-medium text-gray-700 leading-relaxed mb-5">${desc}</p>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col md:flex-row md:items-center gap-2">
+                            <strong class="text-blue-800 shrink-0 w-32"><i class="fa-solid fa-utensils mr-2"></i>Diet:</strong>
+                            <span class="text-gray-700">${diet}</span>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 flex flex-col md:flex-row md:items-center gap-2">
+                            <strong class="text-red-800 shrink-0 w-32"><i class="fa-solid fa-skull mr-2"></i>Predators:</strong>
+                            <span class="text-gray-700">${predators}</span>
+                        </div>
+                        <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
+                            <strong class="text-purple-800 block mb-3 text-lg"><i class="fa-solid fa-lightbulb mr-2"></i>Fascinating Facts:</strong>
+                            <ul class="list-none pl-1 text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[0]}</span></li>
+                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[1]}</span></li>
+                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[2]}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                openModal(name, t, content);
+            }
+        }
+
+        // CREATURE MATCH GAME LOGIC
+        const MATCH_DATA = [
+            { name: "Limpet <span class='tag-benthic'>BENTHIC</span>", sci: "Patellogastropoda", svgKey: "limpet", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Tidepool Sculpin <span class='tag-benthic'>BENTHIC</span>", sci: "Oligocottus maculosus", svgKey: "sculpin", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Shore Crab <span class='tag-benthic'>BENTHIC</span>", sci: "Carcinus maenas", svgKey: "crab", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Acorn Barnacle <span class='tag-benthic'>BENTHIC</span>", sci: "Semibalanus balanoides", svgKey: "barnacle", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Ochre Sea Star <span class='tag-benthic'>BENTHIC</span>", sci: "Pisaster ochraceus", svgKey: "starfish", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Sea Anemone <span class='tag-benthic'>BENTHIC</span>", sci: "Actiniaria", svgKey: "anemone", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "Sea Otter", sci: "Enhydra lutris", svgKey: "otter", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Phytoplankton", sci: "Microalgae", svgKey: "phytoplankton", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Reef-Building Coral <span class='tag-benthic'>BENTHIC</span>", sci: "Scleractinia", svgKey: "coral", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Giant Kelp <span class='tag-benthic'>BENTHIC</span>", sci: "Macrocystis pyrifera", svgKey: "kelp", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Clownfish", sci: "Amphiprion ocellaris", svgKey: "clownfish", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Parrotfish", sci: "Scaridae", svgKey: "parrotfish", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Ocean Sunfish", sci: "Mola mola", svgKey: "sunfish", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Mahi-Mahi", sci: "Coryphaena hippurus", svgKey: "mahimahi", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Bluefin Tuna", sci: "Thunnus thynnus", svgKey: "tuna", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Great White Shark", sci: "Carcharodon carcharias", svgKey: "shark", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Sea Turtle", sci: "Chelonioidea", svgKey: "turtle", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Manta Ray", sci: "Mobula birostris", svgKey: "manta", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Swordfish", sci: "Xiphias gladius", svgKey: "swordfish", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Comb Jelly", sci: "Ctenophora", svgKey: "ctenophore", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "almost all ocean zones" },
+            { name: "Lanternfish", sci: "Myctophidae", svgKey: "lanternfish", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Hatchetfish", sci: "Sternoptychidae", svgKey: "hatchetfish", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Bristlemouth", sci: "Gonostomatidae", svgKey: "bristlemouth", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Deep Sea Dragonfish", sci: "Stomiidae", svgKey: "dragonfish", zones: [4], zoneNames: "Bathypelagic Zone" },
+            { name: "Snipe Eel", sci: "Nemichthyidae", svgKey: "snipeeel", zones: [3, 4], zoneNames: "Mesopelagic or Bathypelagic zones" },
+            { name: "Anglerfish", sci: "Melanocetus johnsonii", svgKey: "anglerfish", zones: [4], zoneNames: "Bathypelagic Zone" },
+            { name: "Gulper Eel", sci: "Eurypharynx pelecanoides", svgKey: "gulper", zones: [4], zoneNames: "Bathypelagic Zone" },
+            { name: "Vampire Squid", sci: "Vampyroteuthis infernalis", svgKey: "vampire", zones: [3, 4], zoneNames: "Mesopelagic or Bathypelagic zones" },
+            { name: "Dumbo Octopus <span class='tag-benthopelagic'>BENTHOPELAGIC</span>", sci: "Grimpoteuthis", svgKey: "dumbo", zones: [4, 5], zoneNames: "Bathyal/Abyssal Benthopelagic" },
+            { name: "Sea Spider <span class='tag-benthic'>BENTHIC</span>", sci: "Pycnogonida", svgKey: "seaspider", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "Benthic at almost all depths" },
+            { name: "Basket Star <span class='tag-benthic'>BENTHIC</span>", sci: "Gorgonocephalidae", svgKey: "basketstar", zones: [4, 5], zoneNames: "Bathyal or Abyssal Benthic zones" },
+            { name: "Sea Cucumber <span class='tag-benthic'>BENTHIC</span>", sci: "Holothuroidea", svgKey: "cucumber", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "Benthic at all depths (dominant Abyssal)" },
+            { name: "Tripod Fish <span class='tag-benthic'>BENTHIC</span>", sci: "Bathypterois grallator", svgKey: "tripod", zones: [4, 5], zoneNames: "Bathyal-Abyssal Benthic" },
+            { name: "Giant Isopod <span class='tag-benthic'>BENTHIC</span>", sci: "Bathynomus giganteus", svgKey: "isopod", zones: [4], zoneNames: "Bathyal Benthic Zone" },
+            { name: "Rattail Fish <span class='tag-benthopelagic'>BENTHOPELAGIC</span>", sci: "Macrouridae", svgKey: "rattail", zones: [4, 5], zoneNames: "Bathyal-Abyssal Benthopelagic" },
+            { name: "Sea Pig <span class='tag-benthic'>BENTHIC</span>", sci: "Scotoplanes globosa", svgKey: "seapig", zones: [5], zoneNames: "Abyssal Benthic Zone" },
+            { name: "Swimming Sea Cucumber <span class='tag-pelagic'>PELAGIC</span>", sci: "Enypniastes eximia", svgKey: "swimcucumber", zones: [5], zoneNames: "Abyssopelagic Zone" },
+            { name: "Arrow Worm <span class='tag-pelagic'>PELAGIC</span>", sci: "Chaetognatha", svgKey: "arrowworm", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "Pelagic at all depths" },
+            { name: "Foraminifera <span class='tag-multi'>BENTHIC & PLANKTONIC</span>", sci: "Foraminifera", svgKey: "foraminifera", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "All zones (Planktonic & Benthic)" },
+            { name: "Mariana Snailfish <span class='tag-benthic'>BENTHIC</span>", sci: "Pseudoliparis swirei", svgKey: "snailfish", zones: [6], zoneNames: "Hadal Zone" },
+            { name: "Riftia Tubeworm <span class='tag-benthic'>BENTHIC</span>", sci: "Riftia pachyptila", svgKey: "tubeworm", zones: [4], zoneNames: "Bathyal Hydrothermal Vents" },
+            { name: "Supergiant Amphipod <span class='tag-benthic'>BENTHIC</span>", sci: "Alicella gigantea", svgKey: "amphipod", zones: [5, 6], zoneNames: "Lower Abyssal / Hadal Zone" },
+            { name: "Cusk Eel <span class='tag-benthopelagic'>BENTHOPELAGIC</span>", sci: "Ophidiidae", svgKey: "cuskeel", zones: [6], zoneNames: "Hadal Zone" }
+        ];
+
+        let currentMatchIndex = 0;
+
+        function renderMatchGame() {
+            const container = document.getElementById('match-game-container');
+            if(currentMatchIndex >= MATCH_DATA.length) {
+                container.innerHTML = `
+                    <div class="text-center py-10 anim-pop">
+                        <div class="text-6xl mb-4">🏆</div>
+                        <h3 class="text-3xl font-bold text-yellow-400 mb-2">Ocean Explorer!</h3>
+                        <p class="text-gray-300">You successfully mapped all the creatures to their correct zones.</p>
+                        <button onclick="currentMatchIndex=0; MATCH_DATA.sort(() => Math.random() - 0.5); renderMatchGame();" class="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition">Play Again</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const data = MATCH_DATA[currentMatchIndex];
+            const zoneLabels = ["Intertidal", "Neritic", "Epipelagic", "Mesopelagic", "Bathyal/Bathypelagic", "Abyssal/Abyssopelagic", "Hadal"];
+
+            let buttonsHTML = zoneLabels.map((lbl, idx) => `
+                <button onclick="checkMatch(${idx}, this)" class="bg-gray-800 hover:bg-blue-600 hover:border-blue-400 text-gray-200 border border-gray-600 rounded-lg py-2 px-3 text-sm font-semibold transition-all">
+                    ${lbl}
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="mb-4 text-left text-blue-300 font-semibold flex justify-between">
+                    <span>Creature ${currentMatchIndex + 1} of ${MATCH_DATA.length}</span>
+                </div>
+                <div class="h-48 md:h-80 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-blue-900 to-black mb-6 border-2 border-gray-700 relative">
+                    <div class="w-full h-full flex items-center justify-center filter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-110 transition-transform duration-300 cursor-pointer select-none">
+                        <div class="w-32 h-32 md:w-48 md:h-48">
+                            ${SVGS[data.svgKey]}
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-3xl font-bold text-white mb-1">${data.name}</h3>
+                <p class="text-gray-400 italic mb-6">${data.sci}</p>
+                
+                <p class="text-gray-300 mb-4 text-sm uppercase tracking-wider font-bold text-left">Where does it live?</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4" id="match-buttons-container">
+                    ${buttonsHTML}
+                </div>
+                
+                <div id="match-feedback" class="hidden p-4 rounded-xl mt-4 text-center font-bold text-lg border"></div>
+                <button id="match-next-btn" onclick="currentMatchIndex++; renderMatchGame();" class="hidden w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition text-lg">Next Creature <i class="fa-solid fa-arrow-right ml-2"></i></button>
+            `;
+        }
+
+        function checkMatch(selectedZone, btn) {
+            const data = MATCH_DATA[currentMatchIndex];
+            const feedback = document.getElementById('match-feedback');
+            const nextBtn = document.getElementById('match-next-btn');
+            const allBtns = document.getElementById('match-buttons-container').querySelectorAll('button');
+
+            if(data.zones.includes(selectedZone)) {
+                // Correct Match
+                if (!data.scored) {
+                    if (!data.failedAttempt) {
+                        globalScore++;
+                        document.getElementById('global-score').innerText = globalScore;
+                    }
+                    data.scored = true;
+                }
+                
+                btn.classList.remove('bg-gray-800', 'hover:bg-blue-600', 'border-gray-600');
+                btn.classList.add('btn-correct', 'scale-105');
+                feedback.innerHTML = `<span class="text-green-400"><i class="fa-solid fa-check-circle mr-2"></i> Correct! Found primarily in the ${data.zoneNames}.</span>`;
+                feedback.classList.remove('hidden', 'bg-red-900/40', 'border-red-500/50');
+                feedback.classList.add('bg-green-900/40', 'border-green-500/50');
+                nextBtn.classList.remove('hidden');
+                
+                // Disable all buttons to prevent further clicking
+                allBtns.forEach(b => {
+                    b.disabled = true;
+                    b.classList.remove('hover:bg-blue-600', 'hover:border-blue-400');
+                });
+                
+                // Pop Confetti Mini
+                const c=document.getElementById('confetti-canvas');
+                if(c) {
+                    c.style.display='block'; const ctx=c.getContext('2d');
+                    c.width=window.innerWidth; c.height=window.innerHeight; let pts=[];
+                    for(let i=0;i<40;i++) pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*4+2,d:Math.random()*10});
+                    function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#4ade80';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+2+p.r/2;});}
+                    let it=0;
+                    let animId = setInterval(() => { draw(); it++; if(it>40){clearInterval(animId); ctx.clearRect(0,0,c.width,c.height); c.style.display='none';} }, 30);
+                }
+
+            } else {
+                // Incorrect Match
+                data.failedAttempt = true; // Mark as failed attempt so no point is awarded later
+                btn.classList.remove('bg-gray-800', 'border-gray-600', 'hover:bg-blue-600', 'hover:border-blue-400');
+                btn.classList.add('btn-wrong', 'anim-shake', 'opacity-75', 'cursor-not-allowed');
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.classList.remove('anim-shake');
+                }, 500);
+                
+                feedback.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-times-circle mr-2"></i> Not quite! Try a different zone.</span>`;
+                feedback.classList.remove('hidden', 'bg-green-900/40', 'border-green-500/50');
+                feedback.classList.add('bg-red-900/40', 'border-red-500/50');
+            }
+        }
+
+        window.onload=()=>{
+            // Inject SVGs into grid spans
+            document.querySelectorAll('.species-icon').forEach(el => {
+                const speciesKey = el.dataset.species;
+                if(SVGS[speciesKey]) {
+                    el.innerHTML = SVGS[speciesKey];
+                }
+            });
+
+            renderZoneQuizzes();
+            // Shuffle the Match Data so it is randomized every time you load the page!
+            MATCH_DATA.sort(() => Math.random() - 0.5);
+            renderMatchGame();
+            const ob=setupIntersectionObserver('depth-marker','data-zone');
+            document.querySelectorAll('.zone-section').forEach(el=>ob.observe(el));
+        };
+    </script>
+</body>
+</html>

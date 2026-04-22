@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Pump Tycoon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-upgrade { transition: all 0.2s; }
+        .btn-upgrade:active { transform: scale(0.95); }
+        .btn-upgrade:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+
+        #water-column {
+            background: linear-gradient(to bottom, 
+                #0ea5e9 0%,   /* Surface */
+                #0369a1 20%,  /* Epipelagic */
+                #1e3a8a 50%,  /* Mesopelagic */
+                #0f172a 80%,  /* Bathypelagic */
+                #020617 100%  /* Ocean Floor */
+            );
+        }
+
+        .weather-active { ring: 2px; ring-color: #38bdf8; background-color: rgba(56, 189, 248, 0.2); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .modal-animate { animation: fadeIn 0.3s ease-out forwards; }
+        
+        @keyframes pulseGlowGreen {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 20px 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes pulseGlowPink {
+            0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+            70% { box-shadow: 0 0 20px 10px rgba(236, 72, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
+        @keyframes pulseGlowBlue {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+            70% { box-shadow: 0 0 20px 10px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+        @keyframes pulseGlowPurple {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+            70% { box-shadow: 0 0 20px 10px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+        @keyframes stirShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px) rotate(-1deg); }
+            50% { transform: translateX(4px) rotate(1deg); }
+            75% { transform: translateX(-4px) rotate(-1deg); }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .anim-bloom { animation: pulseGlowGreen 0.5s ease-out; }
+        .anim-spawn { animation: pulseGlowPink 0.5s ease-out; }
+        .anim-lantern { animation: pulseGlowBlue 0.5s ease-out; }
+        .anim-squid { animation: pulseGlowPurple 0.5s ease-out; }
+        .anim-stir { animation: stirShake 0.3s ease-in-out; }
+        .toast-enter { animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        .locked-zone {
+            position: relative;
+            overflow: hidden;
+        }
+        .locked-zone::after {
+            content: '🔒 Unlocks at ' attr(data-req) ' kg Carbon';
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            z-index: 10;
+        }
+        .unlocked-zone::after { display: none; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col">
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Event Banner -->
+    <div id="event-banner" class="fixed top-16 left-1/2 -translate-x-1/2 z-[90] hidden px-6 py-2 rounded-full font-bold shadow-[0_0_15px_rgba(0,0,0,0.5)] border transition-all duration-300 transform -translate-y-full opacity-0 flex items-center gap-3">
+        <span id="event-icon" class="text-2xl">🔥</span>
+        <span id="event-text" class="text-white">Event Active!</span>
+        <button onclick="setBanner(false)" class="ml-2 text-white/60 hover:text-white transition-colors text-xl leading-none">&times;</button>
+    </div>
+
+    <!-- Header / Progress -->
+    <header class="glass-panel z-10 flex flex-col md:flex-row items-center justify-between p-4 shadow-lg border-b border-slate-700">
+        <div>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+                    Carbon Pump Tycoon
+                </h1>
+                <button onclick="openTutorial()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded-full border border-slate-500 transition-colors shadow-sm">
+                    ❓ Help
+                </button>
+                <button onclick="openDex()" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1 rounded-full border border-indigo-500 transition-colors shadow-sm flex items-center gap-1">
+                    📖 Ocean DEX <span id="dex-badge" class="hidden bg-red-500 w-2 h-2 rounded-full"></span>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 font-light hidden md:block mt-1">Master the biological pump to fight climate change.</p>
+        </div>
+        
+        <div class="flex-1 max-w-2xl mx-4 mt-4 md:mt-0 w-full">
+            <div class="flex justify-between text-sm font-semibold mb-1">
+                <span class="text-cyan-300">Carbon Sequestered</span>
+                <span id="carbon-text" class="text-white">0 / 1000 kg</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-4 border border-slate-600 relative overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-blue-600 h-4 rounded-full" style="width: 0%; transition: width 0.3s ease;"></div>
+                <div class="absolute top-0 right-[2px] h-full w-1 bg-yellow-400 shadow-[0_0_5px_#facc15]"></div>
+            </div>
+            <div class="text-right text-xs text-slate-400 mt-1">Goal: 1 Ton (1,000 kg)</div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Left Panel: Dashboard -->
+        <aside class="w-full lg:w-[400px] xl:w-[450px] glass-panel flex flex-col border-r border-slate-700 z-10 overflow-y-auto shadow-2xl h-1/2 lg:h-full">
+            
+            <!-- Weather Control -->
+            <div class="p-4 border-b border-slate-700 shrink-0">
+                <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-2 font-semibold flex justify-between">
+                    <span>1. Surface Environment</span>
+                </h2>
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="btn-weather-calm" class="btn-upgrade p-2 rounded bg-slate-800 border border-slate-600 text-sm flex flex-col items-center justify-center weather-active" onclick="setWeather('calm')">
+                        <span class="text-xl mb-1">☁️</span><span>Calm</span>
+                    </button>
+                    <button id="btn-weather-sunny" class="btn-upgrade p-2 rounded bg-slate-800 border border-slate-600 text-sm flex flex-col items-center justify-center group relative" onclick="setWeather('sunny')">
+                        <span class="text-xl mb-1">☀️</span><span>Sunny</span>
+                        <div class="absolute bottom-full mb-2 hidden group-hover:block w-32 bg-slate-900 text-xs p-2 rounded border border-slate-700 z-20 shadow-lg text-center">
+                            Phytoplankton multiply <span class="text-green-400">2x faster</span>.
+                        </div>
+                    </button>
+                    <button id="btn-weather-stormy" class="btn-upgrade p-2 rounded bg-slate-800 border border-slate-600 text-sm flex flex-col items-center justify-center group relative" onclick="setWeather('stormy')">
+                        <span class="text-xl mb-1">⛈️</span><span>Stormy</span>
+                        <div class="absolute bottom-full mb-2 hidden group-hover:block w-36 bg-slate-900 text-xs p-2 rounded border border-slate-700 z-20 shadow-lg text-center">
+                            Auto-generates <span class="text-yellow-400">Nutrients</span>.<br>Algae grow 50% slower.<br>Cools Ocean!
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 flex flex-col gap-4">
+                
+                <!-- Epipelagic (Surface) -->
+                <div class="space-y-4">
+                    <!-- Nutrients -->
+                    <div id="card-nutrients" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 class="text-yellow-400 font-bold flex items-center gap-2">Nutrients (N, P, Fe)</h3>
+                                <p class="text-2xl font-mono mt-1" id="res-nutrients">0</p>
+                                <p class="text-xs text-slate-400" id="rate-nutrients">+0 / sec</p>
+                            </div>
+                            <button onclick="clickNutrients()" class="btn-upgrade bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold shadow-[0_4px_0_#854d0e] active:translate-y-[4px] active:shadow-none">Stir Ocean</button>
+                        </div>
+                    </div>
+
+                    <!-- Phytoplankton -->
+                    <div id="card-phyto" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-green-500/10 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 class="text-emerald-400 font-bold">🦠 Phytoplankton</h3>
+                                <div class="flex gap-4">
+                                    <div><p class="text-xs text-slate-400 uppercase mt-1">Colonies</p><p class="text-xl font-mono" id="count-phyto">0</p></div>
+                                    <div><p class="text-xs text-slate-400 uppercase mt-1">Biomass</p><p class="text-xl font-mono text-emerald-200" id="res-biomass">0</p></div>
+                                </div>
+                                <p class="text-xs text-slate-400" id="rate-biomass">+0 Biomass / sec</p>
+                            </div>
+                            <button id="btn-buy-phyto" onclick="buyPhyto()" class="btn-upgrade bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold shadow-[0_4px_0_#065f46] active:translate-y-[4px] active:shadow-none flex flex-col items-center">
+                                <span>Bloom</span><span class="text-xs font-normal opacity-80" id="cost-phyto">Cost: 10 N</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Krill -->
+                    <div id="card-krill" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 class="text-pink-400 font-bold">🦐 Zooplankton (Krill)</h3>
+                                <p class="text-xs text-slate-400 uppercase mt-1">Swarms</p>
+                                <p class="text-2xl font-mono" id="count-krill">0</p>
+                                <p class="text-xs text-slate-400" id="rate-carbon">+0 Carbon / sec</p>
+                            </div>
+                            <button id="btn-buy-krill" onclick="buyKrill()" class="btn-upgrade bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded-lg font-bold shadow-[0_4px_0_#831843] active:translate-y-[4px] active:shadow-none flex flex-col items-center">
+                                <span>Spawn</span><span class="text-xs font-normal opacity-80" id="cost-krill">Cost: 50 B</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Zones (Unlockable) -->
+                <div class="mt-4 space-y-4 border-t border-slate-700 pt-4">
+                    <h2 class="text-sm uppercase tracking-wider text-slate-400 font-semibold">2. Deep Zones</h2>
+                    
+                    <!-- Twilight Zone -->
+                    <div id="zone-twilight" class="locked-zone p-4 rounded-xl border border-slate-700 bg-slate-800/80 shrink-0" data-req="100">
+                        <div class="flex justify-between items-end mb-2 relative z-0">
+                            <div>
+                                <h3 class="text-cyan-300 font-bold">🐟 Lanternfish (Twilight Zone)</h3>
+                                <p class="text-xs text-slate-400 mt-1">Schools: <span id="count-lantern" class="font-mono text-lg text-white">0</span></p>
+                                <p class="text-xs text-slate-400">Packs snow tighter. Boosts C/sec x2!</p>
+                            </div>
+                            <button id="btn-buy-lantern" onclick="buyLanternfish()" class="btn-upgrade bg-cyan-700 hover:bg-cyan-600 text-white px-3 py-2 rounded-lg font-bold shadow-[0_4px_0_#0e7490] active:translate-y-[4px] active:shadow-none flex flex-col items-center text-sm">
+                                <span>Attract</span><span class="text-[10px] font-normal opacity-80" id="cost-lantern">Cost: 500 B</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Midnight Zone -->
+                    <div id="zone-midnight" class="locked-zone p-4 rounded-xl border border-slate-700 bg-slate-900 shrink-0" data-req="400">
+                        <div class="flex justify-between items-end mb-2 relative z-0">
+                            <div>
+                                <h3 class="text-purple-400 font-bold">🦑 Vampire Squid (Midnight Zone)</h3>
+                                <p class="text-xs text-slate-400 mt-1">Squids: <span id="count-squid" class="font-mono text-lg text-white">0</span></p>
+                                <p class="text-xs text-slate-400">Master of the deep. +5 Base C/sec!</p>
+                            </div>
+                            <button id="btn-buy-squid" onclick="buySquid()" class="btn-upgrade bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-bold shadow-[0_4px_0_#581c87] active:translate-y-[4px] active:shadow-none flex flex-col items-center text-sm">
+                                <span>Summon</span><span class="text-[10px] font-normal opacity-80" id="cost-squid">Cost: 2000 B</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upgrades -->
+                <div class="mt-4 border-t border-slate-700 pt-4 pb-4">
+                    <h2 class="text-sm uppercase tracking-wider text-slate-400 mb-2 font-semibold">Surface Upgrades</h2>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button id="upg-pump" onclick="buyUpgrade('pump')" class="btn-upgrade flex items-center justify-between p-2 rounded bg-slate-800 border border-slate-600 hover:bg-slate-700 text-left">
+                            <div>
+                                <div class="font-bold text-sm text-yellow-300">⚙️ Upwelling Pump <span id="lvl-pump" class="text-slate-400 text-xs ml-1 font-bold">Lv.0</span></div>
+                                <div class="text-xs text-slate-400">+1 Nutrient/sec</div>
+                            </div>
+                            <div class="text-xs bg-slate-900 px-2 py-1 rounded border border-slate-700 text-yellow-100" id="cost-pump">Cost: 50 N</div>
+                        </button>
+                        <button id="upg-iron" onclick="buyUpgrade('iron')" class="btn-upgrade flex items-center justify-between p-2 rounded bg-slate-800 border border-slate-600 hover:bg-slate-700 text-left">
+                            <div>
+                                <div class="font-bold text-sm text-emerald-300">🧪 Iron Seeding <span id="lvl-iron" class="text-slate-400 text-xs ml-1 font-bold">Lv.0</span></div>
+                                <div class="text-xs text-slate-400">Phyto output x1.5</div>
+                            </div>
+                            <div class="text-xs bg-slate-900 px-2 py-1 rounded border border-slate-700 text-yellow-100" id="cost-iron">Cost: 500 N</div>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Right Panel: Canvas Visualization -->
+        <section class="flex-1 relative bg-black">
+            <canvas id="water-column" class="absolute inset-0 w-full h-full"></canvas>
+            
+            <div class="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col justify-between p-4 opacity-50 text-xs font-mono tracking-widest text-white/50 z-10">
+                <div class="text-right border-t border-white/20 pt-1">0m - Epipelagic</div>
+                <div class="text-right border-t border-white/20 pt-1 mt-[20vh]">200m - Twilight Zone</div>
+                <div class="text-right border-t border-white/20 pt-1 mt-[30vh]">1000m - Midnight Zone</div>
+                <div class="text-right border-t border-white/20 pt-1 pb-4">Ocean Floor - Sequestration</div>
+            </div>
+            
+            <!-- Red Tint overlay for Heatwave -->
+            <div id="heatwave-overlay" class="absolute inset-0 pointer-events-none bg-red-600/20 mix-blend-color-burn opacity-0 transition-opacity duration-1000 z-20"></div>
+
+            <div id="floating-text-container" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
+        </section>
+    </main>
+
+    <!-- DEX Modal -->
+    <div id="dex-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-indigo-500 rounded-2xl p-6 max-w-3xl w-full shadow-2xl modal-animate relative max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Ocean DEX</h2>
+                <button onclick="closeDex()" class="text-slate-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <p class="text-slate-300 text-sm mb-4">Unlock marine biology facts as you encounter new life and events!</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto pr-2" id="dex-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorial-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-800 border border-slate-600 rounded-2xl p-6 md:p-8 max-w-lg w-full mx-4 shadow-2xl modal-animate relative overflow-hidden">
+            <h2 class="text-2xl md:text-3xl font-black text-white mb-2">How to Play 🌊</h2>
+            <p class="text-slate-300 mb-6">Your mission: Sequester <strong class="text-cyan-300">1 Ton of Carbon</strong> deep in the ocean to help fight climate change!</p>
+            
+            <div class="space-y-4 mb-6">
+                <div class="flex gap-4 items-start bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                    <span class="text-3xl">🥄</span>
+                    <div><h3 class="font-bold text-yellow-400">1. Stir</h3><p class="text-sm text-slate-300">Click to bring up essential nutrients.</p></div>
+                </div>
+                <div class="flex gap-4 items-start bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                    <span class="text-3xl">🦠</span>
+                    <div><h3 class="font-bold text-emerald-400">2. Bloom</h3><p class="text-sm text-slate-300">Use nutrients to grow tiny marine plants.</p></div>
+                </div>
+                <div class="flex gap-4 items-start bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                    <span class="text-3xl">🦐</span>
+                    <div><h3 class="font-bold text-pink-400">3. Spawn</h3><p class="text-sm text-slate-300">Krill eat plants & drop carbon-heavy marine snow.</p></div>
+                </div>
+            </div>
+            <p class="text-sm text-indigo-300 mb-6 italic text-center">Watch out for random Ocean Events, and unlock deep sea creatures as you progress!</p>
+            
+            <button onclick="closeTutorial()" class="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform hover:scale-105 active:scale-95">
+                Start Saving the Planet!
+            </button>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-800 border border-slate-600 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl text-center modal-animate relative overflow-hidden">
+            <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400 mb-4">Target Reached!</h2>
+            <p class="text-xl mb-4 text-white">You sequestered <span class="font-bold text-cyan-300">1 Ton of Carbon!</span></p>
+            <div class="text-sm text-slate-300 text-left space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-700 mb-6">
+                <p>Congratulations! You have successfully managed the <strong>Biological Carbon Pump</strong>.</p>
+                <p>In the real world, this natural process transports roughly <strong>10 billion tons</strong> of carbon from the atmosphere to the deep ocean every year.</p>
+            </div>
+            <button onclick="continueGame()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform hover:scale-105 active:scale-95">
+                Continue Sandbox Mode
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME STATE ---
+        const GOAL_CARBON = 1000;
+        
+        const state = {
+            nutrients: 0, biomass: 0, carbon: 0,
+            phyto: 0, krill: 0, lantern: 0, squid: 0,
+            weather: 'calm',
+            upgrades: { pump: 0, iron: 0 },
+            stats: { clickPower: 1, nutrientsPerSec: 0, biomassPerSec: 0, carbonPerSec: 0 },
+            
+            // Events & Deep Zones
+            events: { heatwave: false },
+            eventTimer: 0,
+            locks: { twilight: true, midnight: true },
+            
+            // DEX system
+            dexUnlocks: {
+                phyto: false, krill: false, lantern: false, squid: false, 
+                whalePump: false, whaleFall: false, heatwave: false
+            },
+            dexUnseen: false,
+            
+            hasWon: false,
+            lastTick: performance.now()
+        };
+
+        const DEX_DB = {
+            phyto: { icon: '🦠', title: 'Phytoplankton', text: 'Microscopic plants that produce roughly 50% of the oxygen in Earth\'s atmosphere!' },
+            krill: { icon: '🦐', title: 'Krill', text: 'Tiny crustaceans that travel in massive swarms so large they can be seen from space.' },
+            lantern: { icon: '🐟', title: 'Lanternfish', text: 'These glowing fish are so abundant they make up 65% of all deep-sea fish biomass. They migrate to the surface at night to feed!' },
+            squid: { icon: '🦑', title: 'Vampire Squid', text: 'Despite the scary name, they don\'t drink blood! They live in the midnight zone and eat "marine snow" (dead matter) falling from above.' },
+            whalePump: { icon: '🐋', title: 'The Whale Pump', text: 'Whales feed in the deep but poop at the surface. Their nutrient-rich feces act as a massive fertilizer for phytoplankton!' },
+            whaleFall: { icon: '🦴', title: 'Whale Fall', text: 'When a massive whale dies and sinks, its carcass can sustain localized deep-sea ecosystems for decades!' },
+            heatwave: { icon: '🔥', title: 'Marine Heatwave', text: 'Periods of unusually high ocean temperatures. They severely stress marine life, causing coral bleaching and slowing down the biological pump.' }
+        };
+
+        // --- MATH & PRICING ---
+        const getPhytoCost = () => Math.floor(10 * Math.pow(1.15, state.phyto));
+        const getKrillCost = () => Math.floor(50 * Math.pow(1.20, state.krill));
+        const getLanternCost = () => Math.floor(500 * Math.pow(1.30, state.lantern));
+        const getSquidCost = () => Math.floor(2000 * Math.pow(1.50, state.squid));
+        const getPumpCost = () => Math.floor(50 * Math.pow(1.5, state.upgrades.pump));
+        const getIronCost = () => Math.floor(500 * Math.pow(2.0, state.upgrades.iron));
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            N: document.getElementById('res-nutrients'),
+            B: document.getElementById('res-biomass'),
+            C: document.getElementById('carbon-text'),
+            Prog: document.getElementById('progress-bar'),
+            rateN: document.getElementById('rate-nutrients'),
+            rateB: document.getElementById('rate-biomass'),
+            rateC: document.getElementById('rate-carbon'),
+            pCount: document.getElementById('count-phyto'),
+            kCount: document.getElementById('count-krill'),
+            lCount: document.getElementById('count-lantern'),
+            sCount: document.getElementById('count-squid'),
+            float: document.getElementById('floating-text-container')
+        };
+
+        // --- HELPER: UI ANIMATIONS & TOASTS ---
+        function triggerUIAnimation(elementId, className) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.classList.remove(className);
+            void el.offsetWidth;
+            el.classList.add(className);
+        }
+
+        function showToast(icon, message, colorClass = "bg-slate-800 border-slate-600 text-white") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-enter flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${colorClass}`;
+            toast.innerHTML = `<span class="text-2xl">${icon}</span><span class="font-bold text-sm">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- DEX SYSTEM ---
+        function checkDex(key) {
+            if (!state.dexUnlocks[key]) {
+                state.dexUnlocks[key] = true;
+                state.dexUnseen = true;
+                showToast(DEX_DB[key].icon, `New DEX Entry: ${DEX_DB[key].title}!`, "bg-indigo-900 border-indigo-500 text-indigo-100");
+                document.getElementById('dex-badge').classList.remove('hidden');
+                renderDex();
+            }
+        }
+
+        function openDex() {
+            state.dexUnseen = false;
+            document.getElementById('dex-badge').classList.add('hidden');
+            document.getElementById('dex-modal').classList.remove('hidden');
+            renderDex();
+        }
+        function closeDex() { document.getElementById('dex-modal').classList.add('hidden'); }
+
+        function renderDex() {
+            const grid = document.getElementById('dex-grid');
+            grid.innerHTML = '';
+            for (const [key, data] of Object.entries(DEX_DB)) {
+                const unlocked = state.dexUnlocks[key];
+                const card = document.createElement('div');
+                if (unlocked) {
+                    card.className = "bg-slate-700/50 border border-indigo-500/30 p-4 rounded-xl flex gap-4 items-start hover:bg-slate-700 transition-colors";
+                    card.innerHTML = `
+                        <div class="text-4xl bg-indigo-900/50 p-2 rounded-lg">${data.icon}</div>
+                        <div>
+                            <h4 class="font-bold text-indigo-300 text-lg">${data.title}</h4>
+                            <p class="text-xs text-slate-300 mt-1 leading-relaxed">${data.text}</p>
+                        </div>`;
+                } else {
+                    card.className = "bg-slate-900/50 border border-slate-700 p-4 rounded-xl flex gap-4 items-center justify-center opacity-50 grayscale";
+                    card.innerHTML = `<div class="text-4xl">❓</div><div><h4 class="font-bold text-slate-500">Undiscovered</h4><p class="text-xs text-slate-600 mt-1">Keep playing to unlock.</p></div>`;
+                }
+                grid.appendChild(card);
+            }
+        }
+
+        // --- ACTIONS ---
+        function clickNutrients() {
+            state.nutrients += state.stats.clickPower;
+            createFloatingText(`+${state.stats.clickPower} N`, event?.clientX, event?.clientY);
+            triggerUIAnimation('card-nutrients', 'anim-stir');
+            for(let i=0; i<3; i++) particles.bursts.push(new Burst(Math.random() * width, Math.random() * (height * 0.1), '250, 204, 21', 60));
+            updateUI();
+        }
+
+        function setWeather(w) {
+            state.weather = w;
+            ['calm', 'sunny', 'stormy'].forEach(t => document.getElementById(`btn-weather-${t}`).classList.remove('weather-active', 'bg-slate-700'));
+            document.getElementById(`btn-weather-${w}`).classList.add('weather-active', 'bg-slate-700');
+            
+            // Stormy cools ocean
+            if (w === 'stormy' && state.events.heatwave) {
+                endHeatwave();
+            }
+            calculateRates(); updateUI();
+        }
+
+        function buyPhyto() {
+            if (state.nutrients >= getPhytoCost()) {
+                state.nutrients -= getPhytoCost(); state.phyto++;
+                triggerUIAnimation('card-phyto', 'anim-bloom');
+                particles.bursts.push(new Burst(Math.random() * width, height * 0.15 + Math.random() * 0.1, '52, 211, 153', 150));
+                checkDex('phyto'); calculateRates(); updateUI();
+            }
+        }
+
+        function buyKrill() {
+            if (state.biomass >= getKrillCost()) {
+                state.biomass -= getKrillCost(); state.krill++;
+                triggerUIAnimation('card-krill', 'anim-spawn');
+                particles.bursts.push(new Burst(Math.random() * width, height * 0.3 + Math.random() * 0.15, '244, 114, 182', 180));
+                checkDex('krill'); calculateRates(); updateUI();
+            }
+        }
+
+        function buyLanternfish() {
+            if (state.biomass >= getLanternCost()) {
+                state.biomass -= getLanternCost(); state.lantern++;
+                triggerUIAnimation('zone-twilight', 'anim-lantern');
+                particles.bursts.push(new Burst(Math.random() * width, height * 0.6, '56, 189, 248', 200));
+                checkDex('lantern'); calculateRates(); updateUI();
+            }
+        }
+
+        function buySquid() {
+            if (state.biomass >= getSquidCost()) {
+                state.biomass -= getSquidCost(); state.squid++;
+                triggerUIAnimation('zone-midnight', 'anim-squid');
+                particles.bursts.push(new Burst(Math.random() * width, height * 0.85, '168, 85, 247', 250));
+                checkDex('squid'); calculateRates(); updateUI();
+            }
+        }
+
+        function buyUpgrade(type) {
+            if (type === 'pump' && state.nutrients >= getPumpCost()) {
+                state.nutrients -= getPumpCost(); state.upgrades.pump++;
+            } else if (type === 'iron' && state.nutrients >= getIronCost()) {
+                state.nutrients -= getIronCost(); state.upgrades.iron++;
+            }
+            calculateRates(); updateUI();
+        }
+
+        // --- EVENTS ---
+        let bannerTimeout = null;
+
+        function setBanner(active, icon, text, colorClass, duration = 0) {
+            const banner = document.getElementById('event-banner');
+            if (bannerTimeout) clearTimeout(bannerTimeout);
+
+            if (active) {
+                document.getElementById('event-icon').textContent = icon;
+                document.getElementById('event-text').textContent = text;
+                banner.className = `fixed top-16 left-1/2 -translate-x-1/2 z-[90] px-6 py-2 rounded-full font-bold shadow-[0_0_15px_rgba(0,0,0,0.5)] border transition-all duration-300 flex items-center gap-3 ${colorClass} translate-y-0 opacity-100`;
+                
+                if (duration > 0) {
+                    bannerTimeout = setTimeout(() => setBanner(false), duration);
+                }
+            } else {
+                banner.classList.remove('translate-y-0', 'opacity-100');
+                banner.classList.add('-translate-y-full', 'opacity-0');
+            }
+        }
+
+        function startHeatwave() {
+            state.events.heatwave = true;
+            document.getElementById('heatwave-overlay').classList.remove('opacity-0');
+            document.getElementById('heatwave-overlay').classList.add('opacity-100');
+            setBanner(true, '🔥', 'Marine Heatwave! Krill are sluggish. Set weather to STORMY to cool down!', 'bg-red-900 border-red-500 text-white');
+            checkDex('heatwave');
+            calculateRates(); updateUI();
+        }
+
+        function endHeatwave() {
+            state.events.heatwave = false;
+            document.getElementById('heatwave-overlay').classList.add('opacity-0');
+            document.getElementById('heatwave-overlay').classList.remove('opacity-100');
+            setBanner(false);
+            showToast('🌊', 'Ocean cooled down!', 'bg-blue-800 border-blue-500 text-white');
+            calculateRates(); updateUI();
+        }
+
+        function triggerWhalePump() {
+            particles.creatures.push(new Whale());
+            checkDex('whalePump');
+        }
+
+        function triggerWhaleFall() {
+            particles.creatures.push(new WhaleFall());
+            setBanner(true, '🦴', 'Whale Fall! A massive carcass is sinking to the depths...', 'bg-blue-900 border-cyan-500 text-white', 6000);
+            checkDex('whaleFall');
+        }
+
+        // --- GAME LOGIC ---
+        function calculateRates() {
+            let nRate = state.upgrades.pump * 2;
+            if (state.weather === 'stormy') nRate += 10;
+            state.stats.nutrientsPerSec = nRate;
+
+            let bMult = 1;
+            if (state.weather === 'sunny') bMult = 2.0;
+            if (state.weather === 'stormy') bMult = 0.5;
+            bMult *= Math.pow(1.5, state.upgrades.iron);
+            state.stats.biomassPerSec = state.phyto * bMult;
+
+            // Heatwave debuff
+            let krillEff = state.events.heatwave ? 0.1 : 1.0;
+            
+            // Deep zone multipliers
+            let cMult = 1;
+            if (state.lantern > 0) cMult += (state.lantern * 0.5); // +50% per lantern
+            
+            let baseC = state.krill * 0.5 * krillEff;
+            let squidBonus = state.squid * 5; // Flat +5 C/s per squid
+            
+            state.stats.carbonPerSec = (baseC * cMult) + squidBonus;
+        }
+
+        function gameLoop(timestamp) {
+            const dt = (timestamp - state.lastTick) / 1000;
+            state.lastTick = timestamp;
+
+            if (dt > 0 && dt < 1) {
+                state.nutrients += state.stats.nutrientsPerSec * dt;
+                state.biomass += state.stats.biomassPerSec * dt;
+                state.carbon += state.stats.carbonPerSec * dt;
+                
+                // Event Timer
+                state.eventTimer += dt;
+                if (state.eventTimer > 15) { // Every 15s chance
+                    state.eventTimer = 0;
+                    if (Math.random() < 0.4 && state.krill > 0) {
+                        const r = Math.random();
+                        if (r < 0.33 && !state.events.heatwave) startHeatwave();
+                        else if (r < 0.66) triggerWhalePump();
+                        else triggerWhaleFall();
+                    }
+                }
+            }
+
+            checkUnlocks();
+            if (state.carbon >= GOAL_CARBON && !state.hasWon) {
+                state.hasWon = true;
+                document.getElementById('win-modal').classList.remove('hidden');
+                for(let i=0; i<50; i++) spawnSnowParticle(true);
+            }
+
+            updateUI();
+            updateParticles(dt);
+            drawCanvas();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function checkUnlocks() {
+            if (state.locks.twilight && state.carbon >= 100) {
+                state.locks.twilight = false;
+                document.getElementById('zone-twilight').classList.remove('locked-zone');
+                document.getElementById('zone-twilight').classList.add('unlocked-zone');
+                showToast('🔓', 'Twilight Zone Unlocked!', 'bg-cyan-900 text-cyan-200 border-cyan-700');
+            }
+            if (state.locks.midnight && state.carbon >= 400) {
+                state.locks.midnight = false;
+                document.getElementById('zone-midnight').classList.remove('locked-zone');
+                document.getElementById('zone-midnight').classList.add('unlocked-zone');
+                showToast('🔓', 'Midnight Zone Unlocked!', 'bg-purple-900 text-purple-200 border-purple-700');
+            }
+        }
+
+        function continueGame() { document.getElementById('win-modal').classList.add('hidden'); }
+        function openTutorial() { document.getElementById('tutorial-modal').classList.remove('hidden'); }
+        function closeTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); }
+
+        // --- UI UPDATES ---
+        const formatNum = n => n >= 1000 ? (n/1000).toFixed(2)+'k' : Math.floor(n).toString();
+
+        function updateUI() {
+            els.N.textContent = formatNum(state.nutrients);
+            els.B.textContent = formatNum(state.biomass);
+            els.C.textContent = `${(state.carbon).toFixed(1)} / ${GOAL_CARBON} kg`;
+            els.Prog.style.width = `${Math.min(100, (state.carbon / GOAL_CARBON) * 100)}%`;
+
+            els.rateN.textContent = `+${state.stats.nutrientsPerSec.toFixed(1)} / sec`;
+            els.rateB.textContent = `+${state.stats.biomassPerSec.toFixed(1)} / sec`;
+            els.rateC.textContent = `+${state.stats.carbonPerSec.toFixed(1)} / sec`;
+
+            els.pCount.textContent = state.phyto;
+            els.kCount.textContent = state.krill;
+            els.lCount.textContent = state.lantern;
+            els.sCount.textContent = state.squid;
+
+            document.getElementById('cost-phyto').textContent = `Cost: ${formatNum(getPhytoCost())} N`;
+            document.getElementById('btn-buy-phyto').disabled = state.nutrients < getPhytoCost();
+
+            document.getElementById('cost-krill').textContent = `Cost: ${formatNum(getKrillCost())} B`;
+            document.getElementById('btn-buy-krill').disabled = state.biomass < getKrillCost();
+
+            document.getElementById('cost-lantern').textContent = `Cost: ${formatNum(getLanternCost())} B`;
+            document.getElementById('btn-buy-lantern').disabled = state.biomass < getLanternCost() || state.locks.twilight;
+
+            document.getElementById('cost-squid').textContent = `Cost: ${formatNum(getSquidCost())} B`;
+            document.getElementById('btn-buy-squid').disabled = state.biomass < getSquidCost() || state.locks.midnight;
+
+            document.getElementById('cost-pump').textContent = `Cost: ${formatNum(getPumpCost())} N`;
+            document.getElementById('lvl-pump').textContent = `Lv.${state.upgrades.pump}`;
+            document.getElementById('upg-pump').disabled = state.nutrients < getPumpCost();
+
+            document.getElementById('cost-iron').textContent = `Cost: ${formatNum(getIronCost())} N`;
+            document.getElementById('lvl-iron').textContent = `Lv.${state.upgrades.iron}`;
+            document.getElementById('upg-iron').disabled = state.nutrients < getIronCost();
+        }
+
+        function createFloatingText(text, x, y, color = 'text-yellow-300', scale = 1.2) {
+            const rect = els.float.getBoundingClientRect();
+            let startX = x ? (x - rect.left) : (Math.random() * rect.width * 0.3);
+            let startY = y ? (y - rect.top) : (rect.height * 0.8);
+
+            const el = document.createElement('div');
+            el.textContent = text;
+            el.className = `absolute font-black pointer-events-none select-none drop-shadow-md z-50 ${color}`;
+            el.style.left = startX + 'px'; el.style.top = startY + 'px';
+            el.style.transition = 'all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1)';
+            els.float.appendChild(el);
+            
+            void el.offsetWidth;
+            el.style.transform = `translateY(-60px) scale(${scale})`;
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        // --- CANVAS VISUALIZATION ---
+        const canvas = document.getElementById('water-column');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        const particles = { algae: [], krill: [], lantern: [], squid: [], snow: [], bursts: [], creatures: [] };
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width; canvas.height = rect.height;
+            width = canvas.width; height = canvas.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // -- Particle Classes --
+        class Algae {
+            constructor() {
+                this.x = Math.random() * width; this.y = Math.random() * (height * 0.2);
+                this.size = Math.random() * 2 + 1;
+                this.vx = (Math.random() - 0.5) * 10; this.vy = (Math.random() - 0.5) * 5;
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update(dt) {
+                this.x += this.vx * dt; this.y += this.vy * dt;
+                if(state.weather === 'stormy') { this.x += (Math.random()-0.5)*50*dt; this.y += (Math.random()-0.5)*20*dt; }
+                if(this.x < 0) this.x = width; if(this.x > width) this.x = 0;
+                if(this.y < 0) this.y = 0; if(this.y > height * 0.25) this.y = height * 0.25;
+            }
+            draw() { ctx.fillStyle=`rgba(52,211,153,${this.alpha})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
+        }
+
+        class Krill {
+            constructor() {
+                this.x = Math.random() * width; this.y = height * 0.15 + Math.random() * (height * 0.25);
+                this.size = Math.random() * 3 + 2;
+                this.dir = Math.random() > 0.5 ? 1 : -1;
+                this.baseVx = this.dir * (20 + Math.random() * 20);
+                this.swimCycle = Math.random() * Math.PI * 2;
+            }
+            update(dt) {
+                let speedMult = state.events.heatwave ? 0.2 : 1;
+                this.x += this.baseVx * speedMult * dt;
+                this.swimCycle += 10 * speedMult * dt;
+                this.y += Math.sin(this.swimCycle) * 0.5;
+                if(this.x < -10) this.x = width + 10; if(this.x > width + 10) this.x = -10;
+                if(this.y < height*0.1) this.y = height*0.1; if(this.y > height*0.45) this.y = height*0.45;
+            }
+            draw() {
+                ctx.fillStyle = state.events.heatwave ? '#fda4af' : '#f472b6'; 
+                ctx.beginPath(); ctx.ellipse(this.x, this.y, this.size*1.5, this.size*0.8, 0, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        class Lanternfish {
+            constructor() {
+                this.x = Math.random() * width; this.y = height * 0.45 + Math.random() * (height * 0.25);
+                this.dir = Math.random() > 0.5 ? 1 : -1;
+                this.vx = this.dir * (15 + Math.random() * 15);
+                this.size = 4 + Math.random() * 2;
+            }
+            update(dt) {
+                this.x += this.vx * dt;
+                if(this.x < -20) this.x = width + 20; if(this.x > width + 20) this.x = -20;
+            }
+            draw() {
+                // Body
+                ctx.fillStyle = '#64748b'; // Slate
+                ctx.beginPath(); ctx.ellipse(this.x, this.y, this.size*2, this.size, 0, 0, Math.PI*2); ctx.fill();
+                // Glowing lure
+                ctx.fillStyle = '#38bdf8'; // Cyan glow
+                ctx.beginPath(); ctx.arc(this.x + (this.dir * this.size * 1.5), this.y - this.size, 2, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        class VampireSquid {
+            constructor() {
+                this.x = Math.random() * width; this.y = height * 0.75 + Math.random() * (height * 0.15);
+                this.vx = (Math.random() - 0.5) * 10;
+                this.size = 8 + Math.random() * 4;
+                this.pulse = 0;
+            }
+            update(dt) {
+                this.x += this.vx * dt;
+                this.pulse += 2 * dt;
+                this.y += Math.sin(this.pulse) * 0.2;
+                if(this.x < -20) this.x = width + 20; if(this.x > width + 20) this.x = -20;
+            }
+            draw() {
+                ctx.fillStyle = '#7e22ce'; // Purple 700
+                ctx.beginPath();
+                // Draw bell shape
+                ctx.moveTo(this.x, this.y - this.size);
+                ctx.quadraticCurveTo(this.x + this.size*1.5, this.y, this.x + this.size, this.y + this.size);
+                ctx.lineTo(this.x - this.size, this.y + this.size);
+                ctx.quadraticCurveTo(this.x - this.size*1.5, this.y, this.x, this.y - this.size);
+                ctx.fill();
+                // Tiny glowing eyes
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(this.x - 2, this.y - 2, 1, 1);
+                ctx.fillRect(this.x + 1, this.y - 2, 1, 1);
+            }
+        }
+
+        class Snow {
+            constructor(isCelebration = false) {
+                this.x = Math.random() * width;
+                this.y = isCelebration ? -10 : (height * 0.3 + Math.random() * (height * 0.2)); 
+                this.size = Math.random() * 3 + 1;
+                // Faster sink if in deep zones due to dense packing
+                let speedBoost = 1;
+                if (!isCelebration) speedBoost += (state.lantern * 0.1) + (state.squid * 0.2);
+                this.vy = (10 + Math.random() * 30) * (this.size * 0.5) * speedBoost; 
+                this.vx = (Math.random() - 0.5) * 5;
+                this.alpha = 0.8;
+                this.isCelebration = isCelebration;
+                if(isCelebration) { this.color = `hsl(${Math.random()*360}, 100%, 70%)`; this.vy = 50 + Math.random() * 100; }
+            }
+            update(dt) {
+                this.y += this.vy * dt; this.x += this.vx * dt;
+                if (this.y > height * 0.9) this.alpha -= 0.5 * dt;
+            }
+            draw() {
+                ctx.fillStyle = this.isCelebration ? this.color : `rgba(214, 211, 209, ${this.alpha})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        function spawnSnowParticle(isCelebration = false) {
+            particles.snow.push(new Snow(isCelebration));
+        }
+
+        class Burst {
+            constructor(x, y, color, maxRadius) {
+                this.x = x; this.y = y; this.color = color;
+                this.radius = 0; this.maxRadius = maxRadius;
+                this.alpha = 0.8; this.speed = 80 + Math.random() * 50;
+            }
+            update(dt) { this.radius += this.speed * dt; this.alpha = 0.8 * (1 - (this.radius / this.maxRadius)); }
+            draw() {
+                if (this.alpha <= 0) return;
+                ctx.strokeStyle = `rgba(${this.color}, ${this.alpha})`; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.stroke();
+            }
+        }
+
+        // --- SPECIAL EVENT ENTITIES ---
+        class Whale {
+            constructor() {
+                this.x = -100;
+                this.y = height * 0.2 + Math.random() * (height * 0.1);
+                this.vx = 80 + Math.random() * 40;
+                this.hasPooped = false;
+                this.size = 40;
+            }
+            update(dt) {
+                this.x += this.vx * dt;
+                // Poop in middle
+                if (this.x > width/2 && !this.hasPooped) {
+                    this.hasPooped = true;
+                    // Eat krill
+                    if (state.krill > 0) { state.krill = Math.max(0, state.krill - 2); calculateRates(); }
+                    // Massive nutrient dump
+                    state.nutrients += 1000;
+                    createFloatingText("🐳 WHALE PUMP! +1000 Nutrients!", width/2, this.y, "text-emerald-400", 1.5);
+                    for(let i=0; i<10; i++) particles.bursts.push(new Burst(this.x - 20, this.y, '52, 211, 153', 100));
+                }
+            }
+            draw() {
+                ctx.fillStyle = '#1e3a8a'; // Dark blue
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.size, this.size*0.4, 0, 0, Math.PI*2);
+                // Tail
+                ctx.moveTo(this.x - this.size*0.8, this.y);
+                ctx.lineTo(this.x - this.size*1.3, this.y - 15);
+                ctx.lineTo(this.x - this.size*1.3, this.y + 15);
+                ctx.fill();
+            }
+        }
+
+        class WhaleFall {
+            constructor() {
+                this.x = width * 0.2 + Math.random() * (width * 0.6);
+                this.y = -50;
+                this.vy = 30 + Math.random() * 20;
+                this.size = 50;
+                this.dead = false;
+            }
+            update(dt) {
+                if (this.dead) return;
+                this.y += this.vy * dt;
+                if (this.y > height - 20) {
+                    this.dead = true;
+                    state.carbon += 50;
+                    createFloatingText("🦴 WHALE FALL! +50 Carbon!", this.x, height - 40, "text-cyan-300", 1.5);
+                    for(let i=0; i<5; i++) particles.bursts.push(new Burst(this.x, height, '100, 116, 139', 150));
+                }
+            }
+            draw() {
+                if(this.dead) return;
+                ctx.fillStyle = '#94a3b8'; // Slate 400 (bone color)
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.size*0.3, this.size, 0, 0, Math.PI*2);
+                ctx.fill();
+                // Draw ribs
+                ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3;
+                for(let i=-2; i<=2; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x - this.size*0.3, this.y + i*10);
+                    ctx.lineTo(this.x + this.size*0.3, this.y + i*10);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // --- DRAWING LOOP ---
+        let snowAccumulator = 0;
+        
+        function updateParticles(dt) {
+            // Visual caps to prevent lag
+            const tAlgae = Math.min(200, state.phyto * 5 + (state.biomass > 0 ? 10 : 0));
+            const tKrill = Math.min(100, state.krill * 3);
+            const tLantern = Math.min(50, state.lantern * 2);
+            const tSquid = Math.min(30, state.squid);
+            
+            while(particles.algae.length < tAlgae) particles.algae.push(new Algae());
+            while(particles.algae.length > tAlgae) particles.algae.pop();
+
+            while(particles.krill.length < tKrill) particles.krill.push(new Krill());
+            while(particles.krill.length > tKrill) particles.krill.pop();
+
+            while(particles.lantern.length < tLantern) particles.lantern.push(new Lanternfish());
+            while(particles.lantern.length > tLantern) particles.lantern.pop();
+
+            while(particles.squid.length < tSquid) particles.squid.push(new VampireSquid());
+            while(particles.squid.length > tSquid) particles.squid.pop();
+
+            if (state.stats.carbonPerSec > 0) {
+                snowAccumulator += state.stats.carbonPerSec * dt * 2; 
+                while(snowAccumulator > 1) { spawnSnowParticle(); snowAccumulator -= 1; }
+            }
+
+            // Update Arrays
+            [particles.algae, particles.krill, particles.lantern, particles.squid].forEach(arr => arr.forEach(p => p.update(dt)));
+            
+            for (let i = particles.bursts.length - 1; i >= 0; i--) {
+                particles.bursts[i].update(dt);
+                if (particles.bursts[i].alpha <= 0) particles.bursts.splice(i, 1);
+            }
+            
+            for (let i = particles.snow.length - 1; i >= 0; i--) {
+                particles.snow[i].update(dt);
+                if (particles.snow[i].alpha <= 0 || particles.snow[i].y > height + 20) particles.snow.splice(i, 1);
+            }
+
+            for (let i = particles.creatures.length - 1; i >= 0; i--) {
+                particles.creatures[i].update(dt);
+                if (particles.creatures[i].x > width + 200 || particles.creatures[i].dead) particles.creatures.splice(i, 1);
+            }
+        }
+
+        // Draw Coral Reef function
+        function drawCoralReef(ctx, w, h, carbon) {
+            if (carbon < 50) return;
+            ctx.save();
+            ctx.translate(w - 50, h); // Bottom right anchor
+            
+            // Stage 1 (50+)
+            ctx.fillStyle = '#fb7185'; // Rose
+            ctx.beginPath(); ctx.ellipse(-20, -10, 15, 30, Math.PI/6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(-40, -5, 10, 20, -Math.PI/4, 0, Math.PI*2); ctx.fill();
+            
+            // Stage 2 (200+)
+            if (carbon > 200) {
+                ctx.fillStyle = '#818cf8'; // Indigo
+                ctx.beginPath(); ctx.ellipse(-60, -20, 15, 40, -Math.PI/6, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(-80, -10, 12, 25, -Math.PI/3, 0, Math.PI*2); ctx.fill();
+            }
+
+            // Stage 3 (500+)
+            if (carbon > 500) {
+                ctx.fillStyle = '#34d399'; // Emerald
+                ctx.beginPath(); ctx.ellipse(-100, -15, 20, 45, -Math.PI/8, 0, Math.PI*2); ctx.fill();
+                // Brain coral blob
+                ctx.fillStyle = '#fcd34d'; // Amber
+                ctx.beginPath(); ctx.arc(-30, -15, 25, 0, Math.PI, true); ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Water Clarity (Murkiness Overlay)
+            // Starts at 0.6 opacity, drops to 0 at 800 Carbon
+            let murkOpacity = Math.max(0, 0.6 - (state.carbon / 800));
+            if (murkOpacity > 0 && !state.events.heatwave) {
+                ctx.fillStyle = `rgba(15, 23, 42, ${murkOpacity})`;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // Weather Sunlight
+            if (state.weather === 'sunny') {
+                const grad = ctx.createLinearGradient(0, 0, 0, height * 0.2);
+                grad.addColorStop(0, 'rgba(253, 224, 71, 0.2)');
+                grad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, width, height * 0.2);
+            } else if (state.weather === 'stormy') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; ctx.fillRect(0, 0, width, height * 0.2);
+            }
+
+            // Entities
+            particles.bursts.forEach(p => p.draw());
+            particles.algae.forEach(p => p.draw());
+            particles.krill.forEach(p => p.draw());
+            particles.lantern.forEach(p => p.draw());
+            particles.squid.forEach(p => p.draw());
+            particles.snow.forEach(p => p.draw());
+            particles.creatures.forEach(p => p.draw());
+            
+            // Draw Coral Reef based on milestones
+            drawCoralReef(ctx, width, height, state.carbon);
+
+            // Sediment layer
+            const fillHeight = (state.carbon / GOAL_CARBON) * 20;
+            if (fillHeight > 0) {
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, height - fillHeight, width, fillHeight);
+            }
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            resizeCanvas();
+            calculateRates();
+            updateUI();
+            
+            // Show tutorial on load
+            setTimeout(openTutorial, 500);
+            
+            requestAnimationFrame(gameLoop);
+        };
+
+    </script>
+</body>
+</html>
