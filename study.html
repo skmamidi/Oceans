@@ -22,6 +22,7 @@
         }
     </script>
     <title>Study Deck | SciOly Oceans</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <style>
         body{background-color:#4c1d95;overflow-x:hidden;}
@@ -99,6 +100,16 @@
     <section id="quiz-container" class="mt-20 pb-12 px-4 max-w-5xl mx-auto relative z-10">
         <!-- Quiz content injected via JS -->
     </section>
+
+    <div id="study-card-modal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] overflow-y-auto shadow-2xl border-4 border-purple-300">
+            <div class="sticky top-0 bg-purple-700 text-white p-5 flex justify-between items-center rounded-t-2xl">
+                <h3 id="study-modal-title" class="text-2xl font-heading font-black">Study Topic</h3>
+                <button onclick="closeStudyCardModal()" class="text-3xl leading-none hover:text-yellow-300">&times;</button>
+            </div>
+            <div id="study-modal-body" class="p-6"></div>
+        </div>
+    </div>
 
     <script>
         // --- Game Logic & Data ---
@@ -341,6 +352,81 @@
 
         let studyCategories = JSON.parse(JSON.stringify(originalStudyCategories));
 
+        const STUDY_CREATURES = {
+            "What is an Ecotone?": ['limpet','crab','starfish','anemone'],
+            "What is Desiccation?": ['limpet','barnacle','anemone','crab'],
+            "Benthic vs Pelagic?": ['starfish','cucumber','lanternfish','tuna'],
+            "What is a Piezolyte?": ['snailfish','amphipod','cuskeel'],
+            "Physostomous vs Physoclistous?": ['tuna','hatchetfish','bristlemouth'],
+            "What is a Trophosome?": ['tubeworm'],
+            "Osmoregulation": ['crab','limpet','turtle','snailfish'],
+            "Bioluminescence": ['lanternfish','anglerfish','dragonfish','ostracod'],
+            "Epipelagic Zone": ['tuna','shark','turtle','phytoplankton'],
+            "Mesopelagic Zone": ['lanternfish','hatchetfish','vampire','ctenophore'],
+            "Bathypelagic Zone": ['anglerfish','gulper','dragonfish','vampire'],
+            "Deep Scattering Layer (DSL)": ['copepod','krill','lanternfish','bristlemouth'],
+            "The 'Clines'": ['dolphin','shark','vampire','tubeworm'],
+            "Marine Snow": ['vampire','cucumber','salp','bristlemouth'],
+            "Spring & Neap Tides": ['limpet','barnacle','crab','starfish'],
+            "Coriolis Effect": ['phytoplankton','krill','tuna','turtle'],
+            "Ocean Gyre": ['turtle','manta','phytoplankton','bluewhale'],
+            "Thermohaline Circulation": ['phytoplankton','krill','lanternfish','cucumber'],
+            "Ekman Transport": ['phytoplankton','copepod','krill','anchovy'],
+            "Amphidromic Point": ['limpet','barnacle','crab'],
+            "Continental Margin": ['kelp','coral','otter','cucumber'],
+            "Mid-Ocean Ridge": ['tubeworm','amphipod'],
+            "Ocean Trench": ['snailfish','amphipod','cuskeel','foraminifera'],
+            "Guyot": ['coral','manta','tuna'],
+            "Atoll": ['coral','clownfish','parrotfish'],
+            "Salinity": ['turtle','crab','limpet','phytoplankton'],
+            "Ocean Acidification": ['coral','pteropod','foraminifera','urchin'],
+            "Chemosynthesis": ['tubeworm','amphipod']
+        };
+
+        function studyCreatureCard(id) {
+            const creature = window.OceanCreatures?.creatures[id];
+            if(!creature) return '';
+            const sci = creature.scientificName ? `<div class="text-[10px] text-purple-400 italic mt-0.5">${creature.scientificName}</div>` : '';
+            return `
+                <div class="bg-purple-50 border border-purple-200 rounded-2xl p-3 flex gap-3 items-center">
+                    <div class="w-16 h-16 shrink-0">${window.OceanCreatures.render(id)}</div>
+                    <div>
+                        <div class="font-black text-purple-900 leading-tight">${creature.name}</div>
+                        ${sci}
+                        <div class="text-xs text-gray-600 mt-1">${creature.habitatZone || 'Used as an example for this topic.'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openStudyCardModal(card) {
+            const ids = STUDY_CREATURES[card.q] || [];
+            const creatureHtml = ids.map(studyCreatureCard).filter(Boolean).join('');
+            document.getElementById('study-modal-title').innerText = card.q;
+            document.getElementById('study-modal-body').innerHTML = `
+                <div class="grid md:grid-cols-[auto_1fr] gap-5 items-start">
+                    <div class="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center">${card.backIcon}</div>
+                    <div>
+                        <div class="text-xs font-black uppercase tracking-widest text-purple-500 mb-1">Science Definition</div>
+                        <p class="text-lg font-bold text-gray-800 leading-snug">${card.a}</p>
+                        <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
+                            <div class="text-xs font-black uppercase tracking-widest text-yellow-600 mb-1">Kid Translation</div>
+                            <p class="text-gray-700 italic">"${card.kidA}"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h4 class="text-sm font-black uppercase tracking-widest text-purple-600 mb-3">Relevant Creatures</h4>
+                    <div class="grid sm:grid-cols-2 gap-3">${creatureHtml || '<p class="text-sm text-gray-500">No specific creature example is used for this topic yet.</p>'}</div>
+                </div>
+            `;
+            document.getElementById('study-card-modal').classList.remove('hidden');
+        }
+
+        function closeStudyCardModal() {
+            document.getElementById('study-card-modal').classList.add('hidden');
+        }
+
         // --- Audio Synthesizer ---
         let audioCtx;
         function initAudio() {
@@ -482,6 +568,7 @@
                     el.onclick = () => {
                         playBloop();
                         el.querySelector('.transform-style-3d').classList.toggle('rotate-y-180');
+                        openStudyCardModal(cd);
                         if(el.dataset.f === '0'){
                             el.dataset.f = '1';
                             cardsFlipped++;
