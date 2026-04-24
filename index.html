@@ -195,9 +195,7 @@
                     </div>
                 </div>
                 <button id="badge-hub-btn" type="button" onclick="toggleBadgeDrawer(true)" class="badge-hub-shell flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-2 rounded-full border border-sky-200 shadow-sm flex-shrink-0 min-w-0" aria-expanded="false" aria-controls="badge-drawer">
-                    <div class="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white text-sky-600 shadow-inner">
-                        <i class="fa-solid fa-award text-sm"></i>
-                    </div>
+                    <div id="badge-hub-master-icon" class="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white text-sky-600 shadow-inner overflow-hidden"></div>
                     <div class="text-left min-w-0">
                         <div class="text-[11px] uppercase tracking-[0.18em] text-sky-500 font-black">Badges</div>
                         <div id="badge-progress-text" class="text-sm font-black text-slate-700 leading-tight">0 / 12 earned</div>
@@ -334,19 +332,185 @@
         let adaptProgress=[0,0,0,0,0,0], adaptCompleted=[false,false,false,false,false,false];
         let badges=window.OceanBadges ? window.OceanBadges.loadBadges() : {zones:false, adaptations:false, migration:false, gradients:false, engineer:false, physics:false, ecology:false, biocode:false, scholar:false, bathymetry:false, carbonpump:false, plankton:false};
         const BADGE_META = {
-            zones:{emoji:'🌟', title:'Zone Master', color:'bg-yellow-400', accent:'text-yellow-600', earnedText:'Earned by completing every Zones quiz track in the app.', howToEarn:'Finish all six zone quiz sections in Zones.'},
-            adaptations:{emoji:'🧬', title:'Adaptation Ace', color:'bg-teal-500', accent:'text-teal-600', earnedText:'Earned by clearing every Adaptations quiz section.', howToEarn:'Complete all six adaptation quiz sections in Adaptations.'},
-            migration:{emoji:'🦑', title:'Migration Commander', color:'bg-indigo-500', accent:'text-indigo-600', earnedText:'Earned by finishing the Diel Vertical Migration quiz challenge.', howToEarn:'Answer all migration quiz questions in Diel Vertical Migration.'},
-            gradients:{emoji:'📊', title:'Gradient Guru', color:'bg-orange-500', accent:'text-orange-600', earnedText:'Earned by repairing the sub and finishing the ocean gradients boss quiz.', howToEarn:'Complete the full Gradients challenge until the victory screen appears.'},
-            engineer:{emoji:'🔬', title:'Bio-Engineer', color:'bg-blue-500', accent:'text-blue-600', earnedText:'Earned by solving every zone in the adaptation-building Bio-Lab.', howToEarn:'Win all six Bio-Lab engineering scenarios.'},
-            physics:{emoji:'🗜️', title:'Physics Pro', color:'bg-red-500', accent:'text-red-600', earnedText:'Earned by surviving the pressure mission and returning safely.', howToEarn:'Complete the Pressure dive successfully.'},
-            ecology:{emoji:'🕸️', title:'Ecology Expert', color:'bg-emerald-500', accent:'text-emerald-600', earnedText:'Earned by fully completing every ecology zone.', howToEarn:'In Ecology, finish each zone’s species discoveries, food web, and crisis mission.'},
-            biocode:{emoji:'💡', title:'Luciferin Coder', color:'bg-cyan-500', accent:'text-cyan-600', earnedText:'Earned by clearing every Bio-Code scenario.', howToEarn:'Solve all Bio-Code programming scenarios.'},
-            scholar:{emoji:'🎓', title:'SciOly Scholar', color:'bg-purple-500', accent:'text-purple-600', earnedText:'Earned by flipping through the entire study deck.', howToEarn:'Reveal all flashcards in Study.'},
-            bathymetry:{emoji:'🗺️', title:'Bathymetry Mapper', color:'bg-sky-500', accent:'text-sky-600', earnedText:'Earned by completing the bathymetry mapping mission.', howToEarn:'Win the Bathymetry game by mapping the sector before your battery runs out.'},
-            carbonpump:{emoji:'🌍', title:'Carbon Pump Manager', color:'bg-emerald-600', accent:'text-emerald-700', earnedText:'Earned by reaching the carbon sequestration goal.', howToEarn:'Hit the final carbon target in Carbon Pump.'},
-            plankton:{emoji:'🦠', title:'Plankton Pro', color:'bg-lime-500', accent:'text-lime-600', earnedText:'Earned by clearing the full plankton feeding migration campaign.', howToEarn:'Finish the final stage in Plankton.'}
+            zones:{title:'Zone Master', color:'bg-amber-400', accent:'text-amber-600', ui:'from-amber-50 via-white to-yellow-100', bg:'#f59e0b', bgDeep:'#b45309', ink:'#7c2d12', symbol:'zones', earnedText:'Earned by completing every Zones quiz track in the app.', howToEarn:'Finish all six zone quiz sections in Zones.'},
+            adaptations:{title:'Adaptation Ace', color:'bg-teal-500', accent:'text-teal-600', ui:'from-teal-50 via-white to-cyan-100', bg:'#14b8a6', bgDeep:'#0f766e', ink:'#134e4a', symbol:'adaptations', earnedText:'Earned by clearing every Adaptations quiz section.', howToEarn:'Complete all six adaptation quiz sections in Adaptations.'},
+            migration:{title:'Migration Commander', color:'bg-indigo-500', accent:'text-indigo-600', ui:'from-indigo-50 via-white to-blue-100', bg:'#6366f1', bgDeep:'#3730a3', ink:'#312e81', symbol:'migration', earnedText:'Earned by finishing the Diel Vertical Migration quiz challenge.', howToEarn:'Answer all migration quiz questions in Diel Vertical Migration.'},
+            gradients:{title:'Gradient Guru', color:'bg-orange-500', accent:'text-orange-600', ui:'from-orange-50 via-white to-amber-100', bg:'#f97316', bgDeep:'#c2410c', ink:'#7c2d12', symbol:'gradients', earnedText:'Earned by repairing the sub and finishing the ocean gradients boss quiz.', howToEarn:'Complete the full Gradients challenge until the victory screen appears.'},
+            engineer:{title:'Bio-Engineer', color:'bg-blue-500', accent:'text-blue-600', ui:'from-blue-50 via-white to-sky-100', bg:'#3b82f6', bgDeep:'#1d4ed8', ink:'#1e3a8a', symbol:'engineer', earnedText:'Earned by solving every zone in the adaptation-building Bio-Lab.', howToEarn:'Win all six Bio-Lab engineering scenarios.'},
+            physics:{title:'Physics Pro', color:'bg-rose-500', accent:'text-rose-600', ui:'from-rose-50 via-white to-orange-100', bg:'#ef4444', bgDeep:'#b91c1c', ink:'#7f1d1d', symbol:'physics', earnedText:'Earned by surviving the pressure mission and returning safely.', howToEarn:'Complete the Pressure dive successfully.'},
+            ecology:{title:'Ecology Expert', color:'bg-emerald-500', accent:'text-emerald-600', ui:'from-emerald-50 via-white to-teal-100', bg:'#10b981', bgDeep:'#047857', ink:'#14532d', symbol:'ecology', earnedText:'Earned by fully completing every ecology zone.', howToEarn:'In Ecology, finish each zone’s species discoveries, food web, and crisis mission.'},
+            biocode:{title:'Luciferin Coder', color:'bg-cyan-500', accent:'text-cyan-600', ui:'from-cyan-50 via-white to-sky-100', bg:'#06b6d4', bgDeep:'#155e75', ink:'#164e63', symbol:'biocode', earnedText:'Earned by clearing every Bio-Code scenario.', howToEarn:'Solve all Bio-Code programming scenarios.'},
+            scholar:{title:'SciOly Scholar', color:'bg-violet-500', accent:'text-violet-600', ui:'from-violet-50 via-white to-fuchsia-100', bg:'#8b5cf6', bgDeep:'#6d28d9', ink:'#581c87', symbol:'scholar', earnedText:'Earned by flipping through the entire study deck.', howToEarn:'Reveal all flashcards in Study.'},
+            bathymetry:{title:'Bathymetry Mapper', color:'bg-sky-500', accent:'text-sky-600', ui:'from-sky-50 via-white to-cyan-100', bg:'#0ea5e9', bgDeep:'#0369a1', ink:'#164e63', symbol:'bathymetry', earnedText:'Earned by completing the bathymetry mapping mission.', howToEarn:'Win the Bathymetry game by mapping the sector before your battery runs out.'},
+            carbonpump:{title:'Carbon Pump Manager', color:'bg-emerald-600', accent:'text-emerald-700', ui:'from-emerald-50 via-white to-lime-100', bg:'#059669', bgDeep:'#166534', ink:'#14532d', symbol:'carbonpump', earnedText:'Earned by reaching the carbon sequestration goal.', howToEarn:'Hit the final carbon target in Carbon Pump.'},
+            plankton:{title:'Plankton Pro', color:'bg-lime-500', accent:'text-lime-600', ui:'from-lime-50 via-white to-emerald-100', bg:'#84cc16', bgDeep:'#4d7c0f', ink:'#365314', symbol:'plankton', earnedText:'Earned by clearing the full plankton feeding migration campaign.', howToEarn:'Finish the final stage in Plankton.'}
         };
+        const BADGE_NAV = {
+            zones:{tab:'zones', selector:'#quiz-container-0'},
+            adaptations:{tab:'adaptations', selector:'#a-inter'},
+            migration:{tab:'migration', selector:'#migration-game-container'},
+            gradients:{tab:'gradients', selector:'#quiz-ui'},
+            engineer:{tab:'lab', selector:'#deploy-zone'},
+            physics:{tab:'pressure', selector:'#dive-shaft'},
+            ecology:{tab:'foodweb', selector:'#zones-list'},
+            biocode:{tab:'biocode', selector:'#bc-sequence-box'},
+            scholar:{tab:'study', selector:'#deck-container'},
+            bathymetry:{tab:'bathymetry', selector:'#game-board'},
+            carbonpump:{tab:'carbonpump', selector:'#card-phyto'},
+            plankton:{tab:'plankton', selector:'#game-container'}
+        };
+        const MASTER_BADGE_META = {
+            title:'Ocean Grandmaster',
+            subtitle:'Complete every ocean challenge',
+            earnedText:'Every badge is unlocked. You mastered the full Living Ocean expedition.',
+            howToEarn:'Earn all 12 badges across the explorer.',
+            bg:'#0f766e',
+            bgDeep:'#1d4ed8',
+            ink:'#fef3c7'
+        };
+        function badgeArt(id, palette) {
+            switch (BADGE_META[id].symbol) {
+                case 'zones':
+                    return `
+                        <circle cx="60" cy="42" r="15" fill="#fde68a"/>
+                        <path d="M18 67c10-8 20-8 30 0s20 8 30 0 20-8 24 0" fill="none" stroke="#e0f2fe" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M22 82c8-6 16-6 24 0s16 6 24 0 16-6 28 0" fill="none" stroke="#bae6fd" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M36 56h48" stroke="#fff7ed" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+                    `;
+                case 'adaptations':
+                    return `
+                        <path d="M42 28c-11 9-11 20 0 29s11 20 0 31" fill="none" stroke="#ecfeff" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M78 28c11 9 11 20 0 29s-11 20 0 31" fill="none" stroke="#99f6e4" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M47 35h26M45 48h30M46 61h28M47 74h26" stroke="#ccfbf1" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="30" cy="84" r="7" fill="#67e8f9" opacity="0.8"/>
+                        <circle cx="90" cy="36" r="5" fill="#99f6e4" opacity="0.8"/>
+                    `;
+                case 'migration':
+                    return `
+                        <path d="M35 72c8-20 15-28 25-28 13 0 22 16 30 16 5 0 8-2 12-5-2 10-8 17-19 20l4 10c-8-2-13-5-17-10-10 0-21 2-35-3z" fill="#e0e7ff"/>
+                        <path d="M26 90l10-10m0 0-10-10m10 10h44" stroke="#bfdbfe" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M94 34l-9 9m0 0 9 9m-9-9H40" stroke="#c7d2fe" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="59" cy="47" r="2.8" fill="${palette.ink}"/>
+                    `;
+                case 'gradients':
+                    return `
+                        <path d="M30 82V34" stroke="#fff7ed" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M30 82h58" stroke="#fff7ed" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M38 71c9-4 12-11 18-11s10-14 18-14 9-7 18-11" fill="none" stroke="#fdba74" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="56" cy="60" r="5" fill="#ffedd5"/>
+                        <circle cx="74" cy="46" r="5" fill="#ffedd5"/>
+                        <circle cx="92" cy="35" r="5" fill="#ffedd5"/>
+                    `;
+                case 'engineer':
+                    return `
+                        <circle cx="46" cy="44" r="13" fill="#dbeafe"/>
+                        <path d="M55 53l12 12" stroke="#eff6ff" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M67 65l12 12" stroke="#93c5fd" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M33 74c10-11 25-13 38-4" fill="none" stroke="#bfdbfe" stroke-width="7" stroke-linecap="round"/>
+                        <circle cx="42" cy="44" r="3" fill="${palette.ink}"/>
+                        <path d="M82 30l9 6-9 6" fill="none" stroke="#dbeafe" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+                case 'physics':
+                    return `
+                        <rect x="28" y="48" width="54" height="26" rx="13" fill="#fee2e2" stroke="#fecaca" stroke-width="3"/>
+                        <circle cx="66" cy="61" r="7" fill="#dbeafe"/>
+                        <path d="M16 28l15 15M16 43l15-15M104 28L89 43M104 43L89 28" stroke="#fff1f2" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M40 85h40" stroke="#fecdd3" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M50 35v-10M70 35v-10" stroke="#fecaca" stroke-width="5" stroke-linecap="round"/>
+                    `;
+                case 'ecology':
+                    return `
+                        <circle cx="34" cy="38" r="8" fill="#d1fae5"/>
+                        <circle cx="82" cy="34" r="8" fill="#a7f3d0"/>
+                        <circle cx="59" cy="58" r="10" fill="#ecfccb"/>
+                        <circle cx="35" cy="84" r="8" fill="#6ee7b7"/>
+                        <circle cx="84" cy="82" r="8" fill="#bbf7d0"/>
+                        <path d="M34 38l25 20 23-24M59 58L35 84M59 58l25 24" fill="none" stroke="#ecfdf5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    `;
+                case 'biocode':
+                    return `
+                        <path d="M36 35l-14 16 14 16M84 35l14 16-14 16" fill="none" stroke="#cffafe" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M66 28L54 86" stroke="#a5f3fc" stroke-width="6" stroke-linecap="round"/>
+                        <circle cx="49" cy="63" r="6" fill="#ecfeff"/>
+                        <circle cx="76" cy="28" r="5" fill="#fde68a"/>
+                        <path d="M76 28c6 2 10 6 12 12" fill="none" stroke="#fde68a" stroke-width="4" stroke-linecap="round"/>
+                    `;
+                case 'scholar':
+                    return `
+                        <path d="M26 43c14-8 27-8 40 0v31c-13-8-26-8-40 0z" fill="#f5f3ff" stroke="#e9d5ff" stroke-width="3"/>
+                        <path d="M94 43c-14-8-27-8-40 0v31c13-8 26-8 40 0z" fill="#ede9fe" stroke="#ddd6fe" stroke-width="3"/>
+                        <path d="M60 39v39" stroke="#c4b5fd" stroke-width="4"/>
+                        <circle cx="78" cy="31" r="9" fill="#fde68a"/>
+                        <path d="M78 23v16M70 31h16" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+                    `;
+                case 'bathymetry':
+                    return `
+                        <circle cx="60" cy="60" r="23" fill="none" stroke="#e0f2fe" stroke-width="4"/>
+                        <circle cx="60" cy="60" r="35" fill="none" stroke="#bae6fd" stroke-width="4" opacity="0.8"/>
+                        <path d="M24 74c9-12 20-18 34-18 11 0 21-5 38-19" fill="none" stroke="#f0f9ff" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M24 88c13-9 26-13 40-13 10 0 18-3 29-11" fill="none" stroke="#bae6fd" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="76" cy="46" r="5" fill="#fef3c7"/>
+                    `;
+                case 'carbonpump':
+                    return `
+                        <circle cx="60" cy="46" r="18" fill="#d1fae5"/>
+                        <path d="M42 46h36M60 28c-7 6-7 30 0 36M50 32c-6 4-6 22 0 28M70 32c6 4 6 22 0 28" fill="none" stroke="#166534" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M60 66v19" stroke="#ecfccb" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M48 78l12 12 12-12" fill="none" stroke="#ecfccb" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="36" cy="86" r="4" fill="#bbf7d0"/>
+                        <circle cx="84" cy="84" r="4" fill="#86efac"/>
+                    `;
+                case 'plankton':
+                    return `
+                        <circle cx="60" cy="60" r="15" fill="#ecfccb"/>
+                        <circle cx="60" cy="60" r="6" fill="#bef264"/>
+                        <circle cx="35" cy="44" r="7" fill="#d9f99d"/>
+                        <circle cx="84" cy="50" r="6" fill="#ecfccb"/>
+                        <circle cx="77" cy="80" r="8" fill="#bef264"/>
+                        <path d="M60 45l10-16M45 63l-18 6M70 73l17 8M33 37l-10-8M86 44l11-7M78 88l8 12" stroke="#f7fee7" stroke-width="4" stroke-linecap="round"/>
+                    `;
+                default:
+                    return '';
+            }
+        }
+        function badgeSvgMarkup(id, sizeClass, locked) {
+            const palette = BADGE_META[id];
+            const stateStyle = locked ? 'opacity:.48;filter:saturate(.6) grayscale(.12);' : '';
+            return `
+                <svg viewBox="0 0 120 120" class="${sizeClass}" aria-hidden="true" style="${stateStyle}">
+                    <circle cx="60" cy="60" r="52" fill="${palette.bgDeep}"/>
+                    <circle cx="60" cy="54" r="44" fill="${palette.bg}"/>
+                    <circle cx="60" cy="54" r="36" fill="rgba(255,255,255,0.12)"/>
+                    <path d="M34 96l8-18h36l8 18-26 10z" fill="rgba(15,23,42,0.18)"/>
+                    <circle cx="28" cy="34" r="4" fill="rgba(255,255,255,0.28)"/>
+                    <circle cx="94" cy="28" r="3" fill="rgba(255,255,255,0.22)"/>
+                    <circle cx="88" cy="84" r="4" fill="rgba(255,255,255,0.18)"/>
+                    ${badgeArt(id, palette)}
+                </svg>
+            `;
+        }
+        function masterBadgeSvgMarkup(sizeClass, earned) {
+            const stateStyle = earned ? '' : 'opacity:.6;filter:saturate(.72);';
+            return `
+                <svg viewBox="0 0 160 160" class="${sizeClass}" aria-hidden="true" style="${stateStyle}">
+                    <circle cx="80" cy="80" r="72" fill="#082f49"/>
+                    <circle cx="80" cy="74" r="60" fill="#0ea5e9"/>
+                    <circle cx="80" cy="74" r="54" fill="#14b8a6" opacity="0.45"/>
+                    <circle cx="80" cy="74" r="48" fill="#1d4ed8" opacity="0.36"/>
+                    <circle cx="80" cy="74" r="46" fill="rgba(255,255,255,0.11)"/>
+                    <path d="M48 124l10-20h44l10 20-32 16z" fill="#7dd3fc" opacity="0.7"/>
+                    <path d="M48 124l10-20h44l10 20-32 16z" fill="none" stroke="#fef3c7" stroke-width="3" opacity="0.9"/>
+                    <path d="M80 31l8 18 19 2-14 12 4 18-17-9-17 9 4-18-14-12 19-2z" fill="#fde68a" stroke="#fef3c7" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="80" cy="83" r="22" fill="#e0f2fe" opacity="0.95"/>
+                    <path d="M62 90c7-7 14-7 21 0s14 7 19 0" fill="none" stroke="#0ea5e9" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M66 73c4-8 9-12 14-12s10 4 14 12" fill="none" stroke="#14b8a6" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M47 54c-8 7-11 14-12 24M113 54c8 7 11 14 12 24" fill="none" stroke="#bbf7d0" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="42" cy="42" r="5" fill="#bae6fd" opacity="0.7"/>
+                    <circle cx="118" cy="48" r="4" fill="#a7f3d0" opacity="0.8"/>
+                    <circle cx="124" cy="92" r="5" fill="#fde68a" opacity="0.7"/>
+                </svg>
+            `;
+        }
         let selectedBadgeId = 'zones';
         const fishState={morphology:'standard', color:'standard', eyes:'standard', specials:{photophores:false, lure:false, jaws:false, tmao:false, osmo:false, omz:false, chemo:false, stilts:false, clinging:false, sealing:false, chemosyn:false}};
         const labWins={intertidal:false, epipelagic:false, mesopelagic:false, bathypelagic:false, abyssal:false, hadal:false};
@@ -439,21 +603,66 @@
             selectedBadgeId = ids.find(id => badges[id]) || ids[0];
         }
 
+        function pulseScrollTarget(node) {
+            if(!node || !node.style) return;
+            const previousTransition = node.style.transition;
+            const previousBoxShadow = node.style.boxShadow;
+            const previousOutline = node.style.outline;
+            node.style.transition = 'box-shadow 0.25s ease, outline 0.25s ease';
+            node.style.boxShadow = '0 0 0 5px rgba(56, 189, 248, 0.28), 0 0 40px rgba(14, 165, 233, 0.35)';
+            node.style.outline = '2px solid rgba(125, 211, 252, 0.8)';
+            setTimeout(() => {
+                node.style.boxShadow = previousBoxShadow;
+                node.style.outline = previousOutline;
+                node.style.transition = previousTransition;
+            }, 1600);
+        }
+
+        function scrollBadgeTarget(target, attempt = 0) {
+            const frame = document.querySelector(`#tab-${target.tab} iframe`);
+            if(!frame) return;
+            const doc = frame.contentDocument;
+            const win = frame.contentWindow;
+            if(!doc || !win || !doc.body) {
+                if(attempt < 12) setTimeout(() => scrollBadgeTarget(target, attempt + 1), 150);
+                return;
+            }
+            const node = target.selector ? doc.querySelector(target.selector) : null;
+            if(node && typeof node.scrollIntoView === 'function') {
+                node.scrollIntoView({behavior:'smooth', block:'start'});
+                pulseScrollTarget(node);
+                return;
+            }
+            win.scrollTo({top:0, behavior:'smooth'});
+        }
+
+        function goToBadgeSection(id) {
+            const target = BADGE_NAV[id];
+            if(!target) return;
+            selectedBadgeId = id;
+            renderBadgeDrawer();
+            toggleBadgeDrawer(false);
+            switchTab(target.tab);
+            setTimeout(() => scrollBadgeTarget(target), 120);
+        }
+
         function renderBadgeHub() {
             const progressEl = document.getElementById('badge-progress-text');
             const previewEl = document.getElementById('badge-preview-row');
             const toggleBtn = document.getElementById('badge-hub-btn');
+            const masterIcon = document.getElementById('badge-hub-master-icon');
             if(!progressEl || !previewEl || !toggleBtn) return;
 
             const ids = getBadgeIds();
             const earnedIds = ids.filter(id => badges[id]);
             const previewIds = (earnedIds.length ? earnedIds : ids).slice(0, 4);
+            const allEarned = earnedIds.length === ids.length;
 
             progressEl.textContent = `${countEarnedBadges()} / ${ids.length} earned`;
+            if(masterIcon) masterIcon.innerHTML = masterBadgeSvgMarkup('w-9 h-9', allEarned);
             previewEl.innerHTML = previewIds.map((id, index) => {
-                const meta = BADGE_META[id];
                 const earned = Boolean(badges[id]);
-                return `<span class="badge-token inline-flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shadow-sm ${meta.color} ${earned ? '' : 'grayscale opacity-45'}" style="z-index:${10-index}" title="${meta.title}">${meta.emoji}</span>`;
+                return `<span class="badge-token inline-flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shadow-sm bg-white/85 overflow-hidden" style="z-index:${10-index}" title="${BADGE_META[id].title}">${badgeSvgMarkup(id, 'w-8 h-8', !earned)}</span>`;
             }).join('');
             toggleBtn.setAttribute('aria-label', `Open badges panel. ${countEarnedBadges()} of ${ids.length} badges earned.`);
         }
@@ -468,21 +677,45 @@
             const ids = getBadgeIds();
             const meta = BADGE_META[selectedBadgeId];
             const earned = Boolean(badges[selectedBadgeId]);
+            const earnedCount = countEarnedBadges();
+            const allEarned = earnedCount === ids.length;
 
-            count.textContent = `${countEarnedBadges()} of ${ids.length} earned`;
+            count.textContent = `${earnedCount} of ${ids.length} earned`;
             detail.innerHTML = `
-                <div class="flex flex-col sm:flex-row sm:items-start gap-4">
-                    <div class="badge-token w-20 h-20 rounded-[24px] ${meta.color} ${earned ? '' : 'grayscale opacity-50'} text-white text-4xl flex items-center justify-center shadow-lg shadow-sky-100">${meta.emoji}</div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-wrap items-center gap-2 mb-2">
-                            <span class="text-xs uppercase tracking-[0.2em] font-black ${meta.accent}">${earned ? 'Earned' : 'Locked'}</span>
-                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${earned ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${earned ? 'Unlocked' : 'Not yet unlocked'}</span>
+                <div class="space-y-4">
+                    <div class="rounded-[28px] border border-sky-200 bg-gradient-to-br from-sky-950 via-cyan-900 to-blue-900 px-5 py-4 text-white shadow-[0_20px_50px_rgba(14,116,144,0.28)]">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="w-28 h-28 sm:w-32 sm:h-32 shrink-0">${masterBadgeSvgMarkup('w-full h-full', allEarned)}</div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[11px] uppercase tracking-[0.24em] text-cyan-200 font-black">Overall Accomplishment</div>
+                                <h3 class="text-2xl sm:text-3xl font-heading font-black mt-1">${MASTER_BADGE_META.title}</h3>
+                                <p class="text-sky-100/85 mt-2 leading-relaxed">${allEarned ? MASTER_BADGE_META.earnedText : MASTER_BADGE_META.howToEarn}</p>
+                                <div class="mt-3 flex flex-wrap items-center gap-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-black ${allEarned ? 'bg-yellow-300 text-slate-900' : 'bg-white/12 text-cyan-100'}">${allEarned ? 'Fully Completed' : 'In Progress'}</span>
+                                    <span class="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100">${earnedCount}/${ids.length} badges secured</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-2xl font-heading font-black text-slate-900">${meta.title}</h3>
-                        <p class="text-slate-600 mt-2 leading-relaxed">${earned ? meta.earnedText : meta.howToEarn}</p>
-                        <div class="mt-4 rounded-2xl bg-white/80 border border-sky-100 px-4 py-3">
-                            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-black mb-1">How It Works</div>
-                            <p class="text-sm text-slate-700 leading-relaxed">${meta.howToEarn}</p>
+                    </div>
+                    <div class="rounded-[28px] border border-sky-100 bg-gradient-to-br ${meta.ui} p-5 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+                            <div class="badge-token w-24 h-24 rounded-[28px] bg-white/85 flex items-center justify-center shadow-lg shadow-sky-100 overflow-hidden">${badgeSvgMarkup(selectedBadgeId, 'w-24 h-24', !earned)}</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="text-xs uppercase tracking-[0.2em] font-black ${meta.accent}">${earned ? 'Earned' : 'Locked'}</span>
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold ${earned ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${earned ? 'Unlocked' : 'Not yet unlocked'}</span>
+                                </div>
+                                <h3 class="text-2xl font-heading font-black text-slate-900">${meta.title}</h3>
+                                <p class="text-slate-600 mt-2 leading-relaxed">${earned ? meta.earnedText : meta.howToEarn}</p>
+                                <div class="mt-4 rounded-2xl bg-white/80 border border-sky-100 px-4 py-3">
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-slate-400 font-black mb-1">How It Works</div>
+                                    <p class="text-sm text-slate-700 leading-relaxed">${meta.howToEarn}</p>
+                                </div>
+                                <button type="button" onclick="goToBadgeSection('${selectedBadgeId}')" class="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white shadow-lg shadow-sky-200/40 transition hover:scale-[1.02] hover:bg-sky-700">
+                                    Jump To Badge Section
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -493,13 +726,14 @@
                 const isEarned = Boolean(badges[id]);
                 const isActive = id === selectedBadgeId;
                 return `
-                    <button type="button" onclick="selectBadge('${id}')" class="badge-drawer-card ${isActive ? 'is-active' : ''} ${isEarned ? 'is-earned' : 'is-locked'} text-left rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+                    <button type="button" onclick="goToBadgeSection('${id}')" onmouseenter="selectBadge('${id}')" onfocus="selectBadge('${id}')" class="badge-drawer-card ${isActive ? 'is-active' : ''} ${isEarned ? 'is-earned' : 'is-locked'} text-left rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
                         <div class="flex items-start gap-3">
-                            <div class="badge-token flex items-center justify-center w-12 h-12 rounded-2xl ${item.color} text-white text-2xl shadow-sm">${item.emoji}</div>
+                            <div class="badge-token flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm overflow-hidden">${badgeSvgMarkup(id, 'w-14 h-14', !isEarned)}</div>
                             <div class="min-w-0 flex-1">
                                 <div class="font-black text-slate-900 leading-tight">${item.title}</div>
-                                <div class="text-xs mt-1 ${isEarned ? 'text-emerald-600' : 'text-slate-400'} font-bold uppercase tracking-[0.16em]">${isEarned ? 'Earned' : 'Tap for unlock details'}</div>
+                                <div class="text-xs mt-1 ${isEarned ? 'text-emerald-600' : 'text-slate-400'} font-bold uppercase tracking-[0.16em]">${isEarned ? 'Click to revisit section' : 'Click to jump there'}</div>
                             </div>
+                            <i class="fa-solid fa-arrow-right text-slate-300 mt-1"></i>
                         </div>
                     </button>
                 `;
