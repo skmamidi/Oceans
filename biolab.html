@@ -55,7 +55,26 @@
         .lab-btn{background-color:#374151;padding:0.5rem;border-radius:0.25rem;font-size:0.75rem;position:relative;padding-right:1.5rem;transition:background-color 0.2s;border:2px solid transparent;}
         .lab-btn:hover{background-color:#4b5563;}
         .info-ic{position:absolute;top:8px;right:6px;color:#9ca3af;cursor:pointer;transition:color 0.2s;}
-        .info-ic:hover{color:#93c5fd;}</style>
+        .info-ic:hover{color:#93c5fd;}
+        .lab-shell{background:radial-gradient(circle at 25% 10%,rgba(34,211,238,0.16),transparent 35%),radial-gradient(circle at 80% 0%,rgba(74,222,128,0.12),transparent 30%),linear-gradient(180deg,#0f172a 0%,#111827 52%,#030712 100%);}
+        .lab-card{background:rgba(15,23,42,0.78);border:1px solid rgba(148,163,184,0.18);box-shadow:0 24px 80px rgba(0,0,0,0.35);backdrop-filter:blur(18px);}
+        .lab-btn{min-height:2.75rem;border-radius:0.85rem;background:rgba(30,41,59,0.86);border-color:rgba(148,163,184,0.16);font-size:0.78rem;text-align:left;padding:0.62rem 1.75rem 0.62rem 0.75rem;touch-action:manipulation;}
+        .lab-btn:hover,.lab-btn:focus-visible{background:rgba(51,65,85,0.98);border-color:rgba(125,211,252,0.7);outline:none;}
+        .equip-btn.active,.toggle-btn.active{background:linear-gradient(135deg,rgba(37,99,235,0.94),rgba(14,165,233,0.58));border-color:#7dd3fc;box-shadow:0 0 0 1px rgba(125,211,252,0.35),0 12px 30px rgba(14,165,233,0.16);}
+        .lab-stage{background:radial-gradient(circle at 50% 48%,rgba(14,165,233,0.18),transparent 34%),linear-gradient(180deg,#06111f 0%,#020617 100%);}
+        .lab-stage::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(125,211,252,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,0.05) 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(circle at center,black 35%,transparent 80%);}
+        .lab-stage::after{content:'';position:absolute;inset:auto 10% 8% 10%;height:28%;background:radial-gradient(ellipse at center,rgba(15,23,42,0.9),transparent 68%);filter:blur(12px);}
+        .trait-chip{display:inline-flex;align-items:center;gap:0.35rem;border:1px solid rgba(125,211,252,0.25);background:rgba(8,47,73,0.45);color:#bae6fd;border-radius:999px;padding:0.28rem 0.58rem;font-size:0.72rem;font-weight:800;}
+        .fish-wrapper{width:100%;height:100%;min-height:18rem;}
+        .creature-svg{width:min(96%,430px);height:auto;position:relative;z-index:3;filter:drop-shadow(0 26px 32px rgba(0,0,0,0.48));}
+        .creature-swim{animation:creature-swim 4.5s ease-in-out infinite;}
+        .creature-pulse{animation:creature-pulse 1.8s ease-in-out infinite alternate;}
+        .creature-drift{animation:creature-drift 5.5s ease-in-out infinite alternate;}
+        @keyframes creature-swim{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-8px) rotate(1deg);}}
+        @keyframes creature-drift{0%,100%{transform:translateY(4px) rotate(-2deg);}50%{transform:translateY(-10px) rotate(2deg);}}
+        @keyframes creature-pulse{0%{opacity:.45;filter:drop-shadow(0 0 3px #7dd3fc);}100%{opacity:1;filter:drop-shadow(0 0 14px #7dd3fc);}}
+        @media (max-width: 640px){.lab-btn{min-height:3rem;font-size:0.8rem}.creature-svg{width:100%}.trait-chip{font-size:0.68rem}.lab-stage{min-height:19rem;}}
+        @media (prefers-reduced-motion: reduce){.creature-swim,.creature-drift,.creature-pulse,.float-anim,.anim-pop{animation:none!important;}}</style>
 </head>
 <body class="text-gray-800 antialiased font-sans">
     <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
@@ -69,13 +88,13 @@
         </div>
     </div>
     <div id="badge-toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-full shadow-2xl font-bold text-lg" style="animation:pop-in 0.4s forwards;">🔬 Bio-Engineer Badge Earned!</div>
-            <section class="py-12 px-4 bg-gray-900 text-white min-h-[85vh]">
+            <section class="lab-shell py-10 md:py-12 px-4 text-white min-h-[85vh]">
                 <div class="max-w-6xl mx-auto text-center mb-10">
-                    <div class="inline-block bg-blue-500/20 text-blue-400 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-blue-500/50"><i class="fa-solid fa-flask"></i> Mission Objective</div>
-                    <h2 class="text-4xl font-black text-blue-300 mb-4">Build-A-Fish Simulator</h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">Select a target depth, genetically engineer a custom organism to survive its specific gradient conditions, and deploy it! Analyze the telemetry logs to see exactly why it lived or perished.</p>
+                    <div class="inline-block bg-cyan-400/10 text-cyan-200 font-bold px-4 py-1 rounded-full mb-4 uppercase text-sm border border-cyan-300/30"><i class="fa-solid fa-flask"></i> Mission Objective</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-cyan-100 mb-4 tracking-tight">Bio-Lab Creature Builder</h2>
+                    <p class="text-slate-300 max-w-3xl mx-auto">Select a target depth, engineer traits from real marine adaptations, and watch the specimen remodel into a believable ocean creature before deployment.</p>
                 </div>
-                <div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 bg-gray-800 p-6 rounded-3xl shadow-xl border border-gray-700">
+                <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-6 lg:gap-8 lab-card p-4 md:p-6 rounded-3xl">
                     <div class="lg:col-span-4 space-y-6">
                         <h3 class="text-xl font-bold text-blue-300 border-b border-gray-700 pb-2">Genetic Toolkit</h3>
                         
@@ -84,9 +103,11 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'standard')">Standard <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('standard')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'fusiform')">Fusiform <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('fusiform')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'laterallyCompressed')">Reef-Flat <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('laterallyCompressed')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'gelatinous')">Gelatinous <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('gelatinous')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'gigantism')">Gigantism <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('gigantism')"></i></button>
-                                <button class="lab-btn equip-btn col-span-2" onclick="equipTrait('morphology', 'stasis')">Metabolic Stasis <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('stasis')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'reducedSkeleton')">Light Skeleton <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('reducedSkeleton')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('morphology', 'stasis')">Metabolic Stasis <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('stasis')"></i></button>
                             </div>
                         </div>
                         <div>
@@ -94,9 +115,12 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <button class="lab-btn equip-btn" onclick="equipTrait('color', 'countershaded')">Countershade <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('countershaded')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('color', 'red')">Red <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('red')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('color', 'chromatophore')">Chromatophores <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('chromatophore')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('color', 'disruptive')">Disruptive Color <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('disruptive')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('color', 'transparent')">Refraction <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('transparent')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('eyes', 'giant')">Giant Eyes <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('giant')"></i></button>
                                 <button class="lab-btn equip-btn" onclick="equipTrait('eyes', 'tubular')">Tubular Eyes <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('tubular')"></i></button>
-                                <button class="lab-btn equip-btn col-span-2" onclick="equipTrait('eyes', 'blind')">Blind / No Eyes <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('blind')"></i></button>
+                                <button class="lab-btn equip-btn" onclick="equipTrait('eyes', 'blind')">Blind / No Eyes <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('blind')"></i></button>
                             </div>
                         </div>
                         <div>
@@ -108,6 +132,8 @@
                                 <button class="lab-btn toggle-btn text-left" data-trait="stilts" onclick="toggleSpecial('stilts')">Stilts <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('stilts')"></i></button>
                                 <button class="lab-btn toggle-btn text-left" data-trait="clinging" onclick="toggleSpecial('clinging')">Clinging <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('clinging')"></i></button>
                                 <button class="lab-btn toggle-btn text-left" data-trait="sealing" onclick="toggleSpecial('sealing')">Operculum <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('sealing')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="hiding" onclick="toggleSpecial('hiding')">Crevice Hiding <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('hiding')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="polyandry" onclick="toggleSpecial('polyandry')">Mate Fusion <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('polyandry')"></i></button>
                             </div>
                         </div>
                         <div>
@@ -117,16 +143,21 @@
                                 <button class="lab-btn toggle-btn text-left" data-trait="photophores" onclick="toggleSpecial('photophores')">Photophores <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('photophores')"></i></button>
                                 <button class="lab-btn toggle-btn text-left" data-trait="osmo" onclick="toggleSpecial('osmo')">Osmoreg. <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('osmo')"></i></button>
                                 <button class="lab-btn toggle-btn text-left" data-trait="omz" onclick="toggleSpecial('omz')">OMZ <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('omz')"></i></button>
-                                <button class="lab-btn toggle-btn text-left col-span-2 border-green-500/50" data-trait="chemosyn" onclick="toggleSpecial('chemosyn')">Chemosynthesis <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('chemosyn')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="hsp" onclick="toggleSpecial('hsp')">Heat Shock Proteins <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('hsp')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="symbiosis" onclick="toggleSpecial('symbiosis')">Symbiosis <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('symbiosis')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="swimbladder" onclick="toggleSpecial('swimbladder')">Swim Bladder <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('swimbladder')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="nogas" onclick="toggleSpecial('nogas')">No Gas Spaces <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('nogas')"></i></button>
+                                <button class="lab-btn toggle-btn text-left" data-trait="enzyme" onclick="toggleSpecial('enzyme')">Flexible Enzymes <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('enzyme')"></i></button>
+                                <button class="lab-btn toggle-btn text-left border-green-500/50" data-trait="chemosyn" onclick="toggleSpecial('chemosyn')">Chemosynthesis <i class="fa-solid fa-circle-info info-ic" onclick="event.stopPropagation(); showLabInfo('chemosyn')"></i></button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-5 flex flex-col items-center mt-8">
-                        <div class="w-full h-64 bg-black rounded-2xl border border-blue-500/30 flex items-center justify-center relative overflow-hidden mb-6 shadow-inner">
-                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 20px 20px;"></div>
-                            <div id="fish-model" class="fish-wrapper morph-standard color-standard eye-standard"><div class="f-tmao-aura"></div><div class="f-lure"></div><div class="f-tail"></div><div class="f-body"><div class="f-photo"><div></div><div></div><div></div><div></div><div></div></div><div class="f-jaw"><svg viewBox="0 0 100 50" class="w-full h-full drop-shadow-md"><path d="M 0 0 Q 50 40 100 0" fill="none" stroke="white" stroke-width="4"/><polygon points="10,15 20,40 30,15" fill="white"/><polygon points="35,25 45,45 55,25" fill="white"/><polygon points="60,25 70,45 80,25" fill="white"/><polygon points="85,15 90,30 95,15" fill="white"/></svg></div></div><div class="f-eye"></div></div>
+                    <div class="lg:col-span-5 flex flex-col items-center mt-2 lg:mt-8">
+                        <div class="lab-stage w-full min-h-80 md:h-[28rem] rounded-3xl border border-cyan-400/20 flex items-center justify-center relative overflow-hidden mb-5 shadow-inner">
+                            <div id="fish-model" class="fish-wrapper morph-standard color-standard eye-standard"></div>
                         </div>
+                        <div id="creature-readout" class="w-full mb-4 rounded-2xl border border-cyan-300/15 bg-slate-950/60 p-4 text-left"></div>
                         <select id="deploy-zone" class="w-full bg-gray-700 text-white rounded-lg p-3 font-bold mb-3 hover:bg-gray-600 transition outline-none cursor-pointer">
                             <option value="intertidal">Target: Intertidal Zone &bull; 0m</option>
                             <option value="epipelagic">Target: Epipelagic Zone &bull; 0-200m</option>
@@ -151,16 +182,21 @@
         function awardBadge(){if(window.OceanBadges) window.OceanBadges.awardBadge('engineer');const b=document.getElementById('badge-toast');if(b){b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),4000);}}
         function confetti(){const c=document.getElementById('confetti-canvas');if(!c)return;c.style.display='block';const ctx=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;let pts=[];for(let i=0;i<150;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*6+2,d:Math.random()*10});function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='gold';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+1+p.r/2;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}});requestAnimationFrame(draw);}draw();setTimeout(()=>c.style.display='none',8000);}
 
-        const fishState={morphology:'standard',color:'standard',eyes:'standard',specials:{photophores:false,lure:false,jaws:false,tmao:false,osmo:false,omz:false,chemo:false,stilts:false,clinging:false,sealing:false,chemosyn:false}};
+        const fishState={morphology:'standard',color:'standard',eyes:'standard',specials:{photophores:false,lure:false,jaws:false,tmao:false,osmo:false,omz:false,chemo:false,stilts:false,clinging:false,sealing:false,hiding:false,polyandry:false,hsp:false,symbiosis:false,swimbladder:false,nogas:false,enzyme:false,chemosyn:false}};
         const labWins={intertidal:false,epipelagic:false,mesopelagic:false,bathypelagic:false,abyssal:false,hadal:false};
         const labInfoData={
             standard:['Standard Morphology','🐟','A generalist body plan. Rounded body, moderate fins. Not optimized for any extreme depth zone.'],
             fusiform:['Fusiform Morphology','🐟','Torpedo-shaped body that minimizes hydrodynamic drag. Ideal for fast, open-water predators in the Epipelagic zone.'],
+            laterallyCompressed:['Laterally Compressed Body','🐠','A tall, flattened reef-fish body that trades top speed for tight turns through coral branches, kelp, and crowded continental-shelf habitats.'],
             gelatinous:['Gelatinous Body','👻','A soft, jelly-like body with no rigid skeleton. The body is mostly water — incompressible and neutral buoyancy at extreme depths. Key for Hadal survival.'],
             gigantism:['Abyssal Gigantism','🪲','Cold temperatures and low food availability slow metabolism and extend growth periods, resulting in extremely large body sizes. Common in Abyssopelagic zones.'],
+            reducedSkeleton:['Reduced Ossification','🦴','A lighter, less bony skeleton saves energy and helps deep-sea animals remain buoyant when food is scarce.'],
             stasis:['Metabolic Stasis','💤','Watery, gelatinous muscles with minimal metabolic activity. Allows "sit and wait" predation to conserve scarce calories in the Bathypelagic zone.'],
             countershaded:['Countershading','🦈','Dark dorsal surface and light ventral surface. Eliminates the 3D shadow effect, making the animal nearly invisible from above and below in the Epipelagic zone.'],
             red:['Red Coloration','🦐','Red light is completely absorbed by ~25m depth. Below this, red-colored animals appear black and invisible to predators — perfect camouflage in the Mesopelagic.'],
+            chromatophore:['Chromatophores','🐙','Expandable pigment cells that let cephalopods rapidly change color and pattern for active camouflage on reefs and shelves.'],
+            disruptive:['Disruptive Coloration','🦓','High-contrast bars and patches break up the body outline against coral, kelp, and rocky backgrounds.'],
+            transparent:['Refraction Matching','🪼','Transparent tissues that bend light nearly like seawater, making gelatinous plankton and jellies difficult to see in open water.'],
             giant:['Giant Eyes','👁️','Massively enlarged eyes to gather every available photon in the dim twilight zone. Often includes a tapetum lucidum reflective layer.'],
             tubular:['Tubular Eyes','🔭','Cylindrical eyes pointing upward to spot the silhouettes of prey and predators against faint surface light. Found in Mesopelagic species like the Hatchetfish.'],
             blind:['No Eyes / Blind','🙈','In the permanently dark Bathypelagic and Hadal zones, eyes are metabolically expensive and useless. Resources are redirected to other senses like chemoreception.'],
@@ -170,24 +206,124 @@
             stilts:['Stilt Fins (Substrate Navigation)','🐡','Elongated, rigid pectoral and pelvic fins used like stilts to stand above soft, silty Abyssal mud and sense vibrations — used by the Tripod Fish.'],
             clinging:['Clinging / Adhesion','⭐','Tube feet, byssal threads, or suction systems to resist powerful intertidal wave action and surge that would otherwise sweep organisms off rocks.'],
             sealing:['Operculum / Sealing','🐌','A tough plate (operculum) that seals the shell opening during low tide, trapping moisture inside to prevent fatal desiccation during air exposure.'],
+            hiding:['Crevice Hiding','🦀','A compact body plan and shelter-seeking behavior that lets intertidal animals wedge into cool, wet cracks during heat and low tide.'],
             tmao:['TMAO (Piezolyte)','🛡️','Trimethylamine N-oxide is a small organic molecule that acts as a counter-pressure chemical scaffold, protecting proteins from unfolding under crushing Hadal pressures exceeding 1,000 atm.'],
             photophores:['Photophores (Bioluminescence)','💡',"Specialized light-producing organs on the belly. Used for counter-illumination to match faint downwelling light and erase the organism's telltale silhouette in the Mesopelagic zone."],
             osmo:['Osmoregulation','💧','The ability to actively regulate internal salt and water balance despite extreme external salinity changes — critical for Intertidal tide pool organisms.'],
             omz:['OMZ Tolerance','🫁','High-affinity hemoglobin or alternate respiratory pigments that can extract oxygen from near-anoxic water in the Oxygen Minimum Zone.'],
+            hsp:['Heat Shock Proteins','🔥','Molecular chaperones that help refold heat-damaged proteins during low-tide sun exposure.'],
+            symbiosis:['Symbiosis','🪸','A close partnership like coral and zooxanthellae, where photosynthetic algae provide food in exchange for shelter.'],
+            swimbladder:['Swim Bladder / Buoyancy','🎈','A gas-filled buoyancy organ used by many bony fish to hover without constant swimming. It is useful in shallower water but risky at extreme pressure.'],
+            nogas:['No Gas Spaces','🚫','Avoiding gas-filled spaces prevents compression injury under hadal pressure; deep fish rely on soft tissue, oils, and chemistry instead.'],
+            enzyme:['Flexible Pressure Enzymes','🧬','Protein and membrane adaptations that keep cellular machinery flexible and functional in cold, crushing trench conditions.'],
+            polyandry:['Parasitic Mate Fusion','👩‍❤️‍👨','A reproductive strategy in some deep-sea anglerfish where tiny males permanently attach to females, solving mate scarcity in dark open water.'],
             chemosyn:['Chemosynthesis (via Bacteria)','🩸','Hosting chemoautotrophic bacteria in specialized organs (trophosomes) that convert hydrogen sulfide (H₂S) from hydrothermal vents into organic energy — the foundation of vent ecosystems.']
         };
 
         function showLabInfo(t){const d=labInfoData[t];if(d)openModal(d[0],d[1],`<p class="font-medium text-gray-700 leading-relaxed">${d[2]}</p>`);}
+        function getCreatureProfile(){
+            const f=fishState, sp=f.specials;
+            if(sp.stilts) return {name:'Tripod fish analog',note:'Stilt fins and vibration sensing for abyssal mud.',motion:'creature-swim'};
+            if(sp.lure || sp.jaws || f.morphology==='stasis') return {name:'Deep angler / gulper analog',note:'Low-energy ambush predator with expandable feeding gear.',motion:'creature-swim'};
+            if(f.morphology==='gigantism') return {name:'Giant isopod analog',note:'Large, armored scavenger shaped by abyssal gigantism.',motion:'creature-drift'};
+            if(f.morphology==='gelatinous' || f.color==='transparent') return {name:'Hadal snailfish / jelly analog',note:'Soft tissue and neutral buoyancy for pressure survival.',motion:'creature-drift'};
+            if(f.morphology==='laterallyCompressed' || f.color==='chromatophore' || f.color==='disruptive' || sp.symbiosis) return {name:'Reef fish analog',note:'Flat, maneuverable body for complex coastal habitats.',motion:'creature-swim'};
+            if(f.morphology==='fusiform' || f.color==='countershaded') return {name:'Tuna / shark analog',note:'Streamlined open-ocean predator built for efficient cruising.',motion:'creature-swim'};
+            return {name:'Generalist coastal fish',note:'A flexible starting body plan awaiting specialization.',motion:'creature-swim'};
+        }
+        function colorStops(){
+            const c=fishState.color;
+            if(c==='countershaded') return ['#1e293b','#2563eb','#f8fafc'];
+            if(c==='red') return ['#450a0a','#991b1b','#ef4444'];
+            if(c==='chromatophore') return ['#0f766e','#f97316','#7c3aed'];
+            if(c==='disruptive') return ['#0f172a','#facc15','#38bdf8'];
+            if(c==='transparent') return ['rgba(255,255,255,0.18)','rgba(125,211,252,0.26)','rgba(255,255,255,0.54)'];
+            return ['#0f766e','#2563eb','#22d3ee'];
+        }
+        function eyeSvg(x=270,y=122){
+            if(fishState.eyes==='blind') return `<path d="M${x-13} ${y} Q${x} ${y+8} ${x+13} ${y}" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" fill="none"/>`;
+            if(fishState.eyes==='giant') return `<circle cx="${x}" cy="${y}" r="21" fill="#fde68a" stroke="#f8fafc" stroke-width="5"/><circle cx="${x+5}" cy="${y+2}" r="10" fill="#020617"/><circle cx="${x+1}" cy="${y-4}" r="4" fill="#fff"/>`;
+            if(fishState.eyes==='tubular') return `<ellipse cx="${x}" cy="${y-5}" rx="13" ry="27" transform="rotate(-18 ${x} ${y-5})" fill="#fde68a" stroke="#f8fafc" stroke-width="4"/><ellipse cx="${x+4}" cy="${y-8}" rx="6" ry="13" transform="rotate(-18 ${x+4} ${y-8})" fill="#020617"/>`;
+            return `<circle cx="${x}" cy="${y}" r="12" fill="#f8fafc"/><circle cx="${x+4}" cy="${y+1}" r="6" fill="#020617"/>`;
+        }
+        function featureSvg(){
+            const sp=fishState.specials;
+            let h='';
+            if(sp.tmao) h+=`<ellipse cx="205" cy="135" rx="150" ry="76" fill="none" stroke="#c084fc" stroke-width="5" opacity=".45" class="creature-pulse"/>`;
+            if(sp.photophores) h+=`<g class="creature-pulse">${[138,166,194,222,250].map((x,i)=>`<circle cx="${x}" cy="${166+i%2*5}" r="5" fill="#7dd3fc"/>`).join('')}</g>`;
+            if(sp.lure) h+=`<path d="M250 84 C260 28 310 34 314 70" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/><circle cx="315" cy="72" r="11" fill="#fef08a" class="creature-pulse"/>`;
+            if(sp.jaws) h+=`<path d="M292 143 C338 152 348 184 306 190 C326 175 320 158 292 143 Z" fill="#0f172a" stroke="#e2e8f0" stroke-width="3"/><path d="M300 148 l8 16 l8 -12 l8 18 l8 -13" fill="none" stroke="#f8fafc" stroke-width="3"/>`;
+            if(sp.stilts) h+=`<path d="M168 176 L106 260 M218 176 L270 260 M140 162 L54 200" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/><circle cx="106" cy="260" r="5" fill="#94a3b8"/><circle cx="270" cy="260" r="5" fill="#94a3b8"/>`;
+            if(sp.clinging) h+=`<g opacity=".85">${[126,164,202].map(x=>`<circle cx="${x}" cy="190" r="10" fill="none" stroke="#bae6fd" stroke-width="4"/>`).join('')}</g>`;
+            if(sp.sealing) h+=`<path d="M304 116 Q332 136 306 160" fill="none" stroke="#64748b" stroke-width="12" stroke-linecap="round"/>`;
+            if(sp.hiding) h+=`<path d="M78 214 l34 -32 l28 34 l38 -40 l36 43" fill="none" stroke="#475569" stroke-width="10" stroke-linecap="round" opacity=".55"/>`;
+            if(sp.hsp) h+=`<g opacity=".9"><path d="M105 76 q12 -18 24 0 t24 0 t24 0" fill="none" stroke="#fb923c" stroke-width="5" stroke-linecap="round"/></g>`;
+            if(sp.symbiosis) h+=`<g>${[78,94,110,126].map((x,i)=>`<circle cx="${x}" cy="${106+i%2*15}" r="6" fill="#34d399"/>`).join('')}</g>`;
+            if(sp.swimbladder) h+=`<ellipse cx="190" cy="134" rx="28" ry="14" fill="rgba(255,255,255,0.28)" stroke="#e0f2fe" stroke-width="2"/>`;
+            if(sp.nogas) h+=`<path d="M166 118 L218 164 M218 118 L166 164" stroke="#fb7185" stroke-width="7" stroke-linecap="round" opacity=".9"/>`;
+            if(sp.enzyme) h+=`<path d="M86 76 C110 48 130 104 154 76 S198 104 222 76" fill="none" stroke="#a78bfa" stroke-width="5" stroke-linecap="round" opacity=".9"/>`;
+            if(sp.chemo) h+=`<path d="M302 106 C344 74 362 100 386 82" fill="none" stroke="#86efac" stroke-width="4" stroke-dasharray="8 8" opacity=".8"/>`;
+            if(sp.chemosyn) h+=`<g class="creature-pulse"><circle cx="76" cy="228" r="9" fill="#22c55e"/><circle cx="98" cy="238" r="6" fill="#84cc16"/><circle cx="121" cy="226" r="7" fill="#14b8a6"/></g>`;
+            if(sp.polyandry) h+=`<g transform="translate(112 176) scale(.55)"><ellipse cx="0" cy="0" rx="24" ry="12" fill="#94a3b8"/><circle cx="14" cy="-2" r="3" fill="#020617"/></g>`;
+            return h;
+        }
+        function creatureSvg(){
+            const [a,b,c]=colorStops();
+            const profile=getCreatureProfile();
+            const morph=fishState.morphology;
+            const transparent=fishState.color==='transparent' || morph==='gelatinous';
+            const isReef=morph==='laterallyCompressed' || fishState.color==='chromatophore' || fishState.color==='disruptive';
+            const isIsopod=morph==='gigantism' && !fishState.specials.stilts;
+            const body = isIsopod
+                ? `<g><ellipse cx="190" cy="138" rx="114" ry="62" fill="url(#bodyGrad)" stroke="#cbd5e1" stroke-width="4"/><path d="M92 108 H286 M82 133 H302 M96 160 H286" stroke="#94a3b8" stroke-width="5" opacity=".75"/><path d="M112 190 l-24 40 M150 196 l-14 48 M230 196 l14 48 M268 190 l24 40" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/></g>`
+                : isReef
+                ? `<path d="M94 132 C126 54 246 46 296 128 C254 214 130 208 94 132 Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,.35)" stroke-width="4"/><path d="M108 132 L52 88 L58 178 Z" fill="${b}" opacity=".9"/><path d="M176 70 C204 34 232 38 244 80" fill="${c}" opacity=".9"/><path d="M164 190 C196 226 232 218 242 184" fill="${c}" opacity=".65"/>`
+                : morph==='gelatinous'
+                ? `<path d="M84 140 C116 54 252 52 306 124 C304 196 202 226 112 184 C80 168 72 154 84 140 Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,.5)" stroke-width="4"/><path d="M105 176 C128 226 254 228 292 176" fill="rgba(125,211,252,.18)" stroke="rgba(255,255,255,.35)" stroke-width="3"/>`
+                : morph==='fusiform'
+                ? `<path d="M72 136 C124 80 250 80 322 132 C252 184 126 188 72 136 Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,.32)" stroke-width="4"/><path d="M78 136 L22 92 L35 136 L22 180 Z" fill="${b}"/><path d="M188 88 L226 42 L218 95 Z" fill="${a}"/><path d="M190 178 L230 222 L218 170 Z" fill="${c}" opacity=".8"/>`
+                : `<path d="M78 136 C112 76 246 72 318 132 C266 190 130 202 78 136 Z" fill="url(#bodyGrad)" stroke="rgba(255,255,255,.32)" stroke-width="4"/><path d="M82 136 L30 102 L36 176 Z" fill="${b}"/><path d="M170 86 L210 52 L202 98 Z" fill="${a}" opacity=".85"/><path d="M170 184 L216 220 L202 170 Z" fill="${c}" opacity=".72"/>`;
+            const patterns = fishState.color==='disruptive' ? `<path d="M138 88 L118 184 M184 78 L164 194 M232 86 L206 184" stroke="#f8fafc" stroke-width="10" opacity=".85"/>` : fishState.color==='chromatophore' ? `<g opacity=".85"><circle cx="148" cy="116" r="10" fill="#f97316"/><circle cx="186" cy="154" r="13" fill="#a855f7"/><circle cx="230" cy="112" r="9" fill="#22d3ee"/></g>` : '';
+            const opacity = transparent ? '.72' : '1';
+            return `<svg class="creature-svg ${profile.motion}" viewBox="0 0 420 300" role="img" aria-label="${profile.name}"><defs><linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${a}"/><stop offset="54%" stop-color="${b}"/><stop offset="100%" stop-color="${c}"/></linearGradient></defs><g opacity="${opacity}">${body}${patterns}${eyeSvg(isReef?248:278,isReef?116:122)}${featureSvg()}</g></svg>`;
+        }
+        function traitLabels(){
+            const labels=[];
+            const map={standard:'Standard',fusiform:'Fusiform',laterallyCompressed:'Reef-flat',gelatinous:'Gelatinous',gigantism:'Gigantism',reducedSkeleton:'Light skeleton',stasis:'Stasis',countershaded:'Countershade',red:'Red',chromatophore:'Chromatophores',disruptive:'Disruptive',transparent:'Refraction',giant:'Giant eyes',tubular:'Tubular eyes',blind:'Blind'};
+            labels.push(map[fishState.morphology]||fishState.morphology,map[fishState.color]||fishState.color,map[fishState.eyes]||fishState.eyes);
+            Object.keys(fishState.specials).forEach(k=>{if(fishState.specials[k])labels.push((labInfoData[k]?.[0]||k).replace(' (via Bacteria)',''));});
+            return labels.slice(0,9);
+        }
         function equipTrait(c,v){
             fishState[c]=v;
             document.querySelectorAll('.equip-btn').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+c+"'")&&b.getAttribute('onclick').includes("'"+v+"'"))b.classList.add('active');else if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+c+"'"))b.classList.remove('active');});
             updateFishVisuals();logTel('Mutated '+c+' -> '+v);
         }
-        function toggleSpecial(t){fishState.specials[t]=!fishState.specials[t];const b=document.querySelector('button[data-trait="'+t+'"]');if(fishState.specials[t])b.classList.add('border-blue-500','bg-blue-900/50');else b.classList.remove('border-blue-500','bg-blue-900/50');updateFishVisuals();logTel('Toggled '+t+' -> '+fishState.specials[t]);}
-        function updateFishVisuals(){const f=document.getElementById('fish-model');f.className='fish-wrapper';f.classList.add('morph-'+fishState.morphology,'color-'+fishState.color,'eye-'+fishState.eyes);if(fishState.specials.photophores)f.classList.add('spec-photophores');if(fishState.specials.lure)f.classList.add('spec-lure');if(fishState.specials.jaws)f.classList.add('spec-jaws');if(fishState.specials.tmao)f.classList.add('spec-tmao');if(fishState.specials.chemosyn)f.classList.add('spec-chemosyn');if(fishState.specials.omz)f.classList.add('spec-omz');if(fishState.specials.stilts)f.classList.add('spec-stilts');if(fishState.specials.osmo)f.classList.add('spec-osmo');if(fishState.specials.sealing)f.classList.add('spec-sealing');}
+        function toggleSpecial(t){fishState.specials[t]=!fishState.specials[t];const b=document.querySelector('button[data-trait="'+t+'"]');if(fishState.specials[t])b.classList.add('active','border-blue-500','bg-blue-900/50');else b.classList.remove('active','border-blue-500','bg-blue-900/50');updateFishVisuals();logTel('Toggled '+t+' -> '+fishState.specials[t]);}
+        function updateFishVisuals(){
+            const f=document.getElementById('fish-model');
+            const profile=getCreatureProfile();
+            f.className='fish-wrapper';
+            f.classList.add('morph-'+fishState.morphology,'color-'+fishState.color,'eye-'+fishState.eyes);
+            f.innerHTML=creatureSvg();
+            const readout=document.getElementById('creature-readout');
+            if(readout){
+                readout.innerHTML=`<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3"><div><p class="text-cyan-200 text-xs uppercase tracking-[0.2em] font-black">Live Morphotype</p><h3 class="text-white text-xl font-heading font-black mt-1">${profile.name}</h3><p class="text-slate-300 text-sm mt-1">${profile.note}</p></div><div class="flex flex-wrap gap-2 sm:justify-end">${traitLabels().map(t=>`<span class="trait-chip">${t}</span>`).join('')}</div></div>`;
+            }
+        }
+        function syncActiveControls(){
+            document.querySelectorAll('.equip-btn').forEach(b=>{
+                const call=b.getAttribute('onclick')||'';
+                b.classList.toggle('active',call.includes("'"+fishState.morphology+"'")||call.includes("'"+fishState.color+"'")||call.includes("'"+fishState.eyes+"'"));
+            });
+            Object.keys(fishState.specials).forEach(t=>{
+                const b=document.querySelector('button[data-trait="'+t+'"]');
+                if(b)b.classList.toggle('active',fishState.specials[t]);
+            });
+        }
         function logTel(m){const l=document.getElementById('telemetry-log');l.innerHTML+=`<div class="border-b border-gray-800 pb-1">> ${m}</div>`;l.scrollTop=l.scrollHeight;}
         function deployFish(){const z=document.getElementById('deploy-zone').value;logTel('Deploying to '+z+'...');let s=false,m='';const f=fishState,sp=f.specials;if(z==='intertidal'){if(sp.osmo&&(sp.clinging||sp.sealing)){s=true;m='Survived the crashing waves and hot sun during low tide!';}else m='Washed away or dried out! Need Clinging/Sealing AND Osmoregulation.';}else if(z==='epipelagic'){if(f.morphology==='fusiform'&&f.color==='countershaded'){s=true;m='Fusiform speed & Countershading made it an apex predator!';}else m='Too slow/visible! Easily spotted and eaten in bright sunlight.';}else if(z==='mesopelagic'){if(sp.photophores&&(f.eyes==='giant'||f.eyes==='tubular')&&sp.omz){s=true;m='Invisible shadows, spots prey, breathes fine in the OMZ!';}else m='Died! Need Photophores, large eyes, and OMZ tolerance.';}else if(z==='bathypelagic'){if(sp.lure&&sp.jaws&&f.morphology==='stasis'){s=true;m='Energy conserved in stasis, lured prey, swallowed whole!';}else m='Starved! Need a lure, expandable jaws, and metabolic stasis.';}else if(z==='abyssal'){if(sp.stilts&&sp.chemo&&f.morphology==='gigantism'){s=true;m='Scavenged whale falls using chemoreception while standing on the mud!';}else m='Sank into soft mud or could not smell rare food sources.';}else if(z==='hadal'){if(f.morphology==='gelatinous'&&sp.tmao&&sp.chemosyn){s=true;m='TMAO protected proteins, gelatinous body survived the crush, ate vent bacteria!';}else m='Implosion! Pressure crushed rigid body, unraveled proteins, or starved.';}if(s){logTel('<span class="text-green-400 font-bold">SUCCESS: '+m+'</span>');labWins[z]=true;if(Object.values(labWins).every(v=>v)){document.getElementById('lab-victory').classList.remove('hidden');awardBadge();confetti();}}else logTel('<span class="text-red-400 font-bold">CRITICAL FAILURE: '+m+'</span>');}
-        window.onload = () => { updateFishVisuals(); };
+        window.onload = () => { syncActiveControls(); updateFishVisuals(); };
     </script>
 </body>
 </html>
