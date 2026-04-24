@@ -12,6 +12,10 @@
         tailwind.config={theme:{extend:{fontFamily:{sans:['Nunito','sans-serif'],heading:['Poppins','sans-serif']},colors:{'ocean-surface':'#4ea8de','ocean-sunlight':'#0077b6','ocean-twilight':'#03045e','ocean-midnight':'#01012b','ocean-abyssal':'#000010','ocean-hadal':'#000000'}}}}
     </script>
     <style>
+        :root {
+            --shell-nav-height: 8rem;
+            --shell-viewport-height: 100dvh;
+        }
         body{background-color:#f0f8ff;overflow-x:hidden;}
         .gradient-ocean{background:linear-gradient(to bottom,#4ea8de 0%,#0077b6 15%,#03045e 35%,#01012b 60%,#000010 85%,#000000 100%);}
         .glass-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);color:white;}
@@ -156,13 +160,18 @@
         .sonar-grid { background-image: linear-gradient(rgba(74,222,128,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.15) 1px, transparent 1px) !important; background-size: 40px 40px !important; background-color: #022c22 !important; }
         .sonar-blob { background-color: #4ade80; border-radius: 50%; filter: blur(12px); opacity: 0.85; transition: all 1s ease-in-out; }
         @keyframes radar-sweep { 0% { transform: translateY(-100%); } 100% { transform: translateY(600px); } }
+        .shell-main{padding-top:var(--shell-nav-height);}
+        .tab-pane{
+            height:calc(var(--shell-viewport-height) - var(--shell-nav-height));
+            min-height:calc(var(--shell-viewport-height) - var(--shell-nav-height));
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased font-sans">
     <canvas id="confetti-canvas"></canvas>
 
     <!-- Nav -->
-    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-md border-b border-gray-200">
+    <nav id="app-nav" class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-md border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center gap-3">
                 <div class="flex items-center space-x-2 text-ocean-sunlight font-heading font-bold text-xl flex-shrink-0">
@@ -256,61 +265,69 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="pt-24 lg:pt-16">
+    <main class="shell-main">
         
         <!-- TAB 1: ZONES -->
-        <div id="tab-zones" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-zones" class="tab-pane hidden">
             <iframe src="zones.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 2: ADAPTATIONS -->
-        <div id="tab-adaptations" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-adaptations" class="tab-pane hidden">
             <iframe src="adaptations.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 3: MIGRATION -->
-        <div id="tab-migration" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-migration" class="tab-pane hidden">
             <iframe src="migration.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 4: GRADIENTS -->
-        <div id="tab-gradients" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-gradients" class="tab-pane hidden">
             <iframe src="gradients.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 5: BIO-LAB -->
-        <div id="tab-lab" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-lab" class="tab-pane hidden">
             <iframe src="biolab.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 6: PRESSURE -->
-        <div id="tab-pressure" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-pressure" class="tab-pane hidden">
             <iframe src="pressure.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 7: ECOLOGY -->
-        <div id="tab-foodweb" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-foodweb" class="tab-pane hidden">
             <iframe src="ecology.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 8: BIO-CODE -->
-        <div id="tab-biocode" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-biocode" class="tab-pane hidden">
             <iframe src="biocode.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 9: STUDY DECK -->
-        <div id="tab-study" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-study" class="tab-pane hidden">
             <iframe src="study.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 10: CREATURE INDEX -->
-        <div id="tab-creatures" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+        <div id="tab-creatures" class="tab-pane hidden">
             <iframe src="creature_index.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
     </main>
 
     <script src="badge-system.js"></script>
     <script>
+        function syncShellViewport() {
+            const nav = document.getElementById('app-nav');
+            if (!nav) return;
+            const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            document.documentElement.style.setProperty('--shell-nav-height', `${nav.offsetHeight}px`);
+            document.documentElement.style.setProperty('--shell-viewport-height', `${viewportHeight}px`);
+        }
+
         let currentGradQ=0, cardsFlipped=0, currentHullIndex=0, migProgress=0, currentBioLevel=0, currentBioSequence=[], currentATP=0;
         let ecologyWins=[false,false,false,false,false,false];
         let zoneProgress=[0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false];
@@ -385,6 +402,7 @@
 
         // --- CORE LOGIC ---
         function switchTab(id) {
+            syncShellViewport();
             document.querySelectorAll('.tab-pane').forEach(el=>el.classList.add('hidden'));
             document.querySelectorAll('.tab-pane').forEach(el=>el.classList.remove('block'));
             document.getElementById('tab-'+id).classList.remove('hidden');
@@ -1216,6 +1234,9 @@
             window.addEventListener('keydown', (event) => {
                 if(event.key === 'Escape') toggleBadgeDrawer(false);
             });
+            window.addEventListener('resize', syncShellViewport);
+            if(window.visualViewport) window.visualViewport.addEventListener('resize', syncShellViewport);
+            syncShellViewport();
             ensureSelectedBadge();
             renderBadgeHub();
             switchTab('zones');
@@ -1223,15 +1244,15 @@
     </script>
 
     <!-- TAB: BATHYMETRY MAPPER -->
-    <div id="tab-bathymetry" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+    <div id="tab-bathymetry" class="tab-pane hidden">
         <iframe id="iframe-bathymetry" src="bathymetry.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
     </div>
     <!-- TAB: CARBON PUMP TYCOON -->
-    <div id="tab-carbonpump" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+    <div id="tab-carbonpump" class="tab-pane hidden">
         <iframe id="iframe-carbonpump" src="carbon_pump.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
     </div>
     <!-- TAB: INTERACTIVE PLANKTON -->
-    <div id="tab-plankton" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+    <div id="tab-plankton" class="tab-pane hidden">
         <iframe id="iframe-plankton" src="plankton.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
     </div>
 </body>

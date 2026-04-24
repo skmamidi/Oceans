@@ -14,7 +14,8 @@
             font-family: 'Outfit', sans-serif;
             background-color: #0f172a; /* Slate 900 */
             color: #f8fafc;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -106,7 +107,7 @@
         .unlocked-zone::after { display: none; }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col">
+<body class="min-h-[100dvh] w-full flex flex-col">
 
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
@@ -121,7 +122,7 @@
     <!-- Header / Progress -->
     <header class="glass-panel z-10 flex flex-col md:flex-row items-center justify-between p-4 shadow-lg border-b border-slate-700">
         <div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <h1 class="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
                     Carbon Pump Tycoon
                 </h1>
@@ -149,10 +150,10 @@
     </header>
 
     <!-- Main Layout -->
-    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+    <main class="flex-1 flex flex-col lg:flex-row relative min-h-0 lg:overflow-hidden">
         
         <!-- Left Panel: Dashboard -->
-        <aside class="w-full lg:w-[400px] xl:w-[450px] glass-panel flex flex-col border-r border-slate-700 z-10 overflow-y-auto shadow-2xl h-1/2 lg:h-full">
+        <aside class="w-full lg:w-[400px] xl:w-[450px] glass-panel flex flex-col border-r border-slate-700 z-10 overflow-y-auto shadow-2xl lg:h-full">
             
             <!-- Weather Control -->
             <div class="p-4 border-b border-slate-700 shrink-0">
@@ -185,7 +186,7 @@
                     <!-- Nutrients -->
                     <div id="card-nutrients" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
                         <div class="absolute -right-4 -top-4 w-16 h-16 bg-yellow-500/10 rounded-full blur-xl"></div>
-                        <div class="flex justify-between items-end mb-2">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-2">
                             <div>
                                 <h3 class="text-yellow-400 font-bold flex items-center gap-2">Nutrients (N, P, Fe)</h3>
                                 <p class="text-2xl font-mono mt-1" id="res-nutrients">0</p>
@@ -198,7 +199,7 @@
                     <!-- Phytoplankton -->
                     <div id="card-phyto" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
                         <div class="absolute -right-4 -top-4 w-16 h-16 bg-green-500/10 rounded-full blur-xl"></div>
-                        <div class="flex justify-between items-end mb-2">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-2">
                             <div>
                                 <h3 class="text-emerald-400 font-bold">🦠 Phytoplankton</h3>
                                 <div class="flex gap-4">
@@ -216,7 +217,7 @@
                     <!-- Krill -->
                     <div id="card-krill" class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 relative overflow-hidden shrink-0">
                         <div class="absolute -right-4 -top-4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl"></div>
-                        <div class="flex justify-between items-end mb-2">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-2">
                             <div>
                                 <h3 class="text-pink-400 font-bold">🦐 Zooplankton (Krill)</h3>
                                 <p class="text-xs text-slate-400 uppercase mt-1">Swarms</p>
@@ -236,7 +237,7 @@
                     
                     <!-- Twilight Zone -->
                     <div id="zone-twilight" class="locked-zone p-4 rounded-xl border border-slate-700 bg-slate-800/80 shrink-0" data-req="100">
-                        <div class="flex justify-between items-end mb-2 relative z-0">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-2 relative z-0">
                             <div>
                                 <h3 class="text-cyan-300 font-bold">🐟 Lanternfish (Twilight Zone)</h3>
                                 <p class="text-xs text-slate-400 mt-1">Schools: <span id="count-lantern" class="font-mono text-lg text-white">0</span></p>
@@ -250,7 +251,7 @@
 
                     <!-- Midnight Zone -->
                     <div id="zone-midnight" class="locked-zone p-4 rounded-xl border border-slate-700 bg-slate-900 shrink-0" data-req="400">
-                        <div class="flex justify-between items-end mb-2 relative z-0">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-2 relative z-0">
                             <div>
                                 <h3 class="text-purple-400 font-bold">🦑 Vampire Squid (Midnight Zone)</h3>
                                 <p class="text-xs text-slate-400 mt-1">Squids: <span id="count-squid" class="font-mono text-lg text-white">0</span></p>
@@ -288,7 +289,7 @@
         </aside>
 
         <!-- Right Panel: Canvas Visualization -->
-        <section class="flex-1 relative bg-black">
+        <section class="flex-1 relative bg-black min-h-[55dvh] sm:min-h-[60dvh] lg:min-h-0">
             <canvas id="water-column" class="absolute inset-0 w-full h-full"></canvas>
             
             <div class="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col justify-between p-4 opacity-50 text-xs font-mono tracking-widest text-white/50 z-10">

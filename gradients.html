@@ -144,16 +144,16 @@
     <div id="bubbles-container" class="fixed inset-0 pointer-events-none z-[-5]"></div>
 
     <!-- Top Navigation & Info Panels -->
-    <div class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-start pointer-events-none">
+    <div class="fixed top-0 left-0 w-full z-50 p-2 sm:p-4 flex justify-between items-start pointer-events-none">
         <div class="pointer-events-auto">
-            <button id="audio-toggle" onclick="toggleAudio()" class="glass-panel text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-700 transition shadow-lg">
+            <button id="audio-toggle" onclick="toggleAudio()" class="glass-panel text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center hover:bg-gray-700 transition shadow-lg">
                 <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
             </button>
         </div>
         
-        <div class="pointer-events-auto flex flex-col items-end gap-3">
+        <div class="pointer-events-auto flex flex-col items-end gap-2 sm:gap-3 origin-top-right scale-90 sm:scale-100">
             <!-- Creature Dex -->
-            <div class="glass-panel p-3 rounded-2xl shadow-xl flex flex-col items-end">
+            <div class="glass-panel p-3 rounded-2xl shadow-xl hidden sm:flex flex-col items-end">
                 <div class="text-xs font-bold uppercase tracking-wider text-cyan-300 mb-2"><i class="fa-solid fa-book-journal-whills mr-1"></i> Creature Dex <span id="dex-count">0</span>/8</div>
                 <div class="flex gap-2 text-2xl" id="creature-dex">
                     <!-- Slots populated by JS -->
@@ -169,7 +169,7 @@
     </div>
 
     <!-- Main Layout -->
-    <div class="flex max-w-7xl mx-auto pt-16 pb-48 w-full px-4 gap-8 relative">
+    <div class="flex max-w-7xl mx-auto pt-20 sm:pt-16 pb-24 sm:pb-48 w-full px-3 sm:px-4 gap-6 sm:gap-8 relative">
         
         <!-- Sticky Left: Gauges & Depth Marker -->
         <!-- Widened to w-80 to accommodate the Mission Control box alongside the depth track -->
