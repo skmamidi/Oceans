@@ -75,7 +75,7 @@
                     <li>Click <strong>Twilight Dash</strong> to play an arcade mini-game—guide your animal to the surface without getting eaten!</li>
                 </ul>
             </div>
-            <button onclick="document.getElementById('splash-screen').classList.add('opacity-0', 'pointer-events-none')" class="bg-gradient-to-r from-ocean-sunlight to-ocean-surface hover:from-ocean-surface hover:to-ocean-sunlight text-white font-bold text-xl py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105">Start Exploring!</button>
+            <button onclick="beginMigrationExperience()" class="bg-gradient-to-r from-ocean-sunlight to-ocean-surface hover:from-ocean-surface hover:to-ocean-sunlight text-white font-bold text-xl py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105">Start Exploring!</button>
         </div>
     </div>
 
@@ -457,7 +457,7 @@
         }
 
         // CIRCADIAN RHYTHM METERS
-        let survival = { active: true, hunger: 100, safety: 100, cycles: 0, lastState: false, won: false };
+        let survival = { active: false, hunger: 100, safety: 100, cycles: 0, lastState: false, won: false };
         setInterval(() => {
             if(!survival.active || survival.won || dashGame.active || isTracking || dielSonarMode) return;
             
@@ -505,11 +505,18 @@
             survival.lastState = dielIsNight;
         }, 1000);
 
+        function beginMigrationExperience() {
+            const splash = document.getElementById('splash-screen');
+            if(splash) splash.classList.add('opacity-0', 'pointer-events-none');
+            restartSurvival();
+        }
+
         function restartSurvival() {
             survival.hunger = 100;
             survival.safety = 100;
             survival.cycles = 0;
             survival.active = true;
+            survival.lastState = dielIsNight;
             survival.won = false;
             document.getElementById('cycle-count').innerText = `(0/3 Cycles)`;
             document.getElementById('survival-msg').innerText = "Balance Day & Night to survive!";
