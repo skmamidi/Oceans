@@ -68,7 +68,12 @@
             document.getElementById('modal-name').textContent = c.name;
             document.getElementById('modal-sci').textContent = c.scientificName || '';
             document.getElementById('modal-svg').innerHTML = OceanCreatures.svg(c.svgKey || c.id);
-            const dvm = c.dvm ? `Yes. Day: ${c.dvm.day}; Night: ${c.dvm.night}.` : 'Not shown as a diel vertical migrator in the app.';
+            const dvm = (() => {
+                if(!c.dvm) return 'Species-specific diel vertical migration information has not been added yet.';
+                if(c.dvm.status === 'migrates') return `Known or commonly reported DVM. Day: ${c.dvm.day}. Night: ${c.dvm.night}.${c.dvm.note ? ` ${c.dvm.note}` : ''}`;
+                if(c.dvm.status === 'non_migrant') return `No regular diel vertical migration reported.${c.dvm.note ? ` ${c.dvm.note}` : ''}`;
+                return `Species-specific day/night DVM depths are not well established.${c.dvm.note ? ` ${c.dvm.note}` : ''}`;
+            })();
             document.getElementById('modal-details').innerHTML = [
                 field('Description', c.description),
                 field('Diet', c.diet),
