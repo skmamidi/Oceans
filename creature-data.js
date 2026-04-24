@@ -160,13 +160,25 @@ const EXTRA_SVGS = {
   dolphin: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M15 55 Q42 25 82 42 Q62 48 28 62 Z" fill="#60a5fa"/><path d="M42 36 Q50 14 60 37" fill="#3b82f6"/><path d="M16 55 L4 43 L8 60 Z" fill="#3b82f6"/><path d="M80 42 Q94 39 96 49 Q87 48 78 46" fill="#60a5fa"/><circle cx="70" cy="42" r="2" fill="#0f172a"/></svg>'
 };
 Object.assign(SVGS, EXTRA_SVGS);
-function cleanName(html){return String(html).replace(/<[^>]+>/g,'').trim();}
+SVGS.vampire = SVGS.squid;
+function cleanName(html){return String(html).replace(/<span[^>]*class=['"][^'"]*tag-[^'"]*['"][^>]*>[\s\S]*?<\/span>/gi,'').replace(/<[^>]+>/g,'').replace(/\b(BENTHIC|PELAGIC|BENTHOPELAGIC|BENTHIC\s*&\s*PLANKTONIC)\b/gi,'').replace(/\s+/g,' ').trim();}
 function uniqueFacts(facts){return [...new Set((facts||[]).filter(Boolean))];}
 const creatures = {};
 Object.keys(SP_DICT).forEach(id=>{
   const d=SP_DICT[id]; const m=MATCH_DATA.find(x=>x.svgKey===id);
   creatures[id]={id,name:cleanName(d[0]),scientificName:m?.sci||'',description:d[2],diet:d[3],predators:d[4],habitatZone:m?.zoneNames||'',adaptationsShown:[],dvm:DVM_DATA[id]||null,funFacts:uniqueFacts(d[5]),svgKey:id};
 });
+if(creatures.squid && creatures.vampire){
+  creatures.vampire = {
+    ...creatures.vampire,
+    description: creatures.vampire.description,
+    diet: creatures.vampire.diet,
+    predators: creatures.vampire.predators,
+    svgKey: 'vampire',
+    funFacts: uniqueFacts([...(creatures.vampire.funFacts||[]), ...(creatures.squid.funFacts||[])])
+  };
+  delete creatures.squid;
+}
 function addCreature(id, data){creatures[id]={id,svgKey:id,adaptationsShown:[],funFacts:[],...creatures[id],...data,funFacts:uniqueFacts([...(creatures[id]?.funFacts||[]),...(data.funFacts||[])])};}
 addCreature('copepod',{name:'Copepod',scientificName:'Copepoda',description:'Tiny drifting crustaceans that transfer energy from phytoplankton to larger animals.',diet:'Phytoplankton',predators:'Fish, whales, squid',habitatZone:'Epipelagic to Mesopelagic',dvm:DVM_DATA.copepod,funFacts:['Most only have a single bright red eye!','They are among the most abundant multi-cellular animals on Earth.']});
 addCreature('krill',{name:'Krill',scientificName:'Euphausiacea',description:'Small shrimp-like crustaceans that form huge swarms and feed many ocean giants.',diet:'Phytoplankton',predators:'Baleen whales, penguins, squid',habitatZone:'Epipelagic to Mesopelagic',dvm:DVM_DATA.krill,funFacts:['Baleen whales love to eat these swarms.','Their swarms can be so massive they are visible from space.']});
