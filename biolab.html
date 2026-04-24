@@ -6,8 +6,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Nunito','sans-serif'],heading:['Poppins','sans-serif']},colors:{'ocean-surface':'#4ea8de','ocean-sunlight':'#0077b6','ocean-twilight':'#03045e','ocean-midnight':'#01012b','ocean-abyssal':'#000010','ocean-hadal':'#000000'}}}}}</script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Nunito','sans-serif'],heading:['Poppins','sans-serif']},colors:{'ocean-surface':'#4ea8de','ocean-sunlight':'#0077b6','ocean-twilight':'#03045e','ocean-midnight':'#01012b','ocean-abyssal':'#000010','ocean-hadal':'#000000'}}}}</script>
     <title>Bio-Lab | The Living Ocean</title>
+    <script src="badge-system.js"></script>
     <style>
         body{background-color:#111827;overflow-x:hidden;}
         @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}} .anim-shake{animation:shake 0.4s ease-in-out;}
@@ -147,7 +148,7 @@
 
         function closeModal(){document.getElementById('interactive-modal').style.opacity='0';document.getElementById('interactive-modal').style.pointerEvents='none';document.getElementById('modal-content-container').style.transform='scale(0.95)';}
         function openModal(t,e,c){document.getElementById('modal-title').innerText=t;document.getElementById('modal-emoji').innerText=e;document.getElementById('modal-body').innerHTML=c;document.getElementById('interactive-modal').style.opacity='1';document.getElementById('interactive-modal').style.pointerEvents='auto';document.getElementById('modal-content-container').style.transform='scale(1)';}
-        function awardBadge(){const b=document.getElementById('badge-toast');if(b){b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),4000);}}
+        function awardBadge(){if(window.OceanBadges) window.OceanBadges.awardBadge('engineer');const b=document.getElementById('badge-toast');if(b){b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),4000);}}
         function confetti(){const c=document.getElementById('confetti-canvas');if(!c)return;c.style.display='block';const ctx=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;let pts=[];for(let i=0;i<150;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*6+2,d:Math.random()*10});function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='gold';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+1+p.r/2;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}});requestAnimationFrame(draw);}draw();setTimeout(()=>c.style.display='none',8000);}
 
         const fishState={morphology:'standard',color:'standard',eyes:'standard',specials:{photophores:false,lure:false,jaws:false,tmao:false,osmo:false,omz:false,chemo:false,stilts:false,clinging:false,sealing:false,chemosyn:false}};
@@ -164,13 +165,13 @@
             tubular:['Tubular Eyes','🔭','Cylindrical eyes pointing upward to spot the silhouettes of prey and predators against faint surface light. Found in Mesopelagic species like the Hatchetfish.'],
             blind:['No Eyes / Blind','🙈','In the permanently dark Bathypelagic and Hadal zones, eyes are metabolically expensive and useless. Resources are redirected to other senses like chemoreception.'],
             lure:['Bioluminescent Lure (Esca)','🎣','A symbiotic bacteria-filled light organ on a modified fin ray. Used by Anglerfish to attract prey in the pitch-black Bathypelagic zone without expending chase energy.'],
-            jaws:['Unhinged / Expandable Jaws','🐍','Loosely-articulated jaws that can expand to swallow prey much larger than the predator's body. Critical in the food-scarce Bathypelagic zone where you can't afford to miss a meal.'],
+            jaws:['Unhinged / Expandable Jaws','🐍',"Loosely-articulated jaws that can expand to swallow prey much larger than the predator's body. Critical in the food-scarce Bathypelagic zone where you can't afford to miss a meal."],
             chemo:['Chemoreception','👃','Highly sensitive chemical detectors for locating distant food sources (like whale falls) through scent gradients across miles of dark Abyssal seafloor.'],
             stilts:['Stilt Fins (Substrate Navigation)','🐡','Elongated, rigid pectoral and pelvic fins used like stilts to stand above soft, silty Abyssal mud and sense vibrations — used by the Tripod Fish.'],
             clinging:['Clinging / Adhesion','⭐','Tube feet, byssal threads, or suction systems to resist powerful intertidal wave action and surge that would otherwise sweep organisms off rocks.'],
             sealing:['Operculum / Sealing','🐌','A tough plate (operculum) that seals the shell opening during low tide, trapping moisture inside to prevent fatal desiccation during air exposure.'],
             tmao:['TMAO (Piezolyte)','🛡️','Trimethylamine N-oxide is a small organic molecule that acts as a counter-pressure chemical scaffold, protecting proteins from unfolding under crushing Hadal pressures exceeding 1,000 atm.'],
-            photophores:['Photophores (Bioluminescence)','💡','Specialized light-producing organs on the belly. Used for counter-illumination to match faint downwelling light and erase the organism's telltale silhouette in the Mesopelagic zone.'],
+            photophores:['Photophores (Bioluminescence)','💡',"Specialized light-producing organs on the belly. Used for counter-illumination to match faint downwelling light and erase the organism's telltale silhouette in the Mesopelagic zone."],
             osmo:['Osmoregulation','💧','The ability to actively regulate internal salt and water balance despite extreme external salinity changes — critical for Intertidal tide pool organisms.'],
             omz:['OMZ Tolerance','🫁','High-affinity hemoglobin or alternate respiratory pigments that can extract oxygen from near-anoxic water in the Oxygen Minimum Zone.'],
             chemosyn:['Chemosynthesis (via Bacteria)','🩸','Hosting chemoautotrophic bacteria in specialized organs (trophosomes) that convert hydrogen sulfide (H₂S) from hydrothermal vents into organic energy — the foundation of vent ecosystems.']

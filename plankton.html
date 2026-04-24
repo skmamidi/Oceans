@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Plankton Inspector (Microscope Mode)</title>
+    <script src="badge-system.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
@@ -1058,6 +1059,7 @@
                 titleEl.className = "text-3xl sm:text-4xl font-bold text-green-400 mb-2 shrink-0";
                 if (currentStageIndex === campaign.length - 1) {
                     feedback = "<span class='text-green-400 font-bold'>Migration Complete!</span> You survived the journey and reached the feeding grounds. Incredible baleen technique!";
+                    if(window.OceanBadges) window.OceanBadges.awardBadge('plankton');
                     btnRestart.innerText = "PLAY AGAIN";
                     btnRestart.classList.remove('hidden');
                     failRestartBtn.classList.add('hidden');

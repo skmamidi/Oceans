@@ -173,13 +173,15 @@
                     <div id="badge-zones" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Zone Master">🌟</div>
                     <div id="badge-adaptations" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-teal-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Adaptation Ace">🧬</div>
                     <div id="badge-migration" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Migration Commander">🦑</div>
-                    <div id="badge-climate" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Climate Savior">🌍</div>
                     <div id="badge-gradients" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Gradient Guru">📊</div>
                     <div id="badge-engineer" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Bio-Engineer">🔬</div>
                     <div id="badge-physics" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Physics Pro">🗜️</div>
                     <div id="badge-ecology" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Ecology Expert">🕸️</div>
                     <div id="badge-biocode" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-cyan-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Luciferin Coder">💡</div>
                     <div id="badge-scholar" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-purple-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="SciOly Scholar">🎓</div>
+                    <div id="badge-bathymetry" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Bathymetry Mapper">🗺️</div>
+                    <div id="badge-carbonpump" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Carbon Pump Manager">🌍</div>
+                    <div id="badge-plankton" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-lime-500 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Plankton Pro">🦠</div>
                 </div>
             </div>
         </div>
@@ -259,12 +261,13 @@
         </div>
     </main>
 
+    <script src="badge-system.js"></script>
     <script>
         let currentGradQ=0, cardsFlipped=0, currentHullIndex=0, migProgress=0, currentBioLevel=0, currentBioSequence=[], currentATP=0;
         let ecologyWins=[false,false,false,false,false,false];
         let zoneProgress=[0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false];
         let adaptProgress=[0,0,0,0,0,0], adaptCompleted=[false,false,false,false,false,false];
-        let badges={zones:false, migration:false, climate:false, adapt:false, engineer:false, gradients:false, physics:false, scholar:false, ecology:false, biocode:false};
+        let badges=window.OceanBadges ? window.OceanBadges.loadBadges() : {zones:false, adaptations:false, migration:false, gradients:false, engineer:false, physics:false, ecology:false, biocode:false, scholar:false, bathymetry:false, carbonpump:false, plankton:false};
         const fishState={morphology:'standard', color:'standard', eyes:'standard', specials:{photophores:false, lure:false, jaws:false, tmao:false, osmo:false, omz:false, chemo:false, stilts:false, clinging:false, sealing:false, chemosyn:false}};
         const labWins={intertidal:false, epipelagic:false, mesopelagic:false, bathypelagic:false, abyssal:false, hadal:false};
         const hullUpgrades=[{maxAtm:50, cssClass:"sub-hull-steel"}, {maxAtm:400, cssClass:"sub-hull-titanium"}, {maxAtm:1200, cssClass:"sub-hull-bio"}];
@@ -342,7 +345,12 @@
         }
 
         function awardBadge(id) {
-            if(!badges[id]) { badges[id]=true; const b=document.getElementById('badge-'+id); if(b) b.classList.add('badge-earned'); checkAllBadges(); }
+            const normalized = id === 'adapt' ? 'adaptations' : id;
+            const wasNew = window.OceanBadges ? window.OceanBadges.awardBadge(normalized) : !badges[normalized];
+            badges = window.OceanBadges ? window.OceanBadges.loadBadges() : {...badges, [normalized]: true};
+            const b=document.getElementById('badge-'+normalized);
+            if(b) b.classList.add('badge-earned');
+            if(wasNew) checkAllBadges();
         }
 
         function checkAllBadges() {
@@ -1021,6 +1029,12 @@
         }
 
         window.onload = () => {
+            if(window.OceanBadges) {
+                badges = window.OceanBadges.initBadgeHost(() => {
+                    badges = window.OceanBadges.loadBadges();
+                    checkAllBadges();
+                });
+            }
             switchTab('zones');
         };
     </script>

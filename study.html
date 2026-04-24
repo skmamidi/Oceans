@@ -22,6 +22,7 @@
         }
     </script>
     <title>Study Deck | SciOly Oceans</title>
+    <script src="badge-system.js"></script>
     <style>
         body{background-color:#4c1d95;overflow-x:hidden;}
         @keyframes pop-in{0%{transform:scale(0.5);opacity:0;}100%{transform:scale(1);opacity:1;}} 
@@ -571,6 +572,7 @@
 
         // --- Victory Effects ---
         function awardBadge(){
+            if(window.OceanBadges) window.OceanBadges.awardBadge('scholar');
             const b=document.getElementById('badge-toast');
             if(b){
                 b.classList.remove('hidden');

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Pump Tycoon</title>
+    <script src="badge-system.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
@@ -652,6 +653,7 @@
             checkUnlocks();
             if (state.carbon >= GOAL_CARBON && !state.hasWon) {
                 state.hasWon = true;
+                if(window.OceanBadges) window.OceanBadges.awardBadge('carbonpump');
                 document.getElementById('win-modal').classList.remove('hidden');
                 for(let i=0; i<50; i++) spawnSnowParticle(true);
             }

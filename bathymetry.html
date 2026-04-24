@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deep Sea Explorer: Sonar Mapper!</title>
+    <script src="badge-system.js"></script>
     <!-- Tailwind CSS loaded via CDN for standalone functionality -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome loaded via CDN for icons -->
@@ -1224,6 +1225,7 @@
             const btnRestart = document.getElementById('btn-restart');
 
             if(isWin) {
+                if(window.OceanBadges) window.OceanBadges.awardBadge('bathymetry');
                 playSound('win');
                 title.textContent = "Mission Accomplished! 🏆";
                 title.className = "text-4xl md:text-5xl font-heading font-bold mb-4 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]";

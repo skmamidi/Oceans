@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Gradients | The Living Ocean</title>
+    <script src="badge-system.js"></script>
     <meta name="description" content="An interactive, immersive educational experience exploring the different gradients and layers of the ocean.">
     
     <!-- Tailwind CSS -->
@@ -1016,6 +1017,7 @@
                 document.getElementById('victory-ui').classList.remove('hidden');
                 document.getElementById('boss-battle').classList.remove('border-cyan-500/30', 'shadow-2xl');
                 document.getElementById('boss-battle').classList.add('border-green-500', 'shadow-[0_0_50px_rgba(34,197,94,0.3)]');
+                if(window.OceanBadges) window.OceanBadges.awardBadge('gradients');
                 
                 // Big points for completing the sub repairs
                 addScore(500); 

@@ -31,6 +31,7 @@
         };
     </script>
     <title>Migration | The Living Ocean</title>
+    <script src="badge-system.js"></script>
     <style>
         body{background-color:#ffffff;overflow-x:hidden;}
         @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
@@ -302,6 +303,8 @@
             document.getElementById('modal-content-container').style.transform='scale(1)';
         }
         function awardBadge(id) {
+            if(window.OceanBadges) window.OceanBadges.awardBadge(id);
+            if(id !== 'migration') return;
             const celebration = document.getElementById('badge-celebration');
             if(celebration) { celebration.classList.remove('hidden'); setTimeout(()=>celebration.classList.add('hidden'), 4000); }
         }
