@@ -168,6 +168,7 @@
                     <button onclick="switchTab('bathymetry')" id="btn-bathymetry" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
                     <button onclick="switchTab('carbonpump')" id="btn-carbonpump" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
                     <button onclick="switchTab('plankton')" id="btn-plankton" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
+                    <button onclick="switchTab('creatures')" id="btn-creatures" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
                 </div>
                 <div class="flex items-center space-x-1 sm:space-x-2 bg-blue-50 px-2 sm:px-3 py-1 rounded-full border border-blue-200 flex-shrink-0 ml-2">
                     <div id="badge-zones" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-[10px] filter grayscale opacity-40 transition-all" title="Zone Master">🌟</div>
@@ -198,6 +199,7 @@
             <button onclick="switchTab('bathymetry')" id="btn-bathymetry-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
             <button onclick="switchTab('carbonpump')" id="btn-carbonpump-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
             <button onclick="switchTab('plankton')" id="btn-plankton-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
+            <button onclick="switchTab('creatures')" id="btn-creatures-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
         </div>
     </nav>
 
@@ -258,6 +260,11 @@
         <!-- TAB 9: STUDY DECK -->
         <div id="tab-study" class="tab-pane hidden" style="height:calc(100vh - 64px);">
             <iframe src="study.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 10: CREATURE INDEX -->
+        <div id="tab-creatures" class="tab-pane hidden" style="height:calc(100vh - 64px);">
+            <iframe src="creature_index.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
     </main>
 

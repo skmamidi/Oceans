@@ -31,6 +31,7 @@
         };
     </script>
     <title>Migration | The Living Ocean</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <style>
         body{background-color:#ffffff;overflow-x:hidden;}
@@ -426,6 +427,11 @@
         ].map(s=>({id:s[0],name:s[1],emoji:s[2],dayDepth:s[3],nightDepth:s[4],dayDepthText:s[5],nightDepthText:s[6],xPos:s[7],size:s[8],diet:s[9],funFacts:s[10],scientificName:s[11],predators:s[12]}));
 
         function getAnimalIcon(id, emoji, sizeCls) {
+            if(window.OceanCreatures && window.OceanCreatures.SVGS[id]) {
+                const sizeMap = {'text-3xl': 'w-16 h-16', 'text-4xl': 'w-20 h-20', 'text-5xl': 'w-24 h-24', 'text-6xl': 'w-28 h-28'};
+                const dims = sizeMap[sizeCls] || 'w-20 h-20';
+                return `<div class="relative ${dims} flex items-center justify-center">${window.OceanCreatures.svg(id)}<div class="absolute bottom-1 right-1 text-[10px] sm:text-xs bg-black/60 rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center border border-white/30" title="Clue: ${emoji}">${emoji}</div></div>`;
+            }
             let svg = '';
             switch(id) {
                 case 'copepod': svg = '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="20" ry="35" fill="rgba(255,255,255,0.8)" stroke="#cbd5e1" stroke-width="2"/><circle cx="50" cy="25" r="4" fill="#ef4444"/><path d="M50 15 L20 40 M50 15 L80 40" stroke="#cbd5e1" stroke-width="3" fill="none"/></svg>'; break;

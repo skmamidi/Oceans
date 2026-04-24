@@ -24,6 +24,7 @@
     </script>
     
     <title>Adaptations | The Living Ocean</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <style>
         body{background-color:#134e4a;overflow-x:hidden;}
@@ -350,6 +351,32 @@
             'adapt-enzyme': ["Some trench animals have proteins that work best under pressure that would be dangerous for shallow-water animals.", "Deep-sea enzymes can stay flexible in cold, crushing water where ordinary enzymes might stop working well."]
         };
 
+        const adaptCreatureIds = {
+            'adapt-sealing': 'limpet',
+            'adapt-clinging': 'starfish',
+            'adapt-hiding': 'crab',
+            'adapt-maneuver': 'clownfish',
+            'adapt-camouflage': 'dumbo',
+            'adapt-symbiosis': 'coral',
+            'adapt-speed': 'tuna',
+            'adapt-countershading': 'shark',
+            'adapt-refraction': 'ctenophore',
+            'adapt-swimbladder': 'tuna',
+            'adapt-tubular': 'hatchetfish',
+            'adapt-counterillumination': 'lanternfish',
+            'adapt-omz': 'vampire',
+            'adapt-stasis': 'bristlemouth',
+            'adapt-lures': 'anglerfish',
+            'adapt-polyandry': 'anglerfish',
+            'adapt-jaws': 'gulper',
+            'adapt-gelatinous': 'snailfish',
+            'adapt-gigantism': 'isopod',
+            'adapt-chemoreception': 'amphipod',
+            'adapt-stilts': 'tripod',
+            'adapt-no-gas': 'snailfish',
+            'adapt-enzyme': 'snailfish'
+        };
+
         function attachAdaptModals(){
             Object.keys(adaptData).forEach(id=>{
                 const el = document.getElementById(id);
@@ -357,12 +384,14 @@
                     el.onclick = () => {
                         const data = adaptData[id];
                         const zoneName = el.closest('.adapt-section').querySelector('.inline-block').innerText.split('•')[0].trim();
+                        const creatureId = adaptCreatureIds[id];
+                        const iconHtml = creatureId && window.OceanCreatures ? window.OceanCreatures.svg(creatureId) : `<span class="text-7xl drop-shadow-md relative z-10">${data.emoji}</span>`;
                         
                         const contentHtml = `
                             <div class="flex flex-col items-center text-center p-2 sm:p-4">
                                 <div class="relative w-40 h-40 mb-6 flex items-center justify-center bg-gradient-to-br from-teal-200 to-teal-500 rounded-3xl shadow-xl transform rotate-3 hover:rotate-0 transition-transform">
                                     <div class="absolute inset-2 bg-white rounded-2xl opacity-20"></div>
-                                    <span class="text-7xl drop-shadow-md relative z-10">${data.emoji}</span>
+                                    <div class="w-28 h-28 relative z-10">${iconHtml}</div>
                                 </div>
                                 <p class="text-lg md:text-xl text-gray-700 leading-relaxed font-medium">${data.info}</p>
                                 <div class="mt-6 w-full bg-teal-50 rounded-xl p-4 border border-teal-100 text-left shadow-inner">

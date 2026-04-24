@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Quest - Deep Sea Ecology Adventure</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -1491,6 +1492,33 @@ async function sendChat() {
 ========================================================================== */
 let dState = { zData: null, spIdx: 0 };
 
+const ECOLOGY_CREATURE_ALIASES = {
+    'Sea Lettuce': 'kelp',
+    'Acorn Barnacle': 'barnacle',
+    'Ochre Sea Star': 'starfish',
+    'Shore Crab': 'crab',
+    'Seagull': 'seagull',
+    'Giant Kelp': 'kelp',
+    'Purple Sea Urchin': 'urchin',
+    'Sea Otter': 'otter',
+    'Coastal Phyto': 'phytoplankton',
+    'Anchovy': 'anchovy',
+    'Phytoplankton': 'phytoplankton',
+    'Zooplankton': 'zooplankton',
+    'Bluefin Tuna': 'tuna',
+    'Great White Shark': 'shark',
+    'Lanternfish': 'lanternfish',
+    'Vampire Squid': 'vampire',
+    'Giant Isopod': 'isopod',
+    'Sea Cucumber': 'cucumber',
+    'Riftia Tubeworm': 'tubeworm'
+};
+
+function creatureSvgFor(name, emoji, className='w-full h-full') {
+    const id = ECOLOGY_CREATURE_ALIASES[name];
+    return id && window.OceanCreatures ? window.OceanCreatures.render(id, className) : emoji;
+}
+
 function openDiscover(id) {
     const z = ZONES_DATA.find(x => x.id === id);
     dState.zData = z;
@@ -1514,7 +1542,7 @@ function renderSpeciesCard() {
     document.getElementById('disc-content').innerHTML = `
         <div class="m-header">
             <div class="sp-count">Species ${dState.spIdx + 1} of ${z.species.length}</div>
-            <div class="sp-emoji">${sp.emoji}</div>
+            <div class="sp-emoji">${creatureSvgFor(sp.name, sp.emoji, 'w-28 h-28 mx-auto')}</div>
             <div class="m-title orbitron">${sp.name}</div>
             <div class="sp-roles">
                 <span class="pill cyan">${sp.role}</span>
@@ -1604,7 +1632,7 @@ function renderFoodWeb(z) {
         let pos = z.fw.nodes[i];
         return `
         <div class="fw-node" id="fwn-${i}" style="left:${pos.x}%; top:${pos.y}%;" onclick="fwClickNode(${i})">
-            <div class="fw-circle">${sp.emoji}</div>
+            <div class="fw-circle">${creatureSvgFor(sp.name, sp.emoji, 'w-12 h-12')}</div>
             <div class="fw-label">${sp.name}</div>
         </div>`;
     }).join('');
@@ -1949,7 +1977,7 @@ function openMasterWeb() {
             
             let nodeHtml = `
             <div class="fw-node" id="mfw-${zIdx}-${spIdx}" style="left:${pos.x}%; top:${topPx}px;" title="${sp.name}" onclick="mfwClickNode(${zIdx}, ${spIdx})">
-                <div class="fw-circle" style="width:48px; height:48px; font-size:1.5rem; border-color:${z.color}88; cursor:pointer;">${sp.emoji}</div>
+                <div class="fw-circle" style="width:48px; height:48px; font-size:1.5rem; border-color:${z.color}88; cursor:pointer;">${creatureSvgFor(sp.name, sp.emoji, 'w-9 h-9')}</div>
                 <div class="fw-label" style="font-size:0.55rem;">${sp.name}</div>
             </div>`;
             container.insertAdjacentHTML('beforeend', nodeHtml);

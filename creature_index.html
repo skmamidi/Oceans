@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creature Index | The Living Ocean</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="creature-data.js"></script>
+    <style>
+        body{background:#071827;color:#e5f7ff;font-family:Inter,system-ui,sans-serif;}
+        .creature-card{background:linear-gradient(180deg,rgba(15,47,72,.92),rgba(8,20,35,.96));border:1px solid rgba(125,211,252,.22);}
+        .creature-card:hover{border-color:rgba(125,211,252,.7);transform:translateY(-2px);}
+        .detail-chip{background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.25);}
+    </style>
+</head>
+<body>
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <header class="mb-8">
+            <div class="text-cyan-300 uppercase tracking-widest text-xs font-black mb-2">Creature Index</div>
+            <h1 class="text-4xl md:text-5xl font-black">All Ocean Creatures</h1>
+            <p class="text-slate-300 mt-3 max-w-3xl">A shared visual index of the unique animals used across the app. Click any card to see the combined facts in a consistent format.</p>
+        </header>
+
+        <section id="creature-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></section>
+    </main>
+
+    <div id="creature-modal" class="fixed inset-0 hidden z-50 bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="max-w-4xl mx-auto my-8 bg-slate-950 border border-cyan-500/30 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center justify-between border-b border-cyan-500/20 p-5">
+                <div>
+                    <h2 id="modal-name" class="text-3xl font-black text-white"></h2>
+                    <p id="modal-sci" class="text-cyan-300 italic"></p>
+                </div>
+                <button onclick="closeCreature()" class="text-3xl text-slate-300 hover:text-white">&times;</button>
+            </div>
+            <div class="grid md:grid-cols-[280px_1fr] gap-6 p-6">
+                <div class="rounded-2xl bg-gradient-to-br from-cyan-900/50 to-slate-900 border border-cyan-500/20 p-8 flex items-center justify-center min-h-64">
+                    <div id="modal-svg" class="w-56 h-56"></div>
+                </div>
+                <div id="modal-details" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function field(title, value) {
+            if(!value || (Array.isArray(value) && value.length === 0)) return '';
+            const content = Array.isArray(value) ? `<ul class="list-disc pl-5 space-y-1">${value.map(v=>`<li>${v}</li>`).join('')}</ul>` : value;
+            return `<section class="detail-chip rounded-xl p-4"><h3 class="text-cyan-200 uppercase tracking-wider text-xs font-black mb-2">${title}</h3><div class="text-slate-100 leading-relaxed">${content}</div></section>`;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('creature-grid');
+            grid.innerHTML = OceanCreatures.list().map(c => `
+                <button onclick="openCreature('${c.id}')" class="creature-card rounded-2xl p-5 text-left transition shadow-xl">
+                    <div class="h-48 rounded-xl bg-gradient-to-br from-sky-900/50 to-black flex items-center justify-center mb-4">
+                        <div class="w-36 h-36">${OceanCreatures.svg(c.svgKey || c.id)}</div>
+                    </div>
+                    <div class="font-black text-xl text-white">${c.name}</div>
+                    <div class="text-sm text-cyan-300 italic mt-1">${c.scientificName || '&nbsp;'}</div>
+                </button>
+            `).join('');
+        }
+
+        function openCreature(id) {
+            const c = OceanCreatures.creatures[id];
+            if(!c) return;
+            document.getElementById('modal-name').textContent = c.name;
+            document.getElementById('modal-sci').textContent = c.scientificName || '';
+            document.getElementById('modal-svg').innerHTML = OceanCreatures.svg(c.svgKey || c.id);
+            const dvm = c.dvm ? `Yes. Day: ${c.dvm.day}; Night: ${c.dvm.night}.` : 'Not shown as a diel vertical migrator in the app.';
+            document.getElementById('modal-details').innerHTML = [
+                field('Description', c.description),
+                field('Diet', c.diet),
+                field('Predators', c.predators),
+                field('Habitat Zone', c.habitatZone),
+                field('Adaptations Shown', c.adaptationsShown && c.adaptationsShown.length ? c.adaptationsShown : 'General body form, behavior, or ecological role shown in the app.'),
+                field('Diel Vertical Migration', dvm),
+                field('Fun Unique Facts', c.funFacts)
+            ].join('');
+            document.getElementById('creature-modal').classList.remove('hidden');
+        }
+
+        function closeCreature() {
+            document.getElementById('creature-modal').classList.add('hidden');
+        }
+
+        renderGrid();
+    </script>
+</body>
+</html>

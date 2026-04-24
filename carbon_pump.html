@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Pump Tycoon</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -390,14 +391,18 @@
         };
 
         const DEX_DB = {
-            phyto: { icon: '🦠', title: 'Phytoplankton', text: 'Microscopic plants that produce roughly 50% of the oxygen in Earth\'s atmosphere!' },
-            krill: { icon: '🦐', title: 'Krill', text: 'Tiny crustaceans that travel in massive swarms so large they can be seen from space.' },
-            lantern: { icon: '🐟', title: 'Lanternfish', text: 'These glowing fish are so abundant they make up 65% of all deep-sea fish biomass. They migrate to the surface at night to feed!' },
-            squid: { icon: '🦑', title: 'Vampire Squid', text: 'Despite the scary name, they don\'t drink blood! They live in the midnight zone and eat "marine snow" (dead matter) falling from above.' },
-            whalePump: { icon: '🐋', title: 'The Whale Pump', text: 'Whales feed in the deep but poop at the surface. Their nutrient-rich feces act as a massive fertilizer for phytoplankton!' },
+            phyto: { icon: '🦠', creatureId: 'phytoplankton', title: 'Phytoplankton', text: 'Microscopic plants that produce roughly 50% of the oxygen in Earth\'s atmosphere!' },
+            krill: { icon: '🦐', creatureId: 'krill', title: 'Krill', text: 'Tiny crustaceans that travel in massive swarms so large they can be seen from space.' },
+            lantern: { icon: '🐟', creatureId: 'lanternfish', title: 'Lanternfish', text: 'These glowing fish are so abundant they make up 65% of all deep-sea fish biomass. They migrate to the surface at night to feed!' },
+            squid: { icon: '🦑', creatureId: 'vampire', title: 'Vampire Squid', text: 'Despite the scary name, they don\'t drink blood! They live in the midnight zone and eat "marine snow" (dead matter) falling from above.' },
+            whalePump: { icon: '🐋', creatureId: 'bluewhale', title: 'The Whale Pump', text: 'Whales feed in the deep but poop at the surface. Their nutrient-rich feces act as a massive fertilizer for phytoplankton!' },
             whaleFall: { icon: '🦴', title: 'Whale Fall', text: 'When a massive whale dies and sinks, its carcass can sustain localized deep-sea ecosystems for decades!' },
             heatwave: { icon: '🔥', title: 'Marine Heatwave', text: 'Periods of unusually high ocean temperatures. They severely stress marine life, causing coral bleaching and slowing down the biological pump.' }
         };
+
+        function dexIcon(data, className = 'w-12 h-12') {
+            return data.creatureId && window.OceanCreatures ? window.OceanCreatures.render(data.creatureId, className) : `<span class="text-4xl">${data.icon}</span>`;
+        }
 
         // --- MATH & PRICING ---
         const getPhytoCost = () => Math.floor(10 * Math.pow(1.15, state.phyto));
@@ -474,7 +479,7 @@
                 if (unlocked) {
                     card.className = "bg-slate-700/50 border border-indigo-500/30 p-4 rounded-xl flex gap-4 items-start hover:bg-slate-700 transition-colors";
                     card.innerHTML = `
-                        <div class="text-4xl bg-indigo-900/50 p-2 rounded-lg">${data.icon}</div>
+                        <div class="bg-indigo-900/50 p-2 rounded-lg shrink-0">${dexIcon(data)}</div>
                         <div>
                             <h4 class="font-bold text-indigo-300 text-lg">${data.title}</h4>
                             <p class="text-xs text-slate-300 mt-1 leading-relaxed">${data.text}</p>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ocean Gradients | The Living Ocean</title>
+    <script src="creature-data.js"></script>
     <script src="badge-system.js"></script>
     <meta name="description" content="An interactive, immersive educational experience exploring the different gradients and layers of the ocean.">
     
@@ -615,7 +616,7 @@
     <div id="creature-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity">
         <div class="glass-panel border-2 border-cyan-400 rounded-3xl p-8 max-w-sm w-11/12 text-center anim-pop relative shadow-[0_0_50px_rgba(34,211,238,0.2)]">
             <button onclick="closeCreatureFact()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
-            <div class="text-7xl mb-4" id="creature-modal-emoji">🐟</div>
+            <div class="w-28 h-28 mx-auto mb-4" id="creature-modal-emoji">🐟</div>
             <h3 class="text-3xl font-heading font-black text-cyan-300 mb-2" id="creature-modal-title">Name</h3>
             <p class="text-gray-300 mb-6" id="creature-modal-desc">Fact goes here.</p>
             <button onclick="closeCreatureFact()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-8 rounded-full shadow-lg transition">Awesome!</button>
@@ -652,15 +653,27 @@
 
         /* --- CREATURE DEX LOGIC --- */
         const creatureData = {
-            'turtle': { name: 'Leatherback Turtle', emoji: '🐢', facts: 'Sea turtles love the Mixed Layer where they can breathe air and hunt for jellyfish!' },
-            'shark': { name: 'Deep Diving Shark', emoji: '🦈', facts: 'Many sharks dive right through the icy Thermocline to hunt deep-sea prey.' },
-            'dolphin': { name: 'Bottlenose Dolphin', emoji: '🐬', facts: 'Dolphins are mammals that stick near the surface but can hold their breath to dive deep!' },
-            'squid': { name: 'Vampire Squid', emoji: '🦑', facts: 'They hide out in the Oxycline where oxygen is so low that their predators cannot follow!' },
-            'crab': { name: 'Deep Sea Crab', emoji: '🦀', facts: 'Crabs feast on the falling organic matter (marine snow) collecting in the Nutricline.' },
-            'lanternfish': { name: 'Lanternfish', emoji: '🐠', facts: 'They migrate up at night and hide in the pitch-black Deep Scattering Layer by day.' },
-            'tubeworm': { name: 'Giant Tubeworm', emoji: '🪱', facts: 'They survive toxic hydrogen sulfide in the Chemocline by teaming up with special bacteria!' },
-            'angler': { name: 'Anglerfish', emoji: '🐡', facts: 'They use a glowing lure attached to their head to attract prey in the total darkness!' }
+            'turtle': { name: 'Leatherback Turtle', emoji: '🐢', creatureId: 'turtle', facts: 'Sea turtles love the Mixed Layer where they can breathe air and hunt for jellyfish!' },
+            'shark': { name: 'Deep Diving Shark', emoji: '🦈', creatureId: 'shark', facts: 'Many sharks dive right through the icy Thermocline to hunt deep-sea prey.' },
+            'dolphin': { name: 'Bottlenose Dolphin', emoji: '🐬', creatureId: 'dolphin', facts: 'Dolphins are mammals that stick near the surface but can hold their breath to dive deep!' },
+            'squid': { name: 'Vampire Squid', emoji: '🦑', creatureId: 'vampire', facts: 'They hide out in the Oxycline where oxygen is so low that their predators cannot follow!' },
+            'crab': { name: 'Deep Sea Crab', emoji: '🦀', creatureId: 'crab', facts: 'Crabs feast on the falling organic matter (marine snow) collecting in the Nutricline.' },
+            'lanternfish': { name: 'Lanternfish', emoji: '🐠', creatureId: 'lanternfish', facts: 'They migrate up at night and hide in the pitch-black Deep Scattering Layer by day.' },
+            'tubeworm': { name: 'Giant Tubeworm', emoji: '🪱', creatureId: 'tubeworm', facts: 'They survive toxic hydrogen sulfide in the Chemocline by teaming up with special bacteria!' },
+            'angler': { name: 'Anglerfish', emoji: '🐡', creatureId: 'anglerfish', facts: 'They use a glowing lure attached to their head to attract prey in the total darkness!' }
         };
+
+        function creatureIcon(id, className = 'w-full h-full') {
+            const c = creatureData[id];
+            return c?.creatureId && window.OceanCreatures ? window.OceanCreatures.render(c.creatureId, className) : c?.emoji || '🐟';
+        }
+
+        function hydrateHiddenCreatures() {
+            document.querySelectorAll('.hidden-creature').forEach(el => {
+                const match = (el.getAttribute('onclick') || '').match(/collectCreature\('([^']+)'/);
+                if(match && creatureData[match[1]]) el.innerHTML = creatureIcon(match[1], 'w-10 h-10');
+            });
+        }
 
         function initDex() {
             const container = document.getElementById('creature-dex');
@@ -672,7 +685,7 @@
         
         function showCreatureFact(id) {
             const c = creatureData[id];
-            document.getElementById('creature-modal-emoji').innerText = c.emoji;
+            document.getElementById('creature-modal-emoji').innerHTML = creatureIcon(id);
             document.getElementById('creature-modal-title').innerText = c.name;
             document.getElementById('creature-modal-desc').innerText = c.facts;
             document.getElementById('creature-modal').classList.remove('hidden');
@@ -694,7 +707,7 @@
 
                 // Update Dex UI to be clickable buttons
                 const slot = document.getElementById(`dex-slot-${foundCreatures.length - 1}`);
-                slot.innerHTML = `<button onclick="showCreatureFact('${id}')" class="w-full h-full flex items-center justify-center text-2xl hover:scale-110 transition" title="${creatureData[id].name}">${creatureData[id].emoji}</button>`;
+                slot.innerHTML = `<button onclick="showCreatureFact('${id}')" class="w-full h-full flex items-center justify-center hover:scale-110 transition" title="${creatureData[id].name}">${creatureIcon(id, 'w-8 h-8')}</button>`;
                 slot.classList.remove('opacity-50', 'text-gray-600', 'border-gray-600');
                 slot.classList.add('border-cyan-400', 'bg-cyan-900/40', 'anim-pop');
                 
@@ -1175,6 +1188,7 @@
 
         /* --- INITIALIZATION --- */
         window.onload = () => {
+            hydrateHiddenCreatures();
             initDex();
             createBubbles(); // Generates organic bubbles now
             loadQuiz();
