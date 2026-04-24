@@ -76,41 +76,41 @@
                     <div class="text-center mb-5">
                         <div class="inline-block bg-cyan-500/15 text-cyan-200 font-bold px-4 py-1 rounded-full mb-3 text-sm border border-cyan-300/30"><i class="fa-solid fa-code"></i> Biological Programming Lab</div>
                         <h2 class="text-3xl md:text-5xl font-heading font-black text-white">Bioluminescence Coding</h2>
-                        <p class="text-sm md:text-base text-cyan-100/75 max-w-4xl mx-auto mt-2">Write a light-organ program using ATP-limited biological commands. Match the right pattern for camouflage, alarm, decoy defense, species signaling, or prey capture.</p>
+                        <p class="text-sm md:text-base text-cyan-100/75 max-w-4xl mx-auto mt-2">Build a deep-sea light pattern. Spend your animal's ATP energy wisely to hide, warn, trick, talk, or hunt.</p>
                     </div>
                     <div class="grid xl:grid-cols-12 gap-4 bc-panel rounded-3xl p-3 sm:p-4">
                         <aside class="xl:col-span-4 space-y-4">
                             <div class="rounded-2xl border border-cyan-300/15 bg-slate-950/60 p-4">
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
-                                        <p class="text-xs uppercase tracking-[0.22em] text-cyan-200 font-black">Scenario</p>
-                                        <h4 id="bc-title" class="font-black text-white text-2xl mt-1">Scenario</h4>
+                                        <p class="text-xs uppercase tracking-[0.22em] text-cyan-200 font-black">Challenge</p>
+                                        <h4 id="bc-title" class="font-black text-white text-2xl mt-1">Challenge</h4>
                                     </div>
                                     <div class="text-right text-xs text-slate-400">Level<br><span id="bc-level-count" class="text-cyan-200 font-black">1/5</span></div>
                                 </div>
                                 <p id="bc-desc" class="text-cyan-100/85 text-sm mt-3 leading-relaxed"></p>
                                 <div class="grid grid-cols-3 gap-2 mt-4">
-                                    <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">ATP</div><div id="bc-atp-text" class="text-xl font-mono text-cyan-200">0 / 5</div></div>
-                                    <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Cost</div><div id="bc-cost-text" class="text-xl font-mono text-yellow-200">0</div></div>
+                                    <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Energy Left</div><div id="bc-atp-text" class="text-xl font-mono text-cyan-200">0 / 5</div></div>
+                                    <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Energy Used</div><div id="bc-cost-text" class="text-xl font-mono text-yellow-200">0</div></div>
                                     <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Goal</div><div id="bc-goal-text" class="text-sm font-black text-emerald-200">Pattern</div></div>
                                 </div>
                             </div>
 
                             <div class="rounded-2xl border border-cyan-300/15 bg-slate-950/60 p-4">
                                 <div class="flex justify-between items-end mb-2">
-                                    <h4 class="text-sm font-bold text-gray-300 uppercase tracking-widest">Program Stack</h4>
+                                    <h4 class="text-sm font-bold text-gray-300 uppercase tracking-widest">My Light Pattern</h4>
                                     <button onclick="showHint()" class="text-xs text-cyan-200 hover:text-white font-bold"><i class="fa-solid fa-lightbulb"></i> Hint</button>
                                 </div>
-                                <div id="bc-sequence-box" class="min-h-[76px] bg-black/70 border-2 border-dashed border-cyan-800 rounded-2xl p-3 flex flex-wrap gap-2 items-center"><span class="text-gray-600 font-mono text-sm">awaiting_input...</span></div>
+                                <div id="bc-sequence-box" class="min-h-[76px] bg-black/70 border-2 border-dashed border-cyan-800 rounded-2xl p-3 flex flex-wrap gap-2 items-center"><span class="text-gray-600 text-sm font-bold">choose a light move...</span></div>
                                 <div class="grid grid-cols-2 gap-2 mt-3">
                                     <button onclick="undoBioCode()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition active:scale-95"><i class="fa-solid fa-rotate-left"></i> Undo</button>
                                     <button onclick="clearBioCode()" class="bg-red-900/50 hover:bg-red-800/80 text-red-100 font-bold py-3 rounded-xl transition border border-red-700/50 active:scale-95">Clear</button>
-                                    <button onclick="executeBioCode()" class="col-span-2 bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-xl transition shadow-[0_0_20px_rgba(8,145,178,0.45)] active:scale-95"><i class="fa-solid fa-play"></i> Execute Program</button>
+                                    <button onclick="executeBioCode()" class="col-span-2 bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-xl transition shadow-[0_0_20px_rgba(8,145,178,0.45)] active:scale-95"><i class="fa-solid fa-play"></i> Test My Pattern</button>
                                 </div>
                             </div>
 
                             <div class="rounded-2xl border border-cyan-300/15 bg-slate-950/60 p-4">
-                                <h4 class="text-sm font-bold text-gray-300 uppercase tracking-widest mb-2">Light Organ Commands</h4>
+                                <h4 class="text-sm font-bold text-gray-300 uppercase tracking-widest mb-2">Choose Light Moves</h4>
                                 <div class="grid sm:grid-cols-2 xl:grid-cols-1 gap-2" id="bc-btn-container"></div>
                             </div>
                         </aside>
@@ -118,11 +118,11 @@
                         <main class="xl:col-span-8">
                             <div class="bc-stage rounded-3xl border border-slate-700 relative overflow-hidden shadow-2xl">
                                 <div class="absolute left-4 top-4 z-20 rounded-2xl bg-black/55 border border-cyan-300/15 p-3 backdrop-blur-md">
-                                    <span class="text-[10px] text-cyan-100 uppercase tracking-widest block font-bold mb-1">Organism</span>
+                                    <span class="text-[10px] text-cyan-100 uppercase tracking-widest block font-bold mb-1">Your Animal</span>
                                     <div id="bc-player-name" class="text-sm text-white font-black">Lanternfish</div>
                                 </div>
                                 <div class="absolute top-4 right-4 bg-red-950/60 border border-red-400/40 p-3 rounded-2xl text-center z-20 backdrop-blur-md">
-                                    <span class="text-[10px] text-red-200 uppercase tracking-widest block font-bold mb-1">Biological Contact</span>
+                                    <span class="text-[10px] text-red-200 uppercase tracking-widest block font-bold mb-1">Nearby Animal</span>
                                     <div id="bc-threat-wrap" class="threat-radar w-20 h-20 mx-auto"></div>
                                     <span id="bc-threat-name" class="text-xs text-red-100 font-mono block mt-1">Great White</span>
                                 </div>
@@ -135,8 +135,8 @@
                                     <h3 id="bc-res-title" class="text-4xl font-black text-white mb-4"></h3>
                                     <div id="bc-res-desc" class="text-gray-300 text-base sm:text-lg max-w-3xl mb-8"></div>
                                     <div class="flex flex-wrap justify-center gap-3">
-                                        <button id="bc-next-btn" onclick="nextBioLevel()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 py-3 rounded-full transition hidden shadow-lg">Next Scenario</button>
-                                        <button id="bc-retry-btn" onclick="retryBioLevel()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold px-8 py-3 rounded-full transition hidden">Rewrite & Retry</button>
+                                        <button id="bc-next-btn" onclick="nextBioLevel()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 py-3 rounded-full transition hidden shadow-lg">Next Challenge</button>
+                                        <button id="bc-retry-btn" onclick="retryBioLevel()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold px-8 py-3 rounded-full transition hidden">Change My Pattern</button>
                                     </div>
                                 </div>
                                 <div id="biocode-victory" class="hidden absolute inset-0 bg-cyan-950/95 z-40 flex flex-col items-center justify-center p-6 text-center"><i class="fa-solid fa-code text-6xl text-cyan-300 mb-4"></i><h2 class="text-4xl font-black text-white">Master Bioluminescence Coder!</h2><p class="text-cyan-100 mt-3 max-w-lg">You translated real deep-sea light behaviors into working biological programs.</p></div>
@@ -154,19 +154,19 @@
 
         let currentBioLevel=0, currentBioSequence=[], currentATP=0, runningBioCode=false;
         const bioCmds=[
-            {id:'BELLY',n:'ventral.photophores()',d:'Counter-illumination: match faint downwelling light.',c:1,icon:'fa-circle-half-stroke'},
-            {id:'FLASH',n:'strobe.full_body()',d:'Bright alarm/startle flash from all light organs.',c:2,icon:'fa-bolt'},
-            {id:'LURE',n:'esca.pulse()',d:'Anglerfish-style lure pulse to attract prey.',c:1,icon:'fa-fish'},
-            {id:'TAIL',n:'tail.beacon()',d:'Short caudal signal for species communication.',c:1,icon:'fa-signal'},
-            {id:'CLOUD',n:'mucus.decoy_cloud()',d:'Release glowing mucus as a defensive decoy.',c:2,icon:'fa-cloud'},
-            {id:'DIM',n:'dim.output()',d:'Lower brightness to conserve ATP and avoid detection.',c:1,icon:'fa-lightbulb'}
+            {id:'BELLY',n:'Belly Glow',code:'ventral photophores',d:'Light up the belly to hide your shadow from hunters below.',c:1,icon:'fa-circle-half-stroke'},
+            {id:'FLASH',n:'Big Flash',code:'full-body strobe',d:'Send a bright warning flash that can startle or call attention.',c:2,icon:'fa-bolt'},
+            {id:'LURE',n:'Wiggle Lure',code:'esca pulse',d:'Blink the anglerfish lure so curious prey swims closer.',c:1,icon:'fa-fish'},
+            {id:'TAIL',n:'Tail Signal',code:'tail beacon',d:'Send a small tail light message to another animal like you.',c:1,icon:'fa-signal'},
+            {id:'CLOUD',n:'Glow Cloud',code:'mucus decoy cloud',d:'Make a glowing fake target so a predator attacks the wrong spot.',c:2,icon:'fa-cloud'},
+            {id:'DIM',n:'Dim Lights',code:'low-power glow',d:'Turn the lights down to save energy and stay harder to spot.',c:1,icon:'fa-lightbulb'}
         ];
         const bioLevels=[
-            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Camouflage',target:['BELLY','DIM'],desc:"A shark is below you. Erase your silhouette with counter-illumination, then dim output to avoid over-glowing.",hint:'Use ventral photophores, then dim.',successMsg:'Perfect: your belly matched the surface glow without wasting ATP.',why:'A lanternfish needs belly lights first so its dark body shadow disappears when a predator looks up. Then it dims so it does not look like a bright snack.'},
-            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Alarm',target:['FLASH','FLASH','FLASH'],desc:'A predator grabs you. Fire a repeated alarm display to attract something larger toward the attacker.',hint:'Use three full-body strobes.',successMsg:'The alarm sequence worked: the attacker fled as the larger animal approached.',why:'The jellyfish is not trying to hide. It needs a loud light alarm, repeated enough times for a bigger animal to notice the attacker.'},
-            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Decoy',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Release a glowing mucus decoy, then go dark while it attacks the cloud.',hint:'Deploy the cloud, then dim.',successMsg:'The glowing cloud drew the strike while your real body vanished into the dark.',why:'The squid needs to make a fake glowing target first. After the decoy appears, dimming helps the real squid disappear.'},
-            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey is too expensive. Twitch the lure, pause low, and pulse again.",hint:'Pulse lure, conserve, pulse lure.',successMsg:'The prey followed the twitching esca close enough for an ambush.',why:'An anglerfish lure works best like a tiny blinking bait. A pause keeps the prey curious and saves energy before the next pulse.'},
-            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Communication',target:['TAIL','FLASH','TAIL'],desc:'You need a species-specific courtship code. Send a tail beacon, a flash marker, then repeat the tail cue.',hint:'Tail, flash, tail.',successMsg:'Your pulse pattern matched the species code and the receiver answered.',why:'Some animals use light like a password. The receiver is looking for the right order, not just any bright flash.'}
+            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Hide',target:['BELLY','DIM'],desc:"A shark is looking up from below. Use belly light to erase your shadow, then turn the glow down so you do not shine too brightly.",hint:'Try Belly Glow, then Dim Lights.',successMsg:'It worked! Your belly glow matched the faint surface light, and dimming saved energy.',why:'A lanternfish needs belly lights first so its dark body shadow disappears when a predator looks up. Then it dims so it does not look like a bright snack.'},
+            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Warn',target:['FLASH','FLASH','FLASH'],desc:'A predator grabbed you. Send repeated bright flashes to call a bigger animal toward the attacker.',hint:'Try Big Flash three times.',successMsg:'It worked! The repeated alarm flashes made the attacker flee as a larger animal came closer.',why:'The jellyfish is not trying to hide. It needs a loud light alarm, repeated enough times for a bigger animal to notice the attacker.'},
+            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Trick',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Make a glowing fake target, then turn your own lights down while the predator attacks the decoy.',hint:'Try Glow Cloud, then Dim Lights.',successMsg:'It worked! The glowing cloud pulled the attack away while your real body faded into the dark.',why:'The squid needs to make a fake glowing target first. After the decoy appears, dimming helps the real squid disappear.'},
+            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey wastes energy. Blink the lure, pause in the dark, then blink it again.",hint:'Try Wiggle Lure, Dim Lights, Wiggle Lure.',successMsg:'It worked! The prey followed the blinking lure close enough for an ambush.',why:'An anglerfish lure works best like a tiny blinking bait. A pause keeps the prey curious and saves energy before the next pulse.'},
+            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Talk',target:['TAIL','FLASH','TAIL'],desc:'You need a special light password for your own species. Send a tail signal, a flash marker, then the tail signal again.',hint:'Try Tail Signal, Big Flash, Tail Signal.',successMsg:'It worked! The receiver recognized your light password and answered.',why:'Some animals use light like a password. The receiver is looking for the right order, not just any bright flash.'}
         ];
         function creatureMarkup(id,label){
             const svg=window.OceanCreatures?.render(id,'w-full h-full')||'<div class="text-6xl">🐟</div>';
@@ -174,7 +174,7 @@
         }
         function renderBioCodeButtons(){
             const c=document.getElementById('bc-btn-container');
-            c.innerHTML=bioCmds.map(cmd=>`<button id="cmd-${cmd.id}" onclick="addBioCode('${cmd.id}')" class="command-btn"><div class="flex items-start justify-between gap-3"><div><div class="font-mono text-sm text-cyan-100"><i class="fa-solid ${cmd.icon} text-cyan-300 mr-2"></i>${cmd.n}</div><div class="text-xs text-slate-400 mt-1">${cmd.d}</div></div><div class="shrink-0 bg-black/45 border border-cyan-300/20 px-2 py-1 rounded-lg text-cyan-200 text-xs font-black">-${cmd.c}</div></div></button>`).join('');
+            c.innerHTML=bioCmds.map(cmd=>`<button id="cmd-${cmd.id}" onclick="addBioCode('${cmd.id}')" class="command-btn"><div class="flex items-start justify-between gap-3"><div><div class="text-base font-black text-cyan-50"><i class="fa-solid ${cmd.icon} text-cyan-300 mr-2"></i>${cmd.n}</div><div class="text-[11px] text-cyan-200/70 mt-1 font-bold uppercase tracking-wider">Science name: ${cmd.code}</div><div class="text-xs text-slate-300 mt-1">${cmd.d}</div></div><div class="shrink-0 bg-black/45 border border-cyan-300/20 px-2 py-1 rounded-lg text-cyan-200 text-xs font-black">-${cmd.c}</div></div></button>`).join('');
         }
         function loadBioLevel(){
             if(currentBioLevel>=bioLevels.length){document.getElementById('biocode-victory').classList.remove('hidden');awardBadge();confetti();return;}
@@ -196,9 +196,9 @@
             clearBioCode();
         }
         function commandCost(id){return bioCmds.find(c=>c.id===id)?.c||0;}
-        function commandName(id){return bioCmds.find(c=>c.id===id)?.n.replace(/\(\)/g,'')||id;}
+        function commandName(id){return bioCmds.find(c=>c.id===id)?.n||id;}
         function friendlyCommand(id){
-            return {BELLY:'turn on belly lights',FLASH:'make a bright full-body flash',LURE:'pulse the lure',TAIL:'send a tail beacon',CLOUD:'release a glowing decoy cloud',DIM:'dim the lights'}[id]||commandName(id);
+            return {BELLY:'turn on Belly Glow',FLASH:'make a Big Flash',LURE:'wiggle the lure',TAIL:'send a Tail Signal',CLOUD:'make a Glow Cloud',DIM:'Dim Lights'}[id]||commandName(id);
         }
         function stepPills(seq,missing=false){
             if(!seq.length)return '<span class="bc-step-pill missing">no light commands yet</span>';
@@ -247,8 +247,8 @@
             document.getElementById('bc-atp-text').innerText=`${Math.max(0,5-currentATP)} / 5`;
             document.getElementById('bc-cost-text').innerText=currentATP;
             const b=document.getElementById('bc-sequence-box');
-            if(currentBioSequence.length===0)b.innerHTML='<span class="text-gray-600 font-mono text-sm">awaiting_input...</span>';
-            else b.innerHTML=currentBioSequence.map((id,i)=>`<span class="code-chip"><span class="text-cyan-300">${String(i+1).padStart(2,'0')}</span>${bioCmds.find(c=>c.id===id)?.n||id}</span>`).join('<i class="fa-solid fa-arrow-right text-cyan-800 text-xs"></i>');
+            if(currentBioSequence.length===0)b.innerHTML='<span class="text-gray-600 text-sm font-bold">choose a light move...</span>';
+            else b.innerHTML=currentBioSequence.map((id,i)=>`<span class="code-chip"><span class="text-cyan-300">${String(i+1).padStart(2,'0')}</span>${commandName(id)}</span>`).join('<i class="fa-solid fa-arrow-right text-cyan-800 text-xs"></i>');
             bioCmds.forEach(cmd=>{const el=document.getElementById('cmd-'+cmd.id);if(el)el.disabled=currentATP+cmd.c>5;});
         }
         function resetLightStage(){
@@ -293,7 +293,7 @@
             const lvl=bioLevels[currentBioLevel], ok=JSON.stringify(lvl.target)===JSON.stringify(currentBioSequence);
             const o=document.getElementById('bc-result-overlay');o.classList.remove('hidden');
             if(ok){
-                document.getElementById('bc-res-title').innerText='Program Accepted';
+                document.getElementById('bc-res-title').innerText='It Worked!';
                 document.getElementById('bc-res-title').className='text-4xl font-black text-green-400 mb-4';
                 document.getElementById('bc-res-desc').innerText=lvl.successMsg;
                 document.getElementById('bc-next-btn').classList.remove('hidden');
@@ -310,7 +310,7 @@
             }
             renderBioCodeBox();
         }
-        function showHint(){openModal('Bio-Code Hint','💡',`<p class="font-medium text-gray-700">${bioLevels[currentBioLevel].hint}</p><p class="mt-4 text-sm text-gray-500">ATP is a real biological energy budget here: correct but wasteful light can still fail.</p>`);}
+        function showHint(){openModal('Light Pattern Hint','💡',`<p class="font-medium text-gray-700">${bioLevels[currentBioLevel].hint}</p><p class="mt-4 text-sm text-gray-500">ATP is the animal's tiny energy budget. A bright or extra light move can waste energy, even if it looks cool.</p>`);}
         function nextBioLevel(){document.getElementById('bc-result-overlay').classList.add('hidden');currentBioLevel++;loadBioLevel();}
         function retryBioLevel(){document.getElementById('bc-result-overlay').classList.add('hidden');clearBioCode();}
         window.onload = () => { renderBioCodeButtons(); loadBioLevel(); };
