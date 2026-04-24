@@ -174,8 +174,25 @@
     <nav id="app-nav" class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-md border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center gap-3">
-                <div class="flex items-center space-x-2 text-ocean-sunlight font-heading font-bold text-xl flex-shrink-0">
-                    <i class="fa-solid fa-water"></i><span class="hidden sm:inline">OceanExplorer</span>
+                <div class="relative flex-shrink-0">
+                    <button type="button" id="nav-menu-btn" onclick="toggleNavDropdown()" class="flex items-center space-x-2 text-ocean-sunlight font-heading font-bold text-xl focus:outline-none">
+                        <i class="fa-solid fa-water"></i><span class="hidden sm:inline">OceanExplorer</span><i class="fa-solid fa-chevron-down text-sm ml-1"></i>
+                    </button>
+                    <div id="nav-dropdown" class="hidden absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-[60] overflow-hidden">
+                        <button onclick="switchTab('zones'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-layer-group w-5 text-center"></i> Zones</button>
+                        <button onclick="switchTab('adaptations'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-dna w-5 text-center"></i> Adaptations</button>
+                        <button onclick="switchTab('migration'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-sort w-5 text-center"></i> Diel Vertical Migration</button>
+                        <button onclick="switchTab('gradients'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-chart-bar w-5 text-center"></i> Gradients</button>
+                        <button onclick="switchTab('lab'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-flask w-5 text-center"></i> Bio-Lab</button>
+                        <button onclick="switchTab('pressure'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compress w-5 text-center"></i> Pressure</button>
+                        <button onclick="switchTab('foodweb'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-network-wired w-5 text-center"></i> Ecology</button>
+                        <button onclick="switchTab('biocode'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-code w-5 text-center"></i> Bio-Code</button>
+                        <button onclick="switchTab('study'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-book-open w-5 text-center"></i> Study</button>
+                        <button onclick="switchTab('bathymetry'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-map w-5 text-center"></i> Bathymetry</button>
+                        <button onclick="switchTab('carbonpump'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-leaf w-5 text-center"></i> Carbon Pump</button>
+                        <button onclick="switchTab('plankton'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-microscope w-5 text-center"></i> Plankton</button>
+                        <button onclick="switchTab('creatures'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-fish w-5 text-center"></i> Creatures</button>
+                    </div>
                 </div>
                 <div class="hidden lg:block flex-1 min-w-0">
                     <div class="flex items-center gap-1 font-bold text-sm overflow-x-auto nav-scroll-x whitespace-nowrap">
@@ -325,6 +342,17 @@
             document.documentElement.style.setProperty('--shell-nav-height', `${nav.offsetHeight}px`);
             document.documentElement.style.setProperty('--shell-viewport-height', `${viewportHeight}px`);
         }
+        function toggleNavDropdown() {
+            const d = document.getElementById('nav-dropdown');
+            if (d) d.classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const btn = document.getElementById('nav-menu-btn');
+            const drop = document.getElementById('nav-dropdown');
+            if (drop && !drop.classList.contains('hidden') && btn && !btn.contains(e.target) && !drop.contains(e.target)) {
+                drop.classList.add('hidden');
+            }
+        });
 
         let currentGradQ=0, cardsFlipped=0, currentHullIndex=0, migProgress=0, currentBioLevel=0, currentBioSequence=[], currentATP=0;
         let ecologyWins=[false,false,false,false,false,false];
