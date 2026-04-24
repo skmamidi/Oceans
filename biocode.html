@@ -44,6 +44,12 @@
         .dot-tail.active{background:#c4b5fd;box-shadow:0 0 18px 5px #8b5cf6;}
         .dot-flash.active{background:#fff;box-shadow:0 0 32px 12px #fff;}
         .bc-wave{position:absolute;border:2px solid rgba(125,211,252,.8);border-radius:999px;animation:bc-wave 1.1s ease-out forwards;z-index:10;}
+        .bc-feedback{max-width:760px;width:min(100%,760px);text-align:left;}
+        .bc-feedback-card{background:rgba(15,23,42,.78);border:1px solid rgba(125,211,252,.18);border-radius:1.25rem;padding:1rem;}
+        .bc-feedback-card strong{color:#e0f2fe;}
+        .bc-step-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem;}
+        .bc-step-pill{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;background:rgba(8,47,73,.75);border:1px solid rgba(125,211,252,.22);padding:.35rem .65rem;color:#cffafe;font-size:.88rem;font-weight:800;}
+        .bc-step-pill.missing{background:rgba(127,29,29,.52);border-color:rgba(248,113,113,.45);color:#fecaca;}
         @keyframes bc-wave{from{opacity:.9;transform:translate(-50%,-50%) scale(.15);}to{opacity:0;transform:translate(-50%,-50%) scale(2.4);}}
         @keyframes drift{0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(-1deg);}50%{transform:translate(-50%,-50%) translateY(-10px) rotate(1deg);}}
         .player-card{animation:drift 5s ease-in-out infinite;}
@@ -125,9 +131,9 @@
                                 <div id="bc-photophores" class="absolute inset-0 pointer-events-none z-20"></div>
                                 <div id="bc-clouds" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
                                 <div id="bc-wave-layer" class="absolute inset-0 pointer-events-none z-10"></div>
-                                <div id="bc-result-overlay" class="hidden absolute inset-0 bg-black/95 z-30 flex flex-col items-center justify-center p-8 text-center backdrop-blur-md">
+                                <div id="bc-result-overlay" class="hidden absolute inset-0 bg-black/95 z-30 flex flex-col items-center justify-start sm:justify-center p-5 sm:p-8 text-center backdrop-blur-md overflow-y-auto">
                                     <h3 id="bc-res-title" class="text-4xl font-black text-white mb-4"></h3>
-                                    <p id="bc-res-desc" class="text-gray-300 text-lg max-w-xl mb-8"></p>
+                                    <div id="bc-res-desc" class="text-gray-300 text-base sm:text-lg max-w-3xl mb-8"></div>
                                     <div class="flex flex-wrap justify-center gap-3">
                                         <button id="bc-next-btn" onclick="nextBioLevel()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 py-3 rounded-full transition hidden shadow-lg">Next Scenario</button>
                                         <button id="bc-retry-btn" onclick="retryBioLevel()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold px-8 py-3 rounded-full transition hidden">Rewrite & Retry</button>
@@ -156,11 +162,11 @@
             {id:'DIM',n:'dim.output()',d:'Lower brightness to conserve ATP and avoid detection.',c:1,icon:'fa-lightbulb'}
         ];
         const bioLevels=[
-            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Camouflage',target:['BELLY','DIM'],desc:"A shark is below you. Erase your silhouette with counter-illumination, then dim output to avoid over-glowing.",hint:'Use ventral photophores, then dim.',successMsg:'Perfect: your belly matched the surface glow without wasting ATP.'},
-            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Alarm',target:['FLASH','FLASH','FLASH'],desc:'A predator grabs you. Fire a repeated alarm display to attract something larger toward the attacker.',hint:'Use three full-body strobes.',successMsg:'The alarm sequence worked: the attacker fled as the larger animal approached.'},
-            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Decoy',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Release a glowing mucus decoy, then go dark while it attacks the cloud.',hint:'Deploy the cloud, then dim.',successMsg:'The glowing cloud drew the strike while your real body vanished into the dark.'},
-            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey is too expensive. Twitch the lure, pause low, and pulse again.",hint:'Pulse lure, conserve, pulse lure.',successMsg:'The prey followed the twitching esca close enough for an ambush.'},
-            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Communication',target:['TAIL','FLASH','TAIL'],desc:'You need a species-specific courtship code. Send a tail beacon, a flash marker, then repeat the tail cue.',hint:'Tail, flash, tail.',successMsg:'Your pulse pattern matched the species code and the receiver answered.'}
+            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Camouflage',target:['BELLY','DIM'],desc:"A shark is below you. Erase your silhouette with counter-illumination, then dim output to avoid over-glowing.",hint:'Use ventral photophores, then dim.',successMsg:'Perfect: your belly matched the surface glow without wasting ATP.',why:'A lanternfish needs belly lights first so its dark body shadow disappears when a predator looks up. Then it dims so it does not look like a bright snack.'},
+            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Alarm',target:['FLASH','FLASH','FLASH'],desc:'A predator grabs you. Fire a repeated alarm display to attract something larger toward the attacker.',hint:'Use three full-body strobes.',successMsg:'The alarm sequence worked: the attacker fled as the larger animal approached.',why:'The jellyfish is not trying to hide. It needs a loud light alarm, repeated enough times for a bigger animal to notice the attacker.'},
+            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Decoy',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Release a glowing mucus decoy, then go dark while it attacks the cloud.',hint:'Deploy the cloud, then dim.',successMsg:'The glowing cloud drew the strike while your real body vanished into the dark.',why:'The squid needs to make a fake glowing target first. After the decoy appears, dimming helps the real squid disappear.'},
+            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey is too expensive. Twitch the lure, pause low, and pulse again.",hint:'Pulse lure, conserve, pulse lure.',successMsg:'The prey followed the twitching esca close enough for an ambush.',why:'An anglerfish lure works best like a tiny blinking bait. A pause keeps the prey curious and saves energy before the next pulse.'},
+            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Communication',target:['TAIL','FLASH','TAIL'],desc:'You need a species-specific courtship code. Send a tail beacon, a flash marker, then repeat the tail cue.',hint:'Tail, flash, tail.',successMsg:'Your pulse pattern matched the species code and the receiver answered.',why:'Some animals use light like a password. The receiver is looking for the right order, not just any bright flash.'}
         ];
         function creatureMarkup(id,label){
             const svg=window.OceanCreatures?.render(id,'w-full h-full')||'<div class="text-6xl">🐟</div>';
@@ -190,6 +196,44 @@
             clearBioCode();
         }
         function commandCost(id){return bioCmds.find(c=>c.id===id)?.c||0;}
+        function commandName(id){return bioCmds.find(c=>c.id===id)?.n.replace(/\(\)/g,'')||id;}
+        function friendlyCommand(id){
+            return {BELLY:'turn on belly lights',FLASH:'make a bright full-body flash',LURE:'pulse the lure',TAIL:'send a tail beacon',CLOUD:'release a glowing decoy cloud',DIM:'dim the lights'}[id]||commandName(id);
+        }
+        function stepPills(seq,missing=false){
+            if(!seq.length)return '<span class="bc-step-pill missing">no light commands yet</span>';
+            return seq.map((id,i)=>`<span class="bc-step-pill ${missing?'missing':''}"><span>${i+1}</span>${friendlyCommand(id)}</span>`).join('');
+        }
+        function compareBioProgram(lvl){
+            const wanted=lvl.target, got=currentBioSequence, firstWrong=wanted.findIndex((id,i)=>got[i]!==id);
+            if(got.length<wanted.length){
+                const next=wanted[got.length];
+                return `Your program stopped too soon. Add step ${got.length+1}: ${friendlyCommand(next)}.`;
+            }
+            if(got.length>wanted.length)return `Your program used extra light after the job was done. Remove commands after step ${wanted.length} so the animal saves ATP.`;
+            if(firstWrong>=0)return `Step ${firstWrong+1} is the turning point. Try ${friendlyCommand(wanted[firstWrong])} there instead.`;
+            return 'The pieces are close, but the order matters in animal signaling. Try matching the mission steps from left to right.';
+        }
+        function failureFeedback(lvl){
+            const remaining=5-currentATP, needed=lvl.target.reduce((sum,id)=>sum+commandCost(id),0);
+            return `<div class="bc-feedback space-y-3">
+                <p class="text-xl md:text-2xl font-black text-white text-center">Good experiment. This light code did something, but it did not solve the animal's problem yet.</p>
+                <div class="bc-feedback-card">
+                    <strong>What your animal sent:</strong>
+                    <div class="bc-step-list">${stepPills(currentBioSequence)}</div>
+                </div>
+                <div class="bc-feedback-card">
+                    <strong>What this animal needs for ${lvl.goal.toLowerCase()}:</strong>
+                    <p class="mt-2 text-slate-200">${lvl.why}</p>
+                    <div class="bc-step-list">${stepPills(lvl.target,true)}</div>
+                </div>
+                <div class="bc-feedback-card bg-cyan-950/50">
+                    <strong>Try next:</strong>
+                    <p class="mt-2 text-cyan-100">${compareBioProgram(lvl)}</p>
+                    <p class="mt-2 text-sm text-slate-400">Energy check: this mission needs ${needed} ATP. Your program used ${currentATP}, leaving ${remaining} ATP.</p>
+                </div>
+            </div>`;
+        }
         function addBioCode(id){
             if(runningBioCode)return;
             const cost=commandCost(id);
@@ -257,10 +301,9 @@
                 document.getElementById('bc-threat-wrap').classList.add(lvl.prey&&!lvl.threat?'':'threat-flee');
                 if(lvl.prey)document.getElementById('bc-prey').style.transform='translate(-140px,-30px) scale(1.2)';
             }else{
-                const expected=lvl.target.map(id=>bioCmds.find(c=>c.id===id)?.n||id).join(' → ');
-                document.getElementById('bc-res-title').innerText='Program Rejected';
-                document.getElementById('bc-res-title').className='text-4xl font-black text-red-400 mb-4';
-                document.getElementById('bc-res-desc').innerText=`The light pattern did not match the biological job. Debug clue: ${expected}.`;
+                document.getElementById('bc-res-title').innerText='Almost! Test a New Pattern';
+                document.getElementById('bc-res-title').className='text-3xl md:text-4xl font-black text-amber-300 mb-4';
+                document.getElementById('bc-res-desc').innerHTML=failureFeedback(lvl);
                 document.getElementById('bc-next-btn').classList.add('hidden');
                 document.getElementById('bc-retry-btn').classList.remove('hidden');
                 document.getElementById('bc-threat-wrap').classList.add('threat-attack');
