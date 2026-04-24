@@ -183,15 +183,15 @@
                         <button onclick="switchTab('adaptations'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-dna w-5 text-center"></i> Adaptations</button>
                         <button onclick="switchTab('migration'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-sort w-5 text-center"></i> Diel Vertical Migration</button>
                         <button onclick="switchTab('gradients'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-chart-bar w-5 text-center"></i> Gradients</button>
-                        <button onclick="switchTab('lab'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-flask w-5 text-center"></i> Bio-Lab</button>
-                        <button onclick="switchTab('pressure'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compress w-5 text-center"></i> Pressure</button>
-                        <button onclick="switchTab('foodweb'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-network-wired w-5 text-center"></i> Ecology</button>
-                        <button onclick="switchTab('biocode'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-code w-5 text-center"></i> Bio-Code</button>
                         <button onclick="switchTab('study'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-book-open w-5 text-center"></i> Study</button>
-                        <button onclick="switchTab('bathymetry'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-map w-5 text-center"></i> Bathymetry</button>
+                        <button onclick="switchTab('creatures'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-fish w-5 text-center"></i> Creatures</button>
+                        <button onclick="switchTab('foodweb'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-network-wired w-5 text-center"></i> Ecology</button>
                         <button onclick="switchTab('carbonpump'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-leaf w-5 text-center"></i> Carbon Pump</button>
                         <button onclick="switchTab('plankton'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-microscope w-5 text-center"></i> Plankton</button>
-                        <button onclick="switchTab('creatures'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-fish w-5 text-center"></i> Creatures</button>
+                        <button onclick="switchTab('bathymetry'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-map w-5 text-center"></i> Bathymetry</button>
+                        <button onclick="switchTab('lab'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-flask w-5 text-center"></i> Bio-Lab</button>
+                        <button onclick="switchTab('pressure'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compress w-5 text-center"></i> Pressure</button>
+                        <button onclick="switchTab('biocode'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-code w-5 text-center"></i> Bio-Code</button>
                     </div>
                 </div>
                 <div class="hidden lg:block flex-1 min-w-0">
@@ -200,15 +200,15 @@
                         <button onclick="switchTab('adaptations')" id="btn-adaptations" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
                         <button onclick="switchTab('migration')" id="btn-migration" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 leading-tight flex-shrink-0"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
                         <button onclick="switchTab('gradients')" id="btn-gradients" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
-                        <button onclick="switchTab('lab')" id="btn-lab" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
-                        <button onclick="switchTab('pressure')" id="btn-pressure" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
-                        <button onclick="switchTab('foodweb')" id="btn-foodweb" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
-                        <button onclick="switchTab('biocode')" id="btn-biocode" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
                         <button onclick="switchTab('study')" id="btn-study" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-book-open mr-1"></i> Study</button>
-                        <button onclick="switchTab('bathymetry')" id="btn-bathymetry" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+                        <button onclick="switchTab('creatures')" id="btn-creatures" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
+                        <button onclick="switchTab('foodweb')" id="btn-foodweb" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
                         <button onclick="switchTab('carbonpump')" id="btn-carbonpump" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
                         <button onclick="switchTab('plankton')" id="btn-plankton" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
-                        <button onclick="switchTab('creatures')" id="btn-creatures" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
+                        <button onclick="switchTab('bathymetry')" id="btn-bathymetry" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+                        <button onclick="switchTab('lab')" id="btn-lab" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
+                        <button onclick="switchTab('pressure')" id="btn-pressure" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
+                        <button onclick="switchTab('biocode')" id="btn-biocode" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
                     </div>
                 </div>
                 <button id="badge-hub-btn" type="button" onclick="toggleBadgeDrawer(true)" class="badge-hub-shell flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-2 rounded-full border border-sky-200 shadow-sm flex-shrink-0 min-w-0" aria-expanded="false" aria-controls="badge-drawer">
@@ -229,15 +229,15 @@
             <button onclick="switchTab('adaptations')" id="btn-adaptations-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
             <button onclick="switchTab('migration')" id="btn-migration-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0 leading-tight"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
             <button onclick="switchTab('gradients')" id="btn-gradients-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
-            <button onclick="switchTab('lab')" id="btn-lab-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
-            <button onclick="switchTab('pressure')" id="btn-pressure-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
-            <button onclick="switchTab('foodweb')" id="btn-foodweb-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
-            <button onclick="switchTab('biocode')" id="btn-biocode-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
             <button onclick="switchTab('study')" id="btn-study-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-book-open mr-1"></i> Study</button>
-            <button onclick="switchTab('bathymetry')" id="btn-bathymetry-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+            <button onclick="switchTab('creatures')" id="btn-creatures-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
+            <button onclick="switchTab('foodweb')" id="btn-foodweb-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-network-wired mr-1"></i> Ecology</button>
             <button onclick="switchTab('carbonpump')" id="btn-carbonpump-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-leaf mr-1"></i> Carbon Pump</button>
             <button onclick="switchTab('plankton')" id="btn-plankton-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-microscope mr-1"></i> Plankton</button>
-            <button onclick="switchTab('creatures')" id="btn-creatures-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-fish mr-1"></i> Creatures</button>
+            <button onclick="switchTab('bathymetry')" id="btn-bathymetry-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-map mr-1"></i> Bathymetry</button>
+            <button onclick="switchTab('lab')" id="btn-lab-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-flask mr-1"></i> Bio-Lab</button>
+            <button onclick="switchTab('pressure')" id="btn-pressure-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compress mr-1"></i> Pressure</button>
+            <button onclick="switchTab('biocode')" id="btn-biocode-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-code mr-1"></i> Bio-Code</button>
         </div>
     </nav>
 
@@ -302,14 +302,14 @@
             <iframe src="gradients.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
-        <!-- TAB 5: BIO-LAB -->
-        <div id="tab-lab" class="tab-pane hidden">
-            <iframe src="biolab.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        <!-- TAB 5: STUDY DECK -->
+        <div id="tab-study" class="tab-pane hidden">
+            <iframe src="study.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
-        <!-- TAB 6: PRESSURE -->
-        <div id="tab-pressure" class="tab-pane hidden">
-            <iframe src="pressure.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        <!-- TAB 6: CREATURE INDEX -->
+        <div id="tab-creatures" class="tab-pane hidden">
+            <iframe src="creature_index.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 7: ECOLOGY -->
@@ -317,19 +317,34 @@
             <iframe src="ecology.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
-        <!-- TAB 8: BIO-CODE -->
+        <!-- TAB 8: CARBON PUMP TYCOON -->
+        <div id="tab-carbonpump" class="tab-pane hidden">
+            <iframe id="iframe-carbonpump" src="carbon_pump.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 9: INTERACTIVE PLANKTON -->
+        <div id="tab-plankton" class="tab-pane hidden">
+            <iframe id="iframe-plankton" src="plankton.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 10: BATHYMETRY MAPPER -->
+        <div id="tab-bathymetry" class="tab-pane hidden">
+            <iframe id="iframe-bathymetry" src="bathymetry.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 11: BIO-LAB -->
+        <div id="tab-lab" class="tab-pane hidden">
+            <iframe src="biolab.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 12: PRESSURE -->
+        <div id="tab-pressure" class="tab-pane hidden">
+            <iframe src="pressure.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB 13: BIO-CODE -->
         <div id="tab-biocode" class="tab-pane hidden">
             <iframe src="biocode.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
-        </div>
-
-        <!-- TAB 9: STUDY DECK -->
-        <div id="tab-study" class="tab-pane hidden">
-            <iframe src="study.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
-        </div>
-
-        <!-- TAB 10: CREATURE INDEX -->
-        <div id="tab-creatures" class="tab-pane hidden">
-            <iframe src="creature_index.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
     </main>
 
@@ -1504,18 +1519,5 @@
             switchTab('zones');
         };
     </script>
-
-    <!-- TAB: BATHYMETRY MAPPER -->
-    <div id="tab-bathymetry" class="tab-pane hidden">
-        <iframe id="iframe-bathymetry" src="bathymetry.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
-    </div>
-    <!-- TAB: CARBON PUMP TYCOON -->
-    <div id="tab-carbonpump" class="tab-pane hidden">
-        <iframe id="iframe-carbonpump" src="carbon_pump.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
-    </div>
-    <!-- TAB: INTERACTIVE PLANKTON -->
-    <div id="tab-plankton" class="tab-pane hidden">
-        <iframe id="iframe-plankton" src="plankton.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
-    </div>
 </body>
 </html>
