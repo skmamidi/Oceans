@@ -19,9 +19,6 @@
         .bc-glow-active{fill:#60a5fa;filter:drop-shadow(0 0 15px #60a5fa);stroke:#93c5fd;stroke-width:2px;}
         .bc-glow-lure{fill:#fde047;filter:drop-shadow(0 0 25px #fef08a);stroke:#fef08a;stroke-width:2px;}
         .bc-glow-flash{fill:#ffffff;filter:drop-shadow(0 0 30px #ffffff);stroke:#ffffff;stroke-width:3px;}
-        .threat-radar{transition:all 0.5s ease-in-out;}
-        .threat-flee{transform:scale(0) translateX(50px);opacity:0;}
-        .threat-attack{transform:scale(3) translateX(-50px) translateY(20px);opacity:0;}
         .bio-cloud{position:absolute;width:15px;height:15px;background:#60a5fa;border-radius:50%;filter:blur(4px);}
         .biocode-shell{background:radial-gradient(circle at 18% 0%,rgba(34,211,238,.18),transparent 34%),radial-gradient(circle at 85% 12%,rgba(96,165,250,.15),transparent 30%),linear-gradient(180deg,#083344 0%,#020617 88%);}
         .bc-panel{background:rgba(15,23,42,.82);border:1px solid rgba(148,163,184,.18);box-shadow:0 24px 80px rgba(0,0,0,.35);backdrop-filter:blur(18px);}
@@ -81,8 +78,6 @@
         @keyframes puff-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.25);}30%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55);}}
         @keyframes plankton-drift{from{transform:translateY(0);opacity:.2;}25%{opacity:.85;}to{transform:translateY(-110px);opacity:0;}}
         .player-card{animation:drift 5s ease-in-out infinite;}
-        .threat-flee{transform:translateX(120px) scale(.2)!important;opacity:0;}
-        .threat-attack{transform:translate(-90px,90px) scale(2.8)!important;opacity:0;}
         @media(max-width:1023px){.bc-stage{height:68vh}.player-card{width:min(78vw,340px);height:240px}.threat-card{width:72px;height:72px}}
         @media(max-width:640px){.bc-stage{height:62vh;min-height:480px}.command-btn{min-height:4.5rem}.player-card{top:56%;height:220px}.prey-card{bottom:8%;right:5%}.predator-card{top:20%;right:4%;width:92px;height:92px}.predator-card.lunge{transform:translate(-47vw,24vh) scale(1.55)!important;}}
         @media(prefers-reduced-motion:reduce){.player-card,.bc-wave,.anim-pop,.anim-shake,.sparkle,.plankton,.predator-card,.confuse-burst,.caught-puff{animation:none!important;}}</style>
@@ -156,11 +151,6 @@
                                 <div class="absolute left-4 top-4 z-20 rounded-2xl bg-black/55 border border-cyan-300/15 p-3 backdrop-blur-md">
                                     <span class="text-[10px] text-cyan-100 uppercase tracking-widest block font-bold mb-1">Your Animal</span>
                                     <div id="bc-player-name" class="text-sm text-white font-black">Lanternfish</div>
-                                </div>
-                                <div class="absolute top-4 right-4 bg-red-950/60 border border-red-400/40 p-3 rounded-2xl text-center z-20 backdrop-blur-md">
-                                    <span class="text-[10px] text-red-200 uppercase tracking-widest block font-bold mb-1">Nearby Animal</span>
-                                <div id="bc-threat-wrap" class="threat-radar w-20 h-20 mx-auto"></div>
-                                    <span id="bc-threat-name" class="text-xs text-red-100 font-mono block mt-1">Great White</span>
                                 </div>
                                 <div id="bc-player" class="organism-card player-card"></div>
                                 <div id="bc-predator" class="organism-card predator-card hidden"></div>
@@ -284,10 +274,6 @@
             document.getElementById('bc-coach-note').innerText=lvl.coach;
             document.getElementById('bc-player-name').innerText=lvl.playerName;
             document.getElementById('bc-player').innerHTML=creatureMarkup(lvl.player,lvl.playerName);
-            const threat=document.getElementById('bc-threat-wrap');
-            threat.className='threat-radar w-20 h-20 mx-auto';
-            threat.innerHTML=lvl.threat?creatureMarkup(lvl.threat,lvl.threatName):'<div class="w-full h-full flex items-center justify-center text-4xl">📡</div>';
-            document.getElementById('bc-threat-name').innerText=lvl.threatName;
             const predator=document.getElementById('bc-predator');
             predator.className='organism-card predator-card hidden';
             predator.innerHTML='';
@@ -369,7 +355,6 @@
             document.getElementById('bc-photophores').innerHTML='';
             document.getElementById('bc-clouds').innerHTML='';
             document.getElementById('bc-wave-layer').innerHTML='';
-            document.getElementById('bc-threat-wrap').classList.remove('threat-flee','threat-attack');
             const prey=document.getElementById('bc-prey');
             prey.style.transform='';
             prey.classList.remove('safe','caught');
@@ -451,7 +436,6 @@
                 document.getElementById('bc-res-desc').innerHTML=`<div class="space-y-3"><p>${lvl.successMsg}</p><p class="text-emerald-200 font-black">Light streak: ${bioStreak}. Keep going!</p></div>`;
                 document.getElementById('bc-next-btn').classList.remove('hidden');
                 document.getElementById('bc-retry-btn').classList.add('hidden');
-                if(lvl.threat)document.getElementById('bc-threat-wrap').classList.add('threat-flee');
                 animateSuccess(lvl);
                 sparkleBurst(30);
                 showSpeech('Yes! That light message worked.', 'win');
@@ -462,7 +446,6 @@
                 document.getElementById('bc-res-desc').innerHTML=failureFeedback(lvl);
                 document.getElementById('bc-next-btn').classList.add('hidden');
                 document.getElementById('bc-retry-btn').classList.remove('hidden');
-                document.getElementById('bc-threat-wrap').classList.add('threat-attack');
                 animateFailure(lvl);
                 showSpeech('Try a new pattern. You learned something!', 'warn');
             }
