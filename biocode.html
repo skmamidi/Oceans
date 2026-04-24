@@ -28,6 +28,8 @@
         .bc-stage{height:clamp(520px,calc(100vh - 250px),780px);min-height:520px;background:radial-gradient(circle at 50% 40%,rgba(14,165,233,.14),transparent 36%),linear-gradient(180deg,#082f49 0%,#020617 76%,#000 100%);}
         .bc-stage::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(125,211,252,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,.04) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(circle at center,black 40%,transparent 88%);}
         .code-chip{display:inline-flex;align-items:center;gap:.45rem;border-radius:.8rem;border:1px solid rgba(125,211,252,.28);background:rgba(8,47,73,.62);padding:.55rem .7rem;color:#e0f2fe;font-size:.82rem;font-weight:900;}
+        .code-chip.good{border-color:rgba(52,211,153,.7);background:rgba(6,78,59,.62);color:#d1fae5;}
+        .code-chip.watch{border-color:rgba(251,191,36,.72);background:rgba(120,53,15,.55);color:#fef3c7;}
         .command-btn{min-height:4.25rem;border-radius:1rem;border:1px solid rgba(148,163,184,.2);background:rgba(30,41,59,.9);color:white;text-align:left;padding:.8rem;transition:.18s;touch-action:manipulation;}
         .command-btn:hover,.command-btn:focus-visible{background:rgba(51,65,85,.98);border-color:#67e8f9;outline:none;transform:translateY(-1px);}
         .command-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
@@ -50,14 +52,24 @@
         .bc-step-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem;}
         .bc-step-pill{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;background:rgba(8,47,73,.75);border:1px solid rgba(125,211,252,.22);padding:.35rem .65rem;color:#cffafe;font-size:.88rem;font-weight:800;}
         .bc-step-pill.missing{background:rgba(127,29,29,.52);border-color:rgba(248,113,113,.45);color:#fecaca;}
+        .coach-card{background:linear-gradient(135deg,rgba(8,47,73,.86),rgba(15,23,42,.92));border:1px solid rgba(125,211,252,.22);border-radius:1.1rem;padding:.85rem;}
+        .progress-dot{height:.65rem;border-radius:999px;background:rgba(51,65,85,.9);border:1px solid rgba(148,163,184,.22);transition:.2s;}
+        .progress-dot.fill{background:linear-gradient(90deg,#22d3ee,#a7f3d0);box-shadow:0 0 14px rgba(34,211,238,.45);}
+        .progress-dot.warn{background:linear-gradient(90deg,#f59e0b,#fb7185);box-shadow:0 0 14px rgba(251,146,60,.45);}
+        .speech-bubble{position:absolute;left:50%;top:31%;transform:translate(-50%,-50%);max-width:min(78%,360px);background:rgba(240,249,255,.94);color:#0f172a;border-radius:1rem;padding:.7rem .9rem;font-weight:900;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.35);z-index:26;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;}
+        .speech-bubble.show{opacity:1;transform:translate(-50%,-62%);}
+        .sparkle{position:absolute;width:7px;height:7px;border-radius:999px;background:#a7f3d0;box-shadow:0 0 14px #67e8f9;animation:sparkle-pop .85s ease-out forwards;z-index:24;pointer-events:none;}
+        .plankton{position:absolute;width:3px;height:3px;border-radius:999px;background:rgba(125,211,252,.7);box-shadow:0 0 10px rgba(125,211,252,.8);animation:plankton-drift linear infinite;z-index:1;pointer-events:none;}
         @keyframes bc-wave{from{opacity:.9;transform:translate(-50%,-50%) scale(.15);}to{opacity:0;transform:translate(-50%,-50%) scale(2.4);}}
         @keyframes drift{0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(-1deg);}50%{transform:translate(-50%,-50%) translateY(-10px) rotate(1deg);}}
+        @keyframes sparkle-pop{0%{opacity:0;transform:scale(.2) translateY(0);}20%{opacity:1;}100%{opacity:0;transform:scale(1.7) translateY(-34px);}}
+        @keyframes plankton-drift{from{transform:translateY(0);opacity:.2;}25%{opacity:.85;}to{transform:translateY(-110px);opacity:0;}}
         .player-card{animation:drift 5s ease-in-out infinite;}
         .threat-flee{transform:translateX(120px) scale(.2)!important;opacity:0;}
         .threat-attack{transform:translate(-90px,90px) scale(2.8)!important;opacity:0;}
         @media(max-width:1023px){.bc-stage{height:68vh}.player-card{width:min(78vw,340px);height:240px}.threat-card{width:72px;height:72px}}
         @media(max-width:640px){.bc-stage{height:62vh;min-height:480px}.command-btn{min-height:4.5rem}.player-card{top:56%;height:220px}.prey-card{bottom:8%;right:5%}}
-        @media(prefers-reduced-motion:reduce){.player-card,.bc-wave,.anim-pop,.anim-shake{animation:none!important;}}</style>
+        @media(prefers-reduced-motion:reduce){.player-card,.bc-wave,.anim-pop,.anim-shake,.sparkle,.plankton{animation:none!important;}}</style>
 </head>
 <body class="text-gray-800 antialiased font-sans">
     <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
@@ -93,6 +105,14 @@
                                     <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Energy Left</div><div id="bc-atp-text" class="text-xl font-mono text-cyan-200">0 / 5</div></div>
                                     <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Energy Used</div><div id="bc-cost-text" class="text-xl font-mono text-yellow-200">0</div></div>
                                     <div class="metric-tile"><div class="text-[10px] text-slate-400 font-bold uppercase">Goal</div><div id="bc-goal-text" class="text-sm font-black text-emerald-200">Pattern</div></div>
+                                </div>
+                                <div class="coach-card mt-3">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <span class="text-xs uppercase tracking-widest text-cyan-200 font-black"><i class="fa-solid fa-compass"></i> Coach Note</span>
+                                        <span id="bc-streak" class="text-xs font-black text-emerald-200">Streak 0</span>
+                                    </div>
+                                    <p id="bc-coach-note" class="text-sm text-cyan-50 mt-2 leading-relaxed"></p>
+                                    <div id="bc-progress-dots" class="grid gap-1 mt-3"></div>
                                 </div>
                             </div>
 
@@ -131,6 +151,9 @@
                                 <div id="bc-photophores" class="absolute inset-0 pointer-events-none z-20"></div>
                                 <div id="bc-clouds" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
                                 <div id="bc-wave-layer" class="absolute inset-0 pointer-events-none z-10"></div>
+                                <div id="bc-plankton" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                                <div id="bc-sparkles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                                <div id="bc-speech" class="speech-bubble"></div>
                                 <div id="bc-result-overlay" class="hidden absolute inset-0 bg-black/95 z-30 flex flex-col items-center justify-start sm:justify-center p-5 sm:p-8 text-center backdrop-blur-md overflow-y-auto">
                                     <h3 id="bc-res-title" class="text-4xl font-black text-white mb-4"></h3>
                                     <div id="bc-res-desc" class="text-gray-300 text-base sm:text-lg max-w-3xl mb-8"></div>
@@ -139,7 +162,7 @@
                                         <button id="bc-retry-btn" onclick="retryBioLevel()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold px-8 py-3 rounded-full transition hidden">Change My Pattern</button>
                                     </div>
                                 </div>
-                                <div id="biocode-victory" class="hidden absolute inset-0 bg-cyan-950/95 z-40 flex flex-col items-center justify-center p-6 text-center"><i class="fa-solid fa-code text-6xl text-cyan-300 mb-4"></i><h2 class="text-4xl font-black text-white">Master Bioluminescence Coder!</h2><p class="text-cyan-100 mt-3 max-w-lg">You translated real deep-sea light behaviors into working biological programs.</p></div>
+                                <div id="biocode-victory" class="hidden absolute inset-0 bg-cyan-950/95 z-40 flex flex-col items-center justify-center p-6 text-center"><i class="fa-solid fa-star text-6xl text-cyan-300 mb-4"></i><h2 class="text-4xl font-black text-white">Deep-Sea Light Expert!</h2><p class="text-cyan-100 mt-3 max-w-lg">You helped animals hide, warn, trick, hunt, and talk using real bioluminescence ideas.</p></div>
                             </div>
                         </main>
                     </div>
@@ -152,7 +175,7 @@
         function awardBadge(){if(window.OceanBadges) window.OceanBadges.awardBadge('biocode');const b=document.getElementById('badge-toast');if(b){b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),4000);}}
         function confetti(){const c=document.getElementById('confetti-canvas');if(!c)return;c.style.display='block';const ctx=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;let pts=[];for(let i=0;i<150;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*6+2,d:Math.random()*10});function draw(){ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='gold';ctx.beginPath();pts.forEach(p=>{ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);});ctx.fill();pts.forEach(p=>{p.y+=Math.cos(p.d)+1+p.r/2;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;}});requestAnimationFrame(draw);}draw();setTimeout(()=>c.style.display='none',8000);}
 
-        let currentBioLevel=0, currentBioSequence=[], currentATP=0, runningBioCode=false;
+        let currentBioLevel=0, currentBioSequence=[], currentATP=0, runningBioCode=false, bioStreak=0, speechTimer=null;
         const bioCmds=[
             {id:'BELLY',n:'Belly Glow',code:'ventral photophores',d:'Light up the belly to hide your shadow from hunters below.',c:1,icon:'fa-circle-half-stroke'},
             {id:'FLASH',n:'Big Flash',code:'full-body strobe',d:'Send a bright warning flash that can startle or call attention.',c:2,icon:'fa-bolt'},
@@ -162,11 +185,11 @@
             {id:'DIM',n:'Dim Lights',code:'low-power glow',d:'Turn the lights down to save energy and stay harder to spot.',c:1,icon:'fa-lightbulb'}
         ];
         const bioLevels=[
-            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Hide',target:['BELLY','DIM'],desc:"A shark is looking up from below. Use belly light to erase your shadow, then turn the glow down so you do not shine too brightly.",hint:'Try Belly Glow, then Dim Lights.',successMsg:'It worked! Your belly glow matched the faint surface light, and dimming saved energy.',why:'A lanternfish needs belly lights first so its dark body shadow disappears when a predator looks up. Then it dims so it does not look like a bright snack.'},
-            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Warn',target:['FLASH','FLASH','FLASH'],desc:'A predator grabbed you. Send repeated bright flashes to call a bigger animal toward the attacker.',hint:'Try Big Flash three times.',successMsg:'It worked! The repeated alarm flashes made the attacker flee as a larger animal came closer.',why:'The jellyfish is not trying to hide. It needs a loud light alarm, repeated enough times for a bigger animal to notice the attacker.'},
-            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Trick',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Make a glowing fake target, then turn your own lights down while the predator attacks the decoy.',hint:'Try Glow Cloud, then Dim Lights.',successMsg:'It worked! The glowing cloud pulled the attack away while your real body faded into the dark.',why:'The squid needs to make a fake glowing target first. After the decoy appears, dimming helps the real squid disappear.'},
-            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey wastes energy. Blink the lure, pause in the dark, then blink it again.",hint:'Try Wiggle Lure, Dim Lights, Wiggle Lure.',successMsg:'It worked! The prey followed the blinking lure close enough for an ambush.',why:'An anglerfish lure works best like a tiny blinking bait. A pause keeps the prey curious and saves energy before the next pulse.'},
-            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Talk',target:['TAIL','FLASH','TAIL'],desc:'You need a special light password for your own species. Send a tail signal, a flash marker, then the tail signal again.',hint:'Try Tail Signal, Big Flash, Tail Signal.',successMsg:'It worked! The receiver recognized your light password and answered.',why:'Some animals use light like a password. The receiver is looking for the right order, not just any bright flash.'}
+            {title:'Shadow Hide',player:'lanternfish',playerName:'Lanternfish',threat:'shark',threatName:'Great White Shark',prey:null,goal:'Hide',target:['BELLY','DIM'],desc:"A shark is looking up from below. Use belly light to erase your shadow, then turn the glow down so you do not shine too brightly.",hint:'Try Belly Glow, then Dim Lights.',coach:'Goal: vanish into the surface glow. First hide the shadow, then save energy.',successMsg:'It worked! Your belly glow matched the faint surface light, and dimming saved energy.',why:'A lanternfish needs belly lights first so its dark body shadow disappears when a predator looks up. Then it dims so it does not look like a bright snack.'},
+            {title:'Burglar Alarm',player:'medusa',playerName:'Atolla Jellyfish',threat:'vampire',threatName:'Vampire Squid',prey:'bluewhale',goal:'Warn',target:['FLASH','FLASH','FLASH'],desc:'A predator grabbed you. Send repeated bright flashes to call a bigger animal toward the attacker.',hint:'Try Big Flash three times.',coach:'Goal: make a loud light alarm. One flash is a whisper; three flashes get noticed.',successMsg:'It worked! The repeated alarm flashes made the attacker flee as a larger animal came closer.',why:'The jellyfish is not trying to hide. It needs a loud light alarm, repeated enough times for a bigger animal to notice the attacker.'},
+            {title:'The Decoy',player:'vampire',playerName:'Vampire Squid',threat:'dolphin',threatName:'Deep-diving Dolphin',prey:null,goal:'Trick',target:['CLOUD','DIM'],desc:'A fast predator is closing in. Make a glowing fake target, then turn your own lights down while the predator attacks the decoy.',hint:'Try Glow Cloud, then Dim Lights.',coach:'Goal: make the predator chase the fake glow while the real squid disappears.',successMsg:'It worked! The glowing cloud pulled the attack away while your real body faded into the dark.',why:'The squid needs to make a fake glowing target first. After the decoy appears, dimming helps the real squid disappear.'},
+            {title:'Fatal Attraction',player:'anglerfish',playerName:'Anglerfish',threat:null,threatName:'No predator',prey:'lanternfish',goal:'Hunt',target:['LURE','DIM','LURE'],desc:"You are hungry, but chasing prey wastes energy. Blink the lure, pause in the dark, then blink it again.",hint:'Try Wiggle Lure, Dim Lights, Wiggle Lure.',coach:'Goal: act like living bait. Blink, wait, then blink again to pull prey closer.',successMsg:'It worked! The prey followed the blinking lure close enough for an ambush.',why:'An anglerfish lure works best like a tiny blinking bait. A pause keeps the prey curious and saves energy before the next pulse.'},
+            {title:'Find Your Own Kind',player:'ostracod',playerName:'Ostracod',threat:null,threatName:'Signal Channel',prey:'ostracod',goal:'Talk',target:['TAIL','FLASH','TAIL'],desc:'You need a special light password for your own species. Send a tail signal, a flash marker, then the tail signal again.',hint:'Try Tail Signal, Big Flash, Tail Signal.',coach:'Goal: send the right light password. The order matters more than brightness.',successMsg:'It worked! The receiver recognized your light password and answered.',why:'Some animals use light like a password. The receiver is looking for the right order, not just any bright flash.'}
         ];
         function creatureMarkup(id,label){
             const svg=window.OceanCreatures?.render(id,'w-full h-full')||'<div class="text-6xl">🐟</div>';
@@ -176,6 +199,62 @@
             const c=document.getElementById('bc-btn-container');
             c.innerHTML=bioCmds.map(cmd=>`<button id="cmd-${cmd.id}" onclick="addBioCode('${cmd.id}')" class="command-btn"><div class="flex items-start justify-between gap-3"><div><div class="text-base font-black text-cyan-50"><i class="fa-solid ${cmd.icon} text-cyan-300 mr-2"></i>${cmd.n}</div><div class="text-[11px] text-cyan-200/70 mt-1 font-bold uppercase tracking-wider">Science name: ${cmd.code}</div><div class="text-xs text-slate-300 mt-1">${cmd.d}</div></div><div class="shrink-0 bg-black/45 border border-cyan-300/20 px-2 py-1 rounded-lg text-cyan-200 text-xs font-black">-${cmd.c}</div></div></button>`).join('');
         }
+        function isGoodPrefix(seq=currentBioSequence){
+            const target=bioLevels[currentBioLevel]?.target||[];
+            return seq.every((id,i)=>target[i]===id);
+        }
+        function updateProgressDots(){
+            const lvl=bioLevels[currentBioLevel];
+            if(!lvl)return;
+            const box=document.getElementById('bc-progress-dots');
+            box.style.gridTemplateColumns=`repeat(${lvl.target.length},minmax(0,1fr))`;
+            box.innerHTML=lvl.target.map((id,i)=>{
+                const chosen=currentBioSequence[i], cls=chosen===id?'fill':chosen?'warn':'';
+                return `<span class="progress-dot ${cls}" title="Step ${i+1}: ${commandName(id)}"></span>`;
+            }).join('');
+            document.getElementById('bc-streak').innerText=`Streak ${bioStreak}`;
+        }
+        function showSpeech(text,kind='coach'){
+            const s=document.getElementById('bc-speech');
+            if(!s)return;
+            clearTimeout(speechTimer);
+            s.textContent=text;
+            s.classList.add('show');
+            s.style.background=kind==='warn'?'rgba(254,243,199,.96)':kind==='win'?'rgba(209,250,229,.96)':'rgba(240,249,255,.94)';
+            speechTimer=setTimeout(()=>s.classList.remove('show'),2200);
+        }
+        function sparkleBurst(count=18){
+            const layer=document.getElementById('bc-sparkles');
+            if(!layer)return;
+            for(let i=0;i<count;i++){
+                const sp=document.createElement('span');
+                sp.className='sparkle';
+                sp.style.left=(38+Math.random()*24)+'%';
+                sp.style.top=(42+Math.random()*20)+'%';
+                sp.style.animationDelay=(Math.random()*.24)+'s';
+                layer.appendChild(sp);
+                setTimeout(()=>sp.remove(),1200);
+            }
+        }
+        function seedPlankton(){
+            const layer=document.getElementById('bc-plankton');
+            if(!layer||layer.childElementCount)return;
+            for(let i=0;i<42;i++){
+                const p=document.createElement('span');
+                p.className='plankton';
+                p.style.left=(Math.random()*100)+'%';
+                p.style.top=(Math.random()*100)+'%';
+                p.style.animationDuration=(6+Math.random()*8)+'s';
+                p.style.animationDelay=(-Math.random()*8)+'s';
+                layer.appendChild(p);
+            }
+        }
+        function reactToBuild(id){
+            const lvl=bioLevels[currentBioLevel], step=currentBioSequence.length, good=isGoodPrefix();
+            if(good&&step<lvl.target.length)showSpeech(`Nice. Step ${step} fits. What comes next?`);
+            else if(good&&step===lvl.target.length)showSpeech('That pattern looks ready to test!', 'win');
+            else showSpeech('That light move changes the message. Try comparing it with the goal.', 'warn');
+        }
         function loadBioLevel(){
             if(currentBioLevel>=bioLevels.length){document.getElementById('biocode-victory').classList.remove('hidden');awardBadge();confetti();return;}
             const lvl=bioLevels[currentBioLevel];
@@ -183,6 +262,7 @@
             document.getElementById('bc-level-count').innerText=`${currentBioLevel+1}/${bioLevels.length}`;
             document.getElementById('bc-desc').innerText=lvl.desc;
             document.getElementById('bc-goal-text').innerText=lvl.goal;
+            document.getElementById('bc-coach-note').innerText=lvl.coach;
             document.getElementById('bc-player-name').innerText=lvl.playerName;
             document.getElementById('bc-player').innerHTML=creatureMarkup(lvl.player,lvl.playerName);
             const threat=document.getElementById('bc-threat-wrap');
@@ -191,9 +271,11 @@
             document.getElementById('bc-threat-name').innerText=lvl.threatName;
             const prey=document.getElementById('bc-prey');
             prey.classList.toggle('hidden',!lvl.prey);
-            if(lvl.prey)prey.innerHTML=creatureMarkup(lvl.prey,lvl.goal==='Communication'?'Receiver':'Prey');
+            if(lvl.prey)prey.innerHTML=creatureMarkup(lvl.prey,lvl.goal==='Talk'?'Receiver':'Prey');
             document.getElementById('bc-result-overlay').classList.add('hidden');
+            seedPlankton();
             clearBioCode();
+            showSpeech(lvl.coach);
         }
         function commandCost(id){return bioCmds.find(c=>c.id===id)?.c||0;}
         function commandName(id){return bioCmds.find(c=>c.id===id)?.n||id;}
@@ -237,10 +319,10 @@
         function addBioCode(id){
             if(runningBioCode)return;
             const cost=commandCost(id);
-            if(currentATP+cost>5){shakeSequence();return;}
-            currentBioSequence.push(id);currentATP+=cost;renderBioCodeBox();
+            if(currentATP+cost>5){shakeSequence();showSpeech('Not enough ATP energy left for that move.', 'warn');return;}
+            currentBioSequence.push(id);currentATP+=cost;renderBioCodeBox();reactToBuild(id);
         }
-        function undoBioCode(){if(runningBioCode||!currentBioSequence.length)return;const id=currentBioSequence.pop();currentATP-=commandCost(id);renderBioCodeBox();resetLightStage();}
+        function undoBioCode(){if(runningBioCode||!currentBioSequence.length)return;const id=currentBioSequence.pop();currentATP-=commandCost(id);renderBioCodeBox();resetLightStage();showSpeech('One light move removed. Try a new ending.');}
         function clearBioCode(){if(runningBioCode)return;currentBioSequence=[];currentATP=0;renderBioCodeBox();resetLightStage();}
         function shakeSequence(){const box=document.getElementById('bc-sequence-box');box.classList.add('border-red-500','anim-shake');setTimeout(()=>box.classList.remove('border-red-500','anim-shake'),420);}
         function renderBioCodeBox(){
@@ -248,8 +330,12 @@
             document.getElementById('bc-cost-text').innerText=currentATP;
             const b=document.getElementById('bc-sequence-box');
             if(currentBioSequence.length===0)b.innerHTML='<span class="text-gray-600 text-sm font-bold">choose a light move...</span>';
-            else b.innerHTML=currentBioSequence.map((id,i)=>`<span class="code-chip"><span class="text-cyan-300">${String(i+1).padStart(2,'0')}</span>${commandName(id)}</span>`).join('<i class="fa-solid fa-arrow-right text-cyan-800 text-xs"></i>');
+            else b.innerHTML=currentBioSequence.map((id,i)=>{
+                const target=bioLevels[currentBioLevel]?.target||[], cls=target[i]===id?'good':target[i]?'watch':'';
+                return `<span class="code-chip ${cls}"><span class="text-cyan-300">${String(i+1).padStart(2,'0')}</span>${commandName(id)}</span>`;
+            }).join('<i class="fa-solid fa-arrow-right text-cyan-800 text-xs"></i>');
             bioCmds.forEach(cmd=>{const el=document.getElementById('cmd-'+cmd.id);if(el)el.disabled=currentATP+cmd.c>5;});
+            updateProgressDots();
         }
         function resetLightStage(){
             document.getElementById('bc-photophores').innerHTML='';
@@ -281,7 +367,7 @@
             if(id==='DIM')document.querySelectorAll('.photophore-dot').forEach(d=>{d.style.opacity='.32';d.style.boxShadow='none';});
         }
         function executeBioCode(){
-            if(runningBioCode||!currentBioSequence.length){if(!currentBioSequence.length)shakeSequence();return;}
+            if(runningBioCode||!currentBioSequence.length){if(!currentBioSequence.length){shakeSequence();showSpeech('Choose at least one light move before testing.', 'warn');}return;}
             runningBioCode=true;resetLightStage();
             document.querySelectorAll('.command-btn').forEach(b=>b.disabled=true);
             let delay=0;
@@ -293,20 +379,25 @@
             const lvl=bioLevels[currentBioLevel], ok=JSON.stringify(lvl.target)===JSON.stringify(currentBioSequence);
             const o=document.getElementById('bc-result-overlay');o.classList.remove('hidden');
             if(ok){
+                bioStreak++;
                 document.getElementById('bc-res-title').innerText='It Worked!';
                 document.getElementById('bc-res-title').className='text-4xl font-black text-green-400 mb-4';
-                document.getElementById('bc-res-desc').innerText=lvl.successMsg;
+                document.getElementById('bc-res-desc').innerHTML=`<div class="space-y-3"><p>${lvl.successMsg}</p><p class="text-emerald-200 font-black">Light streak: ${bioStreak}. Keep going!</p></div>`;
                 document.getElementById('bc-next-btn').classList.remove('hidden');
                 document.getElementById('bc-retry-btn').classList.add('hidden');
                 document.getElementById('bc-threat-wrap').classList.add(lvl.prey&&!lvl.threat?'':'threat-flee');
                 if(lvl.prey)document.getElementById('bc-prey').style.transform='translate(-140px,-30px) scale(1.2)';
+                sparkleBurst(30);
+                showSpeech('Yes! That light message worked.', 'win');
             }else{
+                bioStreak=0;
                 document.getElementById('bc-res-title').innerText='Almost! Test a New Pattern';
                 document.getElementById('bc-res-title').className='text-3xl md:text-4xl font-black text-amber-300 mb-4';
                 document.getElementById('bc-res-desc').innerHTML=failureFeedback(lvl);
                 document.getElementById('bc-next-btn').classList.add('hidden');
                 document.getElementById('bc-retry-btn').classList.remove('hidden');
                 document.getElementById('bc-threat-wrap').classList.add('threat-attack');
+                showSpeech('Try a new pattern. You learned something!', 'warn');
             }
             renderBioCodeBox();
         }
