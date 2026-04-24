@@ -767,10 +767,10 @@
             }
 
             const data = MATCH_DATA[currentMatchIndex];
-            const zoneLabels = ["Intertidal", "Neritic", "Epipelagic", "Mesopelagic", "Bathyal/Bathypelagic", "Abyssal/Abyssopelagic", "Hadal"];
+            const zoneLabels = ["Intertidal", "Neritic", "Epipelagic", "Mesopelagic", "Bathyal /<br>Bathypelagic", "Abyssal /<br>Abyssopelagic", "Hadal"];
 
             let buttonsHTML = zoneLabels.map((lbl, idx) => `
-                <button onclick="checkMatch(${idx}, this)" class="bg-gray-800 hover:bg-blue-600 hover:border-blue-400 text-gray-200 border border-gray-600 rounded-lg py-2 px-3 text-sm font-semibold transition-all">
+                <button onclick="checkMatch(${idx}, this)" class="bg-gray-800 hover:bg-blue-600 hover:border-blue-400 text-gray-200 border border-gray-600 rounded-lg py-4 px-2 text-sm font-semibold transition-all flex items-center justify-center text-center h-full leading-snug">
                     ${lbl}
                 </button>
             `).join('');
