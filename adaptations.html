@@ -409,7 +409,11 @@
             });
         }
 
-        function renderAdaptQuizzes(){
+        let adaptMissedQuestions = Array.from({length:7}, () => new Set());
+        let adaptQuestionCounts = [5,5,5,5,5,5,5];
+        let adaptReviewMode = [false,false,false,false,false,false,false];
+
+        function renderAdaptQuizzes(filters = null, reviewFlags = null, onlyZone = null){
             const q=[
                 [["Snail trapdoors are called:","Radula","Operculum",1],["Drying out is called:","Hypoxia","Desiccation",1],["Mussels anchor using:","Byssal threads","Lipids",0],["Maintaining cell volume during salinity shifts:","Osmoregulation","Bioluminescence",0],["Molecules that refold proteins:","Luciferins","HSPs",1]],
                 [["A laterally compressed body helps reef fish:","Swim faster","Maneuver tightly",1],["Cephalopod cells that instantly change color:","Chromatophores","Nematocysts",0],["Reef-Building Corals rely on these photosynthetic symbiotes:","Zooxanthellae","Cyanobacteria",0],["Stripes/spots that break up an animal's outline:","Countershading","Disruptive Coloration",1],["The Neritic zone is located:","In the deep abyss","Over the continental shelf",1]],
@@ -421,22 +425,51 @@
             ];
             
             q.forEach((z,zi)=>{
+                if(onlyZone !== null && zi !== onlyZone) return;
+                const selected = filters && filters[zi] && filters[zi].length ? filters[zi] : z.map((_, idx) => idx);
+                adaptProgress[zi] = 0;
+                adaptQuestionCounts[zi] = selected.length;
+                adaptReviewMode[zi] = !!(reviewFlags && reviewFlags[zi]);
+                document.getElementById(`a-tracker-${zi}`).innerText = 1;
                 let h='';
-                z.forEach((qq,qi)=>{
+                selected.forEach((originalQi,step)=>{
+                    const qq = z[originalQi];
                     const isSwapped = Math.random() > 0.5;
                     const choiceA = isSwapped ? qq[2] : qq[1];
                     const choiceB = isSwapped ? qq[1] : qq[2];
                     const isChoiceACorrect = isSwapped ? (qq[3] === 1) : (qq[3] === 0);
                     const isChoiceBCorrect = isSwapped ? (qq[3] === 0) : (qq[3] === 1);
+                    const label = adaptReviewMode[zi] ? `Review ${step+1}` : `Q${step+1}`;
 
-                    h+=`<div id="aq-${zi}-${qi}" class="${qi>0?'aq-step hidden':''}"><p class="mb-3 font-semibold text-sm">Q${qi+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkA(${zi},${qi},${isChoiceACorrect},this)" class="aq-btn">A) ${choiceA}</button><button onclick="checkA(${zi},${qi},${isChoiceBCorrect},this)" class="aq-btn">B) ${choiceB}</button></div></div>`;
+                    h+=`<div id="aq-${zi}-${step}" class="${step>0?'aq-step hidden':''}"><p class="mb-3 font-semibold text-sm">${label}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkA(${zi},${originalQi},${step},${isChoiceACorrect},this)" class="aq-btn">A) ${choiceA}</button><button onclick="checkA(${zi},${originalQi},${step},${isChoiceBCorrect},this)" class="aq-btn">B) ${choiceB}</button></div></div>`;
                 });
                 const b=document.getElementById(`aq-body-${zi}`);
                 if(b)b.innerHTML=h;
             });
         }
         
-        function checkA(z, q, isC, btn) {
+        function showAdaptQuizComplete(z) {
+            const b = document.getElementById(`aq-body-${z}`);
+            const missedCount = adaptMissedQuestions[z].size;
+            const reviewButton = missedCount > 0 ? `<button onclick="reviewAdaptMissed(${z})" class="px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-bold transition">Review Missed Only (${missedCount})</button>` : `<p class="text-green-300 font-bold">Perfect run. No missed questions to review.</p>`;
+            if(b)b.innerHTML += `<div class="mt-5 p-4 rounded-xl border border-teal-400/40 bg-black/30 text-center anim-pop"><p class="text-white font-bold mb-3">${adaptReviewMode[z] ? 'Review complete!' : 'Quiz complete!'}</p><div class="flex flex-col sm:flex-row justify-center gap-3">${reviewButton}<button onclick="retakeAdaptQuiz(${z})" class="px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-500 text-white font-bold transition">Retake Full Quiz</button></div></div>`;
+        }
+
+        function reviewAdaptMissed(z) {
+            const filters = [];
+            const reviewFlags = [];
+            filters[z] = Array.from(adaptMissedQuestions[z]);
+            reviewFlags[z] = true;
+            renderAdaptQuizzes(filters, reviewFlags, z);
+        }
+
+        function retakeAdaptQuiz(z) {
+            adaptMissedQuestions[z].clear();
+            adaptReviewMode[z] = false;
+            renderAdaptQuizzes(null, null, z);
+        }
+        
+        function checkA(z, originalQ, q, isC, btn) {
             if (isC) {
                 // Set correct state
                 btn.classList.add('bg-green-correct');
@@ -451,14 +484,14 @@
                 if (adaptProgress[z] === q) {
                     
                     // Increment global score ONLY if this wasn't previously guessed wrong
-                    if (!btn.parentElement.hasAttribute('data-wrong-guessed')) {
+                    if (!btn.parentElement.hasAttribute('data-wrong-guessed') && !adaptReviewMode[z]) {
                         globalQuizScore++;
                         document.getElementById('global-score-display').innerText = globalQuizScore;
                     }
 
                     adaptProgress[z]++;
                     document.getElementById(`a-tracker-${z}`).innerText = adaptProgress[z];
-                    if (adaptProgress[z] < 5) {
+                    if (adaptProgress[z] < adaptQuestionCounts[z]) {
                         const n = document.getElementById(`aq-${z}-${adaptProgress[z]}`);
                         if (n) {
                             n.classList.remove('hidden');
@@ -466,6 +499,7 @@
                         }
                     } else {
                         adaptCompleted[z] = true;
+                        showAdaptQuizComplete(z);
                         if (adaptCompleted.every(v => v)) {
                             document.getElementById('adapt-master-celebration').classList.remove('hidden');
                             awardBadge('adaptations');
@@ -479,6 +513,7 @@
                 btn.disabled = true;
                 // Flag the container so a subsequent correct guess does not earn a point
                 btn.parentElement.setAttribute('data-wrong-guessed', 'true');
+                if (!adaptReviewMode[z]) adaptMissedQuestions[z].add(originalQ);
                 setTimeout(() => btn.classList.remove('anim-shake'), 400);
             }
         }

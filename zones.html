@@ -502,8 +502,11 @@
         let zoneProgress=[0,0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false,false];
         let globalScore = 0;
         let attemptedQuizzes = new Set();
+        let zoneMissedQuestions = Array.from({length:7}, () => new Set());
+        let zoneQuestionCounts = [6,6,6,6,6,6,6];
+        let zoneReviewMode = [false,false,false,false,false,false,false];
 
-        function renderZoneQuizzes() {
+        function renderZoneQuizzes(filters = null, reviewFlags = null, onlyZone = null) {
             const q = [
                 [["To survive the hot sun during low tide, what do barnacles do?","Walk to water","Close shells tightly",1],["What is the scientific term for an animal fatally drying out?","Desiccation","Osmosis",0],["Mussels anchor using strong protein cables called:","Nematocysts","Byssal threads",1],["A transition area between two biological communities (like Intertidal) is a(n):","Ecotone","Estuary",0],["What type of tide provides maximum water movement for spawning?","Neap Tide","Spring Tide",1],["Intertidal snails scrape algae off rocks using a conveyor-belt-like tongue called a:","Radula","Esca",0]],
                 [["What physical feature defines the bottom of the Neritic Zone?","The Continental Shelf","The Abyssal Plain",0],["Which of these is a highly productive ecosystem found in cold Neritic waters?","Coral Reefs","Kelp Forests",1],["What process brings cold, nutrient-rich water from the deep to the Neritic Zone?","Upwelling","Downwelling",0],["Corals rely on symbiotic algae called what to produce food?","Zooxanthellae","Phytoplankton",0],["Compared to the open ocean, the Neritic Zone has:","Lower biodiversity","Higher biomass and nutrients",1],["Land runoff supplies the Neritic zone with important:","Toxic gases","Nutrients like nitrogen and phosphorus",1]],
@@ -513,10 +516,44 @@
                 [["How does the Tripod Fish adapt to soft mud?","Rolls like a ball","Uses long fins as stilts",1],["Organisms living ON the seafloor are called:","Benthic","Pelagic",0],["Deep-sea creatures growing very large due to cold temps is called:","Bathypelagic Swelling","Abyssal Gigantism",1],["A massive food source like a dead whale falling is called:","A Whale Fall","A Pelagic Graveyard",0],["Because the Abyss relies entirely on external energy (marine snow), it is a(n) ________ ecosystem.","Autochthonous","Allochthonous",1],["Hydrostatic pressure increases 1 atm every ____ meters.","10m","100m",0]],
                 [["Which crustacean uses an aluminum shield to survive trench pressure?","Supergiant Amphipod","Giant Isopod",0],["What chemical compound acts as a shield (piezolyte)?","NaCl","TMAO",1],["Slow-leaking areas where methanotrophic mussels live are:","Cold Seeps","Brine Pools",0],["What is the deepest known living fish?","Mariana Snailfish","Cusk Eel",0],["Bacteria thriving >100°C at vents are classified as:","Hyperthermophiles","Cryophiles",0],["Vent ecosystems produce energy locally. This is a(n) ________ ecosystem.","Allochthonous","Autochthonous",1]]
             ];
-            q.forEach((z,zi)=>{let h='';z.forEach((qq,qi)=>{let opts=[{t:qq[1],c:qq[3]===0},{t:qq[2],c:qq[3]===1}].sort(()=>Math.random()-0.5);h+=`<div id="qz-${zi}-${qi}" class="${qi>0?'qz-step hidden':''}"><p class="mb-3 font-semibold text-sm">Level ${qi+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkZ(${zi},${qi},${opts[0].c},this)" class="qz-btn">A) ${opts[0].t}</button><button onclick="checkZ(${zi},${qi},${opts[1].c},this)" class="qz-btn">B) ${opts[1].t}</button></div></div>`;});const b=document.getElementById(`qz-body-${zi}`);if(b)b.innerHTML=h;});
+            q.forEach((z,zi)=>{
+                if(onlyZone !== null && zi !== onlyZone) return;
+                const selected = filters && filters[zi] && filters[zi].length ? filters[zi] : z.map((_, idx) => idx);
+                zoneProgress[zi] = 0;
+                zoneQuestionCounts[zi] = selected.length;
+                zoneReviewMode[zi] = !!(reviewFlags && reviewFlags[zi]);
+                document.getElementById(`q-tracker-${zi}`).innerText = 1;
+                let h='';
+                selected.forEach((originalQi,step)=>{
+                    const qq = z[originalQi];
+                    let opts=[{t:qq[1],c:qq[3]===0},{t:qq[2],c:qq[3]===1}].sort(()=>Math.random()-0.5);
+                    const label = zoneReviewMode[zi] ? `Review ${step+1}` : `Level ${step+1}`;
+                    h+=`<div id="qz-${zi}-${step}" class="${step>0?'qz-step hidden':''}"><p class="mb-3 font-semibold text-sm">${label}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-2"><button onclick="checkZ(${zi},${originalQi},${step},${opts[0].c},this)" class="qz-btn">A) ${opts[0].t}</button><button onclick="checkZ(${zi},${originalQi},${step},${opts[1].c},this)" class="qz-btn">B) ${opts[1].t}</button></div></div>`;
+                });
+                const b=document.getElementById(`qz-body-${zi}`);
+                if(b)b.innerHTML=h;
+            });
         }
-        function checkZ(z,q,isC,btn){
-            const qKey = `${z}-${q}`;
+        function showZoneQuizComplete(z){
+            const b=document.getElementById(`qz-body-${z}`);
+            const missedCount=zoneMissedQuestions[z].size;
+            const reviewButton = missedCount > 0 ? `<button onclick="reviewZoneMissed(${z})" class="px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-bold transition">Review Missed Only (${missedCount})</button>` : `<p class="text-green-300 font-bold">Perfect run. No missed questions to review.</p>`;
+            if(b)b.innerHTML += `<div class="mt-5 p-4 rounded-xl border border-yellow-400/40 bg-black/30 text-center anim-pop"><p class="text-white font-bold mb-3">${zoneReviewMode[z] ? 'Review complete!' : 'Quiz complete!'}</p><div class="flex flex-col sm:flex-row justify-center gap-3">${reviewButton}<button onclick="retakeZoneQuiz(${z})" class="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold transition">Retake Full Quiz</button></div></div>`;
+        }
+        function reviewZoneMissed(z){
+            const filters = [];
+            const reviewFlags = [];
+            filters[z] = Array.from(zoneMissedQuestions[z]);
+            reviewFlags[z] = true;
+            renderZoneQuizzes(filters, reviewFlags, z);
+        }
+        function retakeZoneQuiz(z){
+            zoneMissedQuestions[z].clear();
+            zoneReviewMode[z] = false;
+            renderZoneQuizzes(null, null, z);
+        }
+        function checkZ(z,originalQ,q,isC,btn){
+            const qKey = `${z}-${originalQ}`;
             const isFirstAttempt = !attemptedQuizzes.has(qKey);
             attemptedQuizzes.add(qKey);
 
@@ -528,17 +565,18 @@
                     
                     if(zoneProgress[z]===q){
                         zoneProgress[z]++;
-                        if(isFirstAttempt) {
+                        if(isFirstAttempt && !zoneReviewMode[z]) {
                             globalScore++;
                             document.getElementById('global-score').innerText = globalScore;
                         }
                         document.getElementById(`q-tracker-${z}`).innerText=zoneProgress[z];
                         
-                        if(zoneProgress[z]<=5){
+                        if(zoneProgress[z]<zoneQuestionCounts[z]){
                             const n=document.getElementById(`qz-${z}-${zoneProgress[z]}`);
                             if(n)n.classList.remove('hidden');
                         }else{
                             zoneCompleted[z]=true;
+                            showZoneQuizComplete(z);
                             if(zoneCompleted.every(v=>v)){
                                 document.getElementById('zone-master-celebration').classList.remove('hidden');
                                 awardBadge('zones');
@@ -548,6 +586,7 @@
                     }
                 }
             } else {
+                if(!zoneReviewMode[z]) zoneMissedQuestions[z].add(originalQ);
                 btn.classList.add('btn-wrong','anim-shake','opacity-75','cursor-not-allowed');
                 btn.disabled=true;
                 setTimeout(()=>btn.classList.remove('anim-shake'),400);

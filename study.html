@@ -585,15 +585,26 @@
 
         // --- Quiz State ---
         let quizCards = [];
+        let missedQuizCards = [];
+        let isReviewQuiz = false;
         let currentQuizIndex = 0;
         let quizScore = 0;
 
-        function generateQuiz() {
+        function buildQuizCards(cards) {
+            return cards.map(card => {
+                let wrongAnswers = allCards.filter(c => c.q !== card.q);
+                shuffleArray(wrongAnswers);
+                wrongAnswers = wrongAnswers.slice(0, 3).map(c => c.a);
+                return { ...card, wrongAnswers };
+            });
+        }
+
+        function generateQuiz(reviewOnly = false) {
             const container = document.getElementById('quiz-container');
             container.innerHTML = `
                 <div class="text-center mb-10">
-                    <h3 class="text-4xl font-heading font-black text-white drop-shadow-md border-b-4 border-yellow-400 pb-2 inline-block mx-auto">Knowledge Check Quiz</h3>
-                    <p class="text-purple-200 mt-3">Test your mastery of the terms above!</p>
+                    <h3 class="text-4xl font-heading font-black text-white drop-shadow-md border-b-4 border-yellow-400 pb-2 inline-block mx-auto">${reviewOnly ? 'Review Missed Terms' : 'Knowledge Check Quiz'}</h3>
+                    <p class="text-purple-200 mt-3">${reviewOnly ? 'Practice only the terms you missed last time.' : 'Test your mastery of the terms above!'}</p>
                 </div>
                 <div id="quiz-box" class="max-w-3xl mx-auto">
                     <div class="flex items-center justify-between mb-3">
@@ -604,13 +615,10 @@
                 </div>
             `;
 
-            // Build quiz deck: randomize question order and pick 3 wrong answers per card
-            quizCards = allCards.map(card => {
-                let wrongAnswers = allCards.filter(c => c.q !== card.q);
-                shuffleArray(wrongAnswers);
-                wrongAnswers = wrongAnswers.slice(0, 3).map(c => c.a);
-                return { ...card, wrongAnswers };
-            });
+            isReviewQuiz = reviewOnly;
+            if (!reviewOnly) missedQuizCards = [];
+            const sourceCards = reviewOnly ? missedQuizCards : allCards;
+            quizCards = buildQuizCards(sourceCards);
             shuffleArray(quizCards);
 
             currentQuizIndex = 0;
@@ -694,6 +702,9 @@
                     </div>
                 `;
             } else {
+                if (!isReviewQuiz && !missedQuizCards.some(missed => missed.q === card.q)) {
+                    missedQuizCards.push(card);
+                }
                 btn.classList.remove('opacity-50');
                 btn.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
                 feedback.className = 'mt-6 rounded-xl p-5 border-2 bg-red-50 border-red-400';
@@ -730,6 +741,7 @@
             const box = document.getElementById('quiz-card');
             const total = quizCards.length;
             const pct = Math.round((quizScore / total) * 100);
+            const missedCount = missedQuizCards.length;
             let emoji = '🏆';
             let title = 'Quiz Complete!';
             let msg = `You scored ${quizScore} out of ${total} (${pct}%)`;
@@ -744,9 +756,16 @@
                     <div class="text-6xl mb-4">${emoji}</div>
                     <h4 class="text-3xl font-black text-gray-800 mb-2">${title}</h4>
                     <p class="text-lg text-gray-600 font-semibold mb-6">${msg}</p>
-                    <button onclick="generateQuiz()" class="bg-purple-600 hover:bg-purple-500 text-white py-3 px-8 rounded-full font-bold text-lg transition-transform active:scale-95 shadow-lg">
-                        Try Again
-                    </button>
+                    <div class="flex flex-col sm:flex-row justify-center gap-3">
+                        ${missedCount > 0 ? `
+                            <button onclick="generateQuiz(true)" class="bg-yellow-400 hover:bg-yellow-300 text-purple-950 py-3 px-8 rounded-full font-bold text-lg transition-transform active:scale-95 shadow-lg">
+                                Review Missed Only (${missedCount})
+                            </button>
+                        ` : ''}
+                        <button onclick="generateQuiz()" class="bg-purple-600 hover:bg-purple-500 text-white py-3 px-8 rounded-full font-bold text-lg transition-transform active:scale-95 shadow-lg">
+                            Retake Full Quiz
+                        </button>
+                    </div>
                 </div>
             `;
             document.getElementById('quiz-counter').innerText = 'Finished';
