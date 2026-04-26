@@ -95,7 +95,7 @@
                     <header class="p-4 z-50 flex flex-col xl:flex-row justify-between items-center transition-colors duration-1000 bg-cyan-100/80 text-cyan-900 backdrop-blur-md border-b border-white/20 gap-4" id="diel-header">
                         <div class="flex items-center gap-3">
                             <div class="bg-yellow-400 p-2 rounded-full shadow-lg"><i class="fa-solid fa-trophy w-6 h-6 text-yellow-900 flex items-center justify-center text-lg"></i></div>
-                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 19</p></div>
+                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 23</p></div>
                         </div>
 
                         <div class="flex flex-wrap justify-center items-center gap-2 md:gap-4 bg-white/20 p-2 rounded-full border border-white/30 backdrop-blur-sm">
@@ -132,7 +132,7 @@
                     <div id="diel-success-banner" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 z-50">
                         <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-full shadow-2xl border-4 border-white flex items-center gap-4 animate-bounce">
                             <i class="fa-solid fa-trophy w-8 h-8 text-yellow-100 flex items-center justify-center text-2xl"></i>
-                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 19 DVM species!</p></div>
+                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 23 DVM species!</p></div>
                         </div>
                     </div>
 
@@ -439,7 +439,19 @@
                 'Abralia veranyi', ['🐟','🦑','🐬']],
             ['medusa','Atolla Jellyfish','🚨','70%','30%','900m','200m','40%','text-5xl','Zooplankton',
                 ['Creates a circular flash of blue light.','This light display is a burglar alarm designed to attract a larger predator to eat its attacker!','It has one elongated trailing tentacle used to sweep for prey in the dark.','Its dark red color acts as an invisibility cloak in the deep ocean.','It has no respiratory or digestive system; instead, a simple gastric cavity does the work.'],
-                'Atolla wyvillei', ['🐢','🐟','🐋']]
+                'Atolla wyvillei', ['🐢','🐟','🐋']],
+            ['cookiecutter','Cookiecutter Shark','🍪','84%','28%','1,000m','100m','50%','text-5xl','Squid, fish, and round plugs from large animals',
+                ['Glowing belly photophores help hide its silhouette from below.','It rises toward shallower water at night and returns deeper by day.','Its lips form a suction seal before the teeth cut a round plug of flesh.','Round scars on whales, tuna, and submarines can reveal cookiecutter bites.','A dark throat collar may mimic a small fish shadow and lure curious predators close.'],
+                'Isistius brasiliensis', ['🐋','🦈','🐟']],
+            ['fangtooth','Fangtooth Fish','🦷','82%','36%','900m','250m','54%','text-5xl','Small fish, squid, and crustaceans',
+                ['Huge lower teeth fit into special skull pockets when the mouth closes.','Fangtooth fish often move upward at night to hunt in shallower dim water.','The dark body helps it disappear in the twilight and midnight zones.','Adults are much smaller than their scary teeth make them look.','It is a strong clue creature for scarce-food deep-water adaptations.'],
+                'Anoplogaster cornuta', ['🐟','🦈','🦑']],
+            ['stoplightloosejaw','Stoplight Loosejaw','🚦','74%','26%','700m','180m','58%','text-5xl','Small fish and crustaceans',
+                ['It can make red bioluminescent light, a color many deep animals barely see.','That red light acts like a private flashlight in the twilight zone.','The lower jaw swings open dramatically to grab prey.','Like many mesopelagic predators, it follows prey layers through the water column.','Its special visual pigments help it see its own red light.'],
+                'Malacosteus niger', ['🐟','🦑','🐋']],
+            ['glasssquid','Glass Squid','🔍','66%','16%','600m','90m','32%','text-5xl','Small fish, crustaceans, and planktonic animals',
+                ['A transparent body makes it difficult for predators to spot in midwater.','Photophores near the eyes can help erase shadows from above.','Many glass squids live in the twilight zone and rise shallower at night.','Some species look like little glass balloons with arms held over the head.','Transparency is an active habitat clue for open midwater, not a tide-pool clue.'],
+                'Cranchiidae', ['🐋','🐬','🐟']]
         ].map(s=>({id:s[0],name:s[1],emoji:s[2],dayDepth:s[3],nightDepth:s[4],dayDepthText:s[5],nightDepthText:s[6],xPos:s[7],size:s[8],diet:s[9],funFacts:s[10],scientificName:s[11],predators:s[12]}));
 
         function getAnimalIcon(id, emoji, sizeCls) {

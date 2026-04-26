@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Region Taxonomy Lab | The Living Ocean</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Nunito','sans-serif'], heading: ['Poppins','sans-serif'] },
+                    colors: {
+                        ink: '#101828',
+                        reef: '#00b4d8',
+                        kelp: '#10b981',
+                        coral: '#fb7185',
+                        sun: '#facc15',
+                        trench: '#271033'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root{
+            --surface:#87e0ff;
+            --shelf:#12b9c8;
+            --slope:#2272a8;
+            --basin:#24306e;
+            --deep:#090b2b;
+            --floor:#231324;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            min-height:100vh;
+            overflow-x:hidden;
+            color:#f8fafc;
+            background:
+                radial-gradient(circle at 12% 8%,rgba(250,204,21,0.28),transparent 18rem),
+                radial-gradient(circle at 82% 18%,rgba(45,212,191,0.22),transparent 20rem),
+                linear-gradient(180deg,#0f86b7 0%,#074267 35%,#120d32 68%,#070411 100%);
+        }
+        body::before{
+            content:"";
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.07) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
+            background-size:56px 56px;
+            mask-image:linear-gradient(to bottom,rgba(0,0,0,0.45),rgba(0,0,0,0.05));
+        }
+        .soft-panel{
+            background:rgba(4,12,28,0.68);
+            border:1px solid rgba(186,230,253,0.22);
+            box-shadow:0 24px 70px rgba(0,0,0,0.26);
+            backdrop-filter:blur(14px);
+        }
+        .ocean-stage > .soft-panel{pointer-events:none}
+        .top-link{
+            background:rgba(255,255,255,0.12);
+            border:1px solid rgba(255,255,255,0.18);
+        }
+        .ocean-stage{
+            position:relative;
+            min-height:560px;
+            overflow:hidden;
+            border:1px solid rgba(186,230,253,0.25);
+            background:linear-gradient(180deg,var(--surface) 0%,var(--shelf) 22%,var(--slope) 44%,var(--basin) 67%,var(--deep) 100%);
+            box-shadow:inset 0 0 70px rgba(255,255,255,0.14),0 26px 70px rgba(0,0,0,0.34);
+        }
+        .ocean-stage::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background:
+                radial-gradient(circle at 18% 10%,rgba(255,255,255,0.44),transparent 10rem),
+                linear-gradient(110deg,rgba(255,255,255,0.18),transparent 22%,transparent 78%,rgba(0,0,0,0.36));
+            pointer-events:none;
+        }
+        .sea-floor{
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:0;
+            height:38%;
+            background:linear-gradient(180deg,rgba(111,64,39,0.18),rgba(20,9,22,0.96));
+            clip-path:polygon(0 36%,12% 28%,25% 34%,36% 47%,48% 58%,60% 57%,70% 42%,78% 30%,85% 43%,91% 70%,100% 76%,100% 100%,0 100%);
+        }
+        .shelf-shape{
+            position:absolute;
+            left:0;
+            bottom:25%;
+            width:45%;
+            height:18%;
+            background:linear-gradient(165deg,rgba(252,211,77,0.55),rgba(180,83,9,0.1));
+            clip-path:polygon(0 14%,54% 14%,100% 100%,0 100%);
+        }
+        .ridge-shape{
+            position:absolute;
+            left:55%;
+            bottom:0;
+            width:25%;
+            height:30%;
+            background:linear-gradient(155deg,rgba(45,212,191,0.42),rgba(20,184,166,0.06));
+            clip-path:polygon(0 100%,24% 42%,43% 67%,58% 26%,77% 62%,100% 100%);
+            filter:drop-shadow(0 0 18px rgba(45,212,191,0.35));
+        }
+        .trench-shape{
+            position:absolute;
+            right:-1%;
+            bottom:0;
+            width:25%;
+            height:33%;
+            background:linear-gradient(135deg,rgba(248,113,113,0.04),rgba(127,29,29,0.74));
+            clip-path:polygon(16% 0,56% 88%,100% 12%,100% 100%,0 100%);
+        }
+        .arc-islands{
+            position:absolute;
+            right:13%;
+            bottom:28%;
+            display:flex;
+            gap:0.45rem;
+            transform:rotate(-12deg);
+        }
+        .arc-islands span{
+            width:2.4rem;
+            height:1rem;
+            border-radius:50% 50% 45% 45%;
+            background:linear-gradient(180deg,#166534,#84cc16);
+            box-shadow:0 7px 0 rgba(87,83,78,0.75);
+        }
+        .vent{
+            position:absolute;
+            left:65%;
+            bottom:23%;
+            width:3.2rem;
+            height:5.4rem;
+            background:linear-gradient(180deg,rgba(229,231,235,0.18),rgba(76,29,149,0.92));
+            clip-path:polygon(35% 100%,66% 100%,56% 20%,74% 0,43% 18%);
+        }
+        .vent::before{
+            content:"";
+            position:absolute;
+            left:50%;
+            bottom:72%;
+            width:5rem;
+            height:6rem;
+            transform:translateX(-50%);
+            background:radial-gradient(circle,rgba(216,180,254,0.5),transparent 62%);
+            animation:smoke 2.7s infinite ease-in-out;
+        }
+        @keyframes smoke{50%{transform:translate(-50%,-12px) scale(1.12);opacity:0.55}}
+        .scan-btn{
+            position:absolute;
+            width:2.7rem;
+            height:2.7rem;
+            border-radius:999px;
+            color:#082f49;
+            background:#fef08a;
+            border:3px solid rgba(255,255,255,0.85);
+            box-shadow:0 0 0 0 rgba(250,204,21,0.65),0 16px 28px rgba(0,0,0,0.25);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            transition:transform 0.18s ease,background 0.18s ease;
+            animation:pulse 2s infinite;
+        }
+        .scan-btn:hover,.scan-btn.active{transform:scale(1.12);background:#fff;color:#0e7490}
+        @keyframes pulse{70%{box-shadow:0 0 0 15px rgba(250,204,21,0),0 16px 28px rgba(0,0,0,0.25)}}
+        .badge-chip{
+            border:1px solid rgba(255,255,255,0.18);
+            background:rgba(255,255,255,0.1);
+        }
+        .category-btn,.answer-btn,.drop-card{
+            transition:transform 0.16s ease,background 0.16s ease,border-color 0.16s ease,box-shadow 0.16s ease;
+        }
+        .category-btn:hover,.answer-btn:hover,.drop-card:hover{transform:translateY(-2px)}
+        .category-btn.selected{
+            background:rgba(250,204,21,0.22);
+            border-color:rgba(250,204,21,0.82);
+            box-shadow:0 0 0 3px rgba(250,204,21,0.12);
+        }
+        .answer-btn.correct,.drop-card.correct{
+            background:rgba(34,197,94,0.22)!important;
+            border-color:rgba(74,222,128,0.88)!important;
+        }
+        .answer-btn.wrong,.drop-card.wrong{
+            background:rgba(239,68,68,0.24)!important;
+            border-color:rgba(248,113,113,0.88)!important;
+            animation:shake 0.35s ease;
+        }
+        @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+        .token{
+            touch-action:none;
+            user-select:none;
+            cursor:grab;
+        }
+        .token.dragging{
+            cursor:grabbing;
+            z-index:70;
+            box-shadow:0 18px 42px rgba(0,0,0,0.4);
+        }
+        .drop-card.hovered{
+            background:rgba(14,165,233,0.24);
+            border-color:rgba(125,211,252,0.88);
+        }
+        .creature-dot{
+            position:absolute;
+            width:5.5rem;
+            height:2.8rem;
+            filter:drop-shadow(0 8px 10px rgba(0,0,0,0.32));
+            opacity:0.94;
+        }
+        .creature-dot::before{
+            content:"";
+            position:absolute;
+            inset:20% 10% 20% 0;
+            border-radius:999px 65% 65% 999px;
+            background:linear-gradient(90deg,#fef3c7,#fb7185);
+        }
+        .creature-dot::after{
+            content:"";
+            position:absolute;
+            right:0;
+            top:28%;
+            border-left:1.25rem solid #fb7185;
+            border-top:0.65rem solid transparent;
+            border-bottom:0.65rem solid transparent;
+        }
+        .swim-a{animation:swimA 8s infinite ease-in-out}
+        .swim-b{animation:swimB 10s infinite ease-in-out}
+        .swim-c{animation:swimC 12s infinite ease-in-out}
+        @keyframes swimA{50%{transform:translate(54px,-14px) scale(0.92)}}
+        @keyframes swimB{50%{transform:translate(-70px,18px) scale(1.06)}}
+        @keyframes swimC{50%{transform:translate(32px,22px) rotate(-5deg)}}
+        @media (max-width:700px){
+            .ocean-stage{min-height:620px}
+            .scan-btn{width:2.35rem;height:2.35rem}
+            .creature-dot{width:4.4rem;height:2.2rem}
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <main class="relative z-10">
+        <section class="px-4 pt-6 pb-4">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+                <a href="index.html" class="top-link inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white hover:bg-white/20">
+                    <i class="fa-solid fa-water"></i>
+                    OceanExplorer
+                </a>
+                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-cyan-100">
+                    <i class="fa-solid fa-compass-drafting text-yellow-300"></i>
+                    Region Taxonomy Lab
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 pb-8">
+            <div class="max-w-7xl mx-auto grid lg:grid-cols-[0.88fr_1.12fr] gap-5 items-stretch">
+                <div class="soft-panel rounded-3xl p-5 sm:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-300 text-slate-950 text-xs font-black uppercase tracking-[0.16em] mb-5">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            No flat worksheet zone
+                        </div>
+                        <h1 class="font-heading text-4xl sm:text-5xl xl:text-6xl font-black leading-tight text-white">
+                            Master Ocean Region Taxonomy
+                        </h1>
+                        <p class="mt-4 text-lg sm:text-xl text-cyan-50/86 font-bold max-w-2xl">
+                            Explore how one ocean place can be a depth zone, a habitat, a seafloor province, a tectonic feature, and a geographic region all at once.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mt-8">
+                        <button onclick="scrollToMode('scanner')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
+                            <i class="fa-solid fa-location-crosshairs text-yellow-300 text-2xl"></i>
+                            <span class="block mt-2 text-sm font-black">Scan</span>
+                        </button>
+                        <button onclick="scrollToMode('passport')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
+                            <i class="fa-solid fa-stamp text-teal-300 text-2xl"></i>
+                            <span class="block mt-2 text-sm font-black">Classify</span>
+                        </button>
+                        <button onclick="scrollToMode('challenge')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
+                            <i class="fa-solid fa-bolt text-rose-300 text-2xl"></i>
+                            <span class="block mt-2 text-sm font-black">Battle</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="scanner" class="ocean-stage rounded-3xl">
+                    <div class="creature-dot swim-a" style="left:17%;top:20%"></div>
+                    <div class="creature-dot swim-b" style="left:72%;top:43%;transform:scale(0.72)"></div>
+                    <div class="creature-dot swim-c" style="left:38%;top:65%;transform:scale(0.55)"></div>
+                    <div class="shelf-shape"></div>
+                    <div class="sea-floor"></div>
+                    <div class="ridge-shape"></div>
+                    <div class="trench-shape"></div>
+                    <div class="arc-islands"><span></span><span></span><span></span></div>
+                    <div class="vent"></div>
+                    <button class="scan-btn active" style="left:8%;top:28%" data-scan="intertidal" aria-label="Scan intertidal zone"><i class="fa-solid fa-person-rays"></i></button>
+                    <button class="scan-btn" style="left:28%;top:23%" data-scan="shelf" aria-label="Scan continental shelf"><i class="fa-solid fa-layer-group"></i></button>
+                    <button class="scan-btn" style="left:38%;top:48%" data-scan="slope" aria-label="Scan continental slope"><i class="fa-solid fa-arrow-trend-down"></i></button>
+                    <button class="scan-btn" style="left:55%;top:58%" data-scan="plain" aria-label="Scan abyssal plain"><i class="fa-solid fa-ruler-horizontal"></i></button>
+                    <button class="scan-btn" style="left:67%;top:62%" data-scan="ridge" aria-label="Scan mid-ocean ridge"><i class="fa-solid fa-mountain"></i></button>
+                    <button class="scan-btn" style="left:68%;top:47%" data-scan="vent" aria-label="Scan hydrothermal vent"><i class="fa-solid fa-fire-flame-curved"></i></button>
+                    <button class="scan-btn" style="left:84%;top:56%" data-scan="arc" aria-label="Scan island arc"><i class="fa-solid fa-volcano"></i></button>
+                    <button class="scan-btn" style="left:91%;top:61%" data-scan="trench" aria-label="Scan trench"><i class="fa-solid fa-angles-down"></i></button>
+                    <div class="absolute left-4 right-4 bottom-4 soft-panel rounded-2xl p-4 sm:p-5">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <div id="scan-kicker" class="text-xs uppercase tracking-[0.2em] font-black text-yellow-200">Scanner locked</div>
+                                <h2 id="scan-title" class="font-heading text-2xl sm:text-3xl font-black text-white mt-1">Intertidal / Littoral Zone</h2>
+                            </div>
+                            <div id="scan-depth" class="px-3 py-2 rounded-xl bg-cyan-300 text-slate-950 font-black text-sm">Tide zone</div>
+                        </div>
+                        <div id="scan-tags" class="flex flex-wrap gap-2 mt-4"></div>
+                        <p id="scan-copy" class="mt-4 text-cyan-50 font-bold"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-4 py-8">
+            <div class="max-w-7xl mx-auto grid xl:grid-cols-[0.95fr_1.05fr] gap-5">
+                <div id="passport" class="soft-panel rounded-3xl p-5 sm:p-7">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs uppercase tracking-[0.2em] font-black text-teal-200">Taxonomy Passport</div>
+                            <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Stamp Every Identity</h2>
+                        </div>
+                        <div class="px-3 py-2 rounded-2xl bg-white/10 border border-white/15 font-black">
+                            Score <span id="passport-score" class="text-yellow-300">0</span>
+                        </div>
+                    </div>
+                    <div class="mt-5 rounded-2xl border border-white/15 bg-white/8 p-4">
+                        <div id="passport-icon" class="w-16 h-16 rounded-2xl bg-cyan-200 text-slate-950 flex items-center justify-center text-3xl shadow-lg"></div>
+                        <h3 id="passport-title" class="font-heading text-2xl font-black text-white mt-4"></h3>
+                        <p id="passport-clue" class="mt-2 text-cyan-50 font-bold"></p>
+                    </div>
+                    <div id="category-grid" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+                    <div class="flex flex-wrap gap-3 mt-5">
+                        <button onclick="checkPassport()" class="px-5 py-3 rounded-2xl bg-yellow-300 text-slate-950 font-black hover:bg-yellow-200 active:scale-95">
+                            <i class="fa-solid fa-circle-check mr-2"></i>Check Stamps
+                        </button>
+                        <button onclick="nextPassport()" class="px-5 py-3 rounded-2xl bg-white/12 border border-white/20 text-white font-black hover:bg-white/20 active:scale-95">
+                            <i class="fa-solid fa-shuffle mr-2"></i>New Mission
+                        </button>
+                    </div>
+                    <div id="passport-feedback" class="mt-4 min-h-[4.5rem] rounded-2xl border border-white/12 bg-black/18 p-4 text-sm sm:text-base font-bold text-cyan-50"></div>
+                </div>
+
+                <div class="soft-panel rounded-3xl p-5 sm:p-7">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs uppercase tracking-[0.2em] font-black text-rose-200">Drag Deck</div>
+                            <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Drop Features Into Families</h2>
+                        </div>
+                        <button onclick="resetDrops()" class="px-4 py-2 rounded-xl bg-white/10 border border-white/15 font-black hover:bg-white/18">
+                            <i class="fa-solid fa-rotate-right mr-2"></i>Reset
+                        </button>
+                    </div>
+                    <div id="token-row" class="flex flex-wrap gap-3 mt-5 min-h-[4.5rem]"></div>
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5" id="drop-zones"></div>
+                    <div id="drop-feedback" class="mt-4 min-h-[3.5rem] rounded-2xl border border-white/12 bg-black/18 p-4 font-bold text-cyan-50"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenge" class="px-4 py-8 pb-14">
+            <div class="max-w-7xl mx-auto soft-panel rounded-3xl p-5 sm:p-7">
+                <div class="grid lg:grid-cols-[0.8fr_1.2fr] gap-5 items-start">
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.2em] font-black text-yellow-200">Boss Quiz</div>
+                        <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Ocean Identity Battle</h2>
+                        <p class="mt-3 text-cyan-50 font-bold">Fast rounds mix geography, ecology, depth, landforms, and tectonics. Beat all rounds to prove you can read the ocean like a layered map.</p>
+                        <div class="grid grid-cols-3 gap-3 mt-5">
+                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
+                                <div class="text-xs uppercase font-black text-cyan-200">Round</div>
+                                <div id="battle-round" class="text-2xl font-black text-white">1/1</div>
+                            </div>
+                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
+                                <div class="text-xs uppercase font-black text-cyan-200">Wins</div>
+                                <div id="battle-score" class="text-2xl font-black text-yellow-300">0</div>
+                            </div>
+                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
+                                <div class="text-xs uppercase font-black text-cyan-200">Streak</div>
+                                <div id="battle-streak" class="text-2xl font-black text-teal-300">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-3xl border border-white/15 bg-white/8 p-5">
+                        <div id="battle-question" class="font-heading text-2xl sm:text-3xl font-black text-white"></div>
+                        <div id="battle-options" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+                        <div id="battle-feedback" class="mt-4 min-h-[4rem] rounded-2xl border border-white/12 bg-black/20 p-4 font-bold"></div>
+                        <button id="battle-next" onclick="nextBattle()" class="hidden mt-4 px-5 py-3 rounded-2xl bg-yellow-300 text-slate-950 font-black hover:bg-yellow-200">
+                            Next Round <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const scanData = {
+            intertidal: {
+                title: 'Intertidal / Littoral Zone',
+                depth: 'Tide zone',
+                tags: ['Horizontal ecological region','Benthic depth region','Biological habitat'],
+                copy: 'Between high and low tide, organisms switch between seawater and air. Tide pools, rocky shores, beaches, mudflats, salt marshes, and mangroves can all live in this identity.'
+            },
+            shelf: {
+                title: 'Continental Shelf / Neritic Zone',
+                depth: 'Low tide to about 200 m',
+                tags: ['Seafloor province','Horizontal ecological region','Sublittoral benthic'],
+                copy: 'The shallow underwater edge of a continent is often productive because light and nutrients overlap. Reefs, kelp, seagrass, banks, shoals, and shelf seas belong here.'
+            },
+            slope: {
+                title: 'Continental Slope and Submarine Canyon',
+                depth: 'About 200-4,000 m',
+                tags: ['Seafloor province','Bathyal region','Landform habitat'],
+                copy: 'The slope is the steep descent after the shelf break. Canyons, gullies, scarps, slope basins, and cold-water corals are common clues.'
+            },
+            plain: {
+                title: 'Abyssal Plain and Abyssal Hills',
+                depth: 'About 4,000-6,000 m',
+                tags: ['Deep-ocean basin','Abyssal benthic','Abyssopelagic above'],
+                copy: 'Abyssal plains are extremely flat deep seafloor. Abyssal hills and lower ridge flanks interrupt the plain with low rounded terrain.'
+            },
+            ridge: {
+                title: 'Mid-Ocean Ridge Province',
+                depth: 'Deep basin highland',
+                tags: ['Tectonic region','Seafloor province','Ridge flank / rift valley'],
+                copy: 'This is a divergent plate boundary where new ocean crust forms. Look for a ridge axis, rift valley, transform faults, fracture zones, and vent fields.'
+            },
+            vent: {
+                title: 'Hydrothermal Vent Field',
+                depth: 'Usually deep seafloor',
+                tags: ['Biological habitat','Tectonic setting','Chemosynthetic ecosystem'],
+                copy: 'Hot mineral-rich fluids exit the seafloor near ridges, arcs, back-arcs, or hotspots. Life here is powered by chemistry instead of sunlight.'
+            },
+            arc: {
+                title: 'Island Arc / Back-Arc Province',
+                depth: 'Subduction neighborhood',
+                tags: ['Tectonic region','Geographic province','Volcanic habitat'],
+                copy: 'Island arcs, forearc basins, back-arc basins, and remnant arcs often form around convergent margins where plates interact.'
+            },
+            trench: {
+                title: 'Trench / Hadal Province',
+                depth: 'Deeper than 6,000 m',
+                tags: ['Tectonic region','Hadal benthic','Hadopelagic water'],
+                copy: 'Trenches are long, narrow, very deep depressions at many subduction zones. Trench walls, axes, basins, and accretionary wedges are part of the system.'
+            }
+        };
+
+        const categoryMeta = {
+            geographic: { label: 'Geographic ocean region', icon: 'fa-earth-americas', hint: 'World Ocean, basin, sea, gulf, bay, strait, sound, fjord, ria.' },
+            horizontal: { label: 'Horizontal ecological region', icon: 'fa-arrows-left-right', hint: 'Supratidal, intertidal, subtidal, neritic, oceanic, pelagic, benthic, demersal.' },
+            vertical: { label: 'Vertical light/depth zone', icon: 'fa-arrow-down-long', hint: 'Euphotic, mesopelagic, bathypelagic, abyssopelagic, hadopelagic.' },
+            seafloor: { label: 'Seafloor province', icon: 'fa-mountain-sun', hint: 'Shelf, slope, rise, abyssal province, ridge, trench, island arc.' },
+            tectonic: { label: 'Tectonic region', icon: 'fa-volcano', hint: 'Ridges, transform faults, trenches, island arcs, back-arc basins.' },
+            habitat: { label: 'Biological habitat', icon: 'fa-seedling', hint: 'Reefs, kelp forests, vents, seeps, marshes, mangroves, mudflats.' },
+            benthicDepth: { label: 'Benthic depth name', icon: 'fa-anchor', hint: 'Littoral, sublittoral, bathyal, abyssal, hadal.' }
+        };
+
+        const passportMissions = [
+            {
+                title: 'Hydrothermal vent field on a mid-ocean ridge',
+                clue: 'Hot mineral-rich fluid pours from the seafloor; tube-shaped animals and chemosynthetic microbes crowd around it.',
+                icon: 'fa-fire-flame-curved',
+                answers: ['seafloor','tectonic','habitat','benthicDepth'],
+                explain: 'It is a vent habitat, often on a ridge tectonic province, located on the seafloor, and it also has a benthic depth identity.'
+            },
+            {
+                title: 'Coral reef on the continental shelf',
+                clue: 'Sunlight reaches the bottom; reef builders and algae cooperate in shallow coastal water.',
+                icon: 'fa-spa',
+                answers: ['horizontal','seafloor','habitat','benthicDepth'],
+                explain: 'The shelf is a seafloor province, the water is neritic, the reef is a habitat, and the bottom is sublittoral shelf benthic.'
+            },
+            {
+                title: 'Drake Passage',
+                clue: 'A narrow connection lets large water bodies exchange water between continents.',
+                icon: 'fa-route',
+                answers: ['geographic'],
+                explain: 'A passage, channel, or strait is a geographic ocean-region term rather than a depth or habitat by itself.'
+            },
+            {
+                title: 'Abyssal plain under abyssopelagic water',
+                clue: 'A very flat deep basin floor sits below dark open water far beyond the shelf break.',
+                icon: 'fa-ruler-horizontal',
+                answers: ['vertical','seafloor','benthicDepth','horizontal'],
+                explain: 'The floor is an abyssal seafloor province and benthic depth region; the water above is abyssopelagic and part of the oceanic/pelagic realm.'
+            },
+            {
+                title: 'Mangrove forest in a tidal estuary',
+                clue: 'Tree roots stand in brackish coastal water where river flow and tides mix.',
+                icon: 'fa-tree',
+                answers: ['horizontal','habitat','geographic','benthicDepth'],
+                explain: 'An estuary is a geographic/coastal system, mangrove forest is a habitat, and the tide zone maps to intertidal/littoral benthic terms.'
+            },
+            {
+                title: 'Hadal trench axis',
+                clue: 'The deepest long valley lies at a convergent plate boundary below 6,000 meters.',
+                icon: 'fa-angles-down',
+                answers: ['vertical','seafloor','tectonic','benthicDepth'],
+                explain: 'A trench is a tectonic/seafloor province; below 6,000 m the bottom is hadal and the water is hadopelagic.'
+            }
+        ];
+
+        const drops = [
+            { label: 'Gulf of Mexico', family: 'geographic' },
+            { label: 'Neritic zone', family: 'horizontal' },
+            { label: 'Mesopelagic', family: 'vertical' },
+            { label: 'Continental rise', family: 'seafloor' },
+            { label: 'Transform fault', family: 'tectonic' },
+            { label: 'Kelp forest', family: 'habitat' },
+            { label: 'Bathyal', family: 'benthicDepth' },
+            { label: 'Submarine canyon', family: 'seafloor' },
+            { label: 'Cold seep', family: 'habitat' },
+            { label: 'Marginal sea', family: 'geographic' }
+        ];
+
+        const battles = [
+            {
+                q: 'Which pair best describes water over the continental shelf?',
+                options: ['Neritic + usually productive', 'Hadopelagic + trench wall', 'Back-arc + abyssal hill', 'Oceanic + below 6,000 m'],
+                a: 0,
+                explain: 'Neritic water lies over the shelf and is often productive because light and nutrients can overlap.'
+            },
+            {
+                q: 'A flat-topped underwater mountain is called a...',
+                options: ['Guyot or tablemount', 'Ria', 'Forearc basin', 'Turbidite levee'],
+                a: 0,
+                explain: 'A guyot is a flat-topped seamount, often eroded near sea level before it subsided.'
+            },
+            {
+                q: 'Which is the best correction for using "abyssal slope" as a main label?',
+                options: ['Use a more precise local feature such as ridge flank, trench wall, seamount slope, or continental rise', 'Always replace it with continental shelf', 'Use it only for beaches', 'Call every deep feature hadal'],
+                a: 0,
+                explain: 'The PDF notes that "abyssal slope" is usually descriptive, not a major standardized province.'
+            },
+            {
+                q: 'Which category connects ridges, transform faults, trenches, island arcs, and back-arc basins?',
+                options: ['Tectonic region', 'Supratidal region', 'Estuary habitat', 'Bight classification'],
+                a: 0,
+                explain: 'Those terms describe plate-boundary or plate-related structure.'
+            },
+            {
+                q: 'What makes a taxonomy map more accurate than one single ocean-region list?',
+                options: ['Depth, biology, geography, and tectonics overlap at the same place', 'Every place has only one correct label', 'Depth never changes across basins', 'Habitats are separate from physical regions'],
+                a: 0,
+                explain: 'One location can belong to several systems at once, which is the central idea of this taxonomy.'
+            },
+            {
+                q: 'Which set belongs mostly to individual seafloor landforms and habitats?',
+                options: ['Seamount, trench, cold seep, submarine canyon', 'World Ocean, Pacific Basin, gulf, strait', 'Euphotic, mesopelagic, bathypelagic', 'Pelagic, benthic, demersal'],
+                a: 0,
+                explain: 'Those are recognizable features or habitats on the seafloor.'
+            }
+        ];
+
+        let passportIndex = 0;
+        let passportScore = 0;
+        let battleIndex = 0;
+        let battleScore = 0;
+        let battleStreak = 0;
+        let activeDrag = null;
+
+        function scrollToMode(id){
+            document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+
+        function renderScan(key){
+            const data = scanData[key];
+            document.querySelectorAll('.scan-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.scan === key));
+            document.getElementById('scan-title').textContent = data.title;
+            document.getElementById('scan-depth').textContent = data.depth;
+            document.getElementById('scan-copy').textContent = data.copy;
+            document.getElementById('scan-tags').innerHTML = data.tags.map(tag => `<span class="badge-chip px-3 py-1 rounded-full text-xs font-black text-cyan-50">${tag}</span>`).join('');
+        }
+
+        function renderPassport(){
+            const mission = passportMissions[passportIndex];
+            document.getElementById('passport-title').textContent = mission.title;
+            document.getElementById('passport-clue').textContent = mission.clue;
+            document.getElementById('passport-icon').innerHTML = `<i class="fa-solid ${mission.icon}"></i>`;
+            document.getElementById('category-grid').innerHTML = Object.entries(categoryMeta).map(([key, cat]) => `
+                <button type="button" class="category-btn rounded-2xl border border-white/15 bg-white/10 p-4 text-left" data-cat="${key}" onclick="toggleCategory('${key}')">
+                    <i class="fa-solid ${cat.icon} text-yellow-200 text-xl"></i>
+                    <span class="block mt-2 font-black text-white">${cat.label}</span>
+                    <span class="block mt-1 text-xs font-bold text-cyan-100/80">${cat.hint}</span>
+                </button>
+            `).join('');
+            document.getElementById('passport-feedback').textContent = 'Pick every category that belongs to this place. Some missions need more than one stamp.';
+        }
+
+        function toggleCategory(key){
+            document.querySelector(`[data-cat="${key}"]`)?.classList.toggle('selected');
+        }
+
+        function checkPassport(){
+            const selected = [...document.querySelectorAll('.category-btn.selected')].map(btn => btn.dataset.cat).sort();
+            const mission = passportMissions[passportIndex];
+            const answers = [...mission.answers].sort();
+            const ok = selected.length === answers.length && selected.every((v, i) => v === answers[i]);
+            const feedback = document.getElementById('passport-feedback');
+            if(ok){
+                passportScore += 10;
+                document.getElementById('passport-score').textContent = passportScore;
+                feedback.innerHTML = `<span class="text-green-300"><i class="fa-solid fa-check mr-2"></i>Stamped perfectly.</span> ${mission.explain}`;
+            } else {
+                const missing = answers.filter(a => !selected.includes(a)).map(a => categoryMeta[a].label);
+                const extras = selected.filter(a => !answers.includes(a)).map(a => categoryMeta[a].label);
+                feedback.innerHTML = `<span class="text-rose-300"><i class="fa-solid fa-xmark mr-2"></i>Almost.</span> ${missing.length ? 'Missing: ' + missing.join(', ') + '. ' : ''}${extras.length ? 'Extra: ' + extras.join(', ') + '. ' : ''}${mission.explain}`;
+            }
+        }
+
+        function nextPassport(){
+            passportIndex = (passportIndex + 1) % passportMissions.length;
+            renderPassport();
+        }
+
+        function renderDrops(){
+            const tokenRow = document.getElementById('token-row');
+            tokenRow.innerHTML = drops.map((item, index) => `
+                <button class="token px-4 py-3 rounded-2xl bg-yellow-200 text-slate-950 font-black shadow-lg" data-token="${index}" aria-label="Drag ${item.label}">
+                    ${item.label}
+                </button>
+            `).join('');
+            document.getElementById('drop-zones').innerHTML = Object.entries(categoryMeta).map(([key, cat]) => `
+                <div class="drop-card min-h-[7rem] rounded-2xl border border-white/15 bg-white/10 p-4" data-drop="${key}">
+                    <i class="fa-solid ${cat.icon} text-cyan-200 text-xl"></i>
+                    <div class="mt-2 font-black text-white">${cat.label}</div>
+                    <div class="mt-2 text-xs text-cyan-100/75 font-bold">Drop matching cards here.</div>
+                </div>
+            `).join('');
+            document.querySelectorAll('.token').forEach(token => token.addEventListener('pointerdown', beginDrag));
+            document.getElementById('drop-feedback').textContent = 'Drag a term into its best taxonomy family.';
+        }
+
+        function beginDrag(e){
+            if(e.button !== undefined && e.button !== 0) return;
+            const token = e.currentTarget;
+            const rect = token.getBoundingClientRect();
+            activeDrag = { token, home: token.parentElement, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+            token.classList.add('dragging');
+            token.style.position = 'fixed';
+            token.style.left = `${rect.left}px`;
+            token.style.top = `${rect.top}px`;
+            token.style.width = `${rect.width}px`;
+            token.style.margin = '0';
+            document.body.appendChild(token);
+            token.setPointerCapture?.(e.pointerId);
+            window.addEventListener('pointermove', moveDrag);
+            window.addEventListener('pointerup', endDrag, { once:true });
+            e.preventDefault();
+        }
+
+        function moveDrag(e){
+            if(!activeDrag) return;
+            activeDrag.token.style.left = `${e.clientX - activeDrag.offsetX}px`;
+            activeDrag.token.style.top = `${e.clientY - activeDrag.offsetY}px`;
+            document.querySelectorAll('.drop-card').forEach(card => card.classList.remove('hovered'));
+            const drop = dropFromPoint(e.clientX, e.clientY);
+            drop?.classList.add('hovered');
+        }
+
+        function endDrag(e){
+            if(!activeDrag) return;
+            window.removeEventListener('pointermove', moveDrag);
+            document.querySelectorAll('.drop-card').forEach(card => card.classList.remove('hovered'));
+            const drop = dropFromPoint(e.clientX, e.clientY);
+            const token = activeDrag.token;
+            token.classList.remove('dragging');
+            if(!drop){
+                restoreToken();
+                return;
+            }
+            const item = drops[Number(token.dataset.token)];
+            const ok = item.family === drop.dataset.drop;
+            const feedback = document.getElementById('drop-feedback');
+            drop.classList.remove('correct','wrong');
+            void drop.offsetWidth;
+            drop.classList.add(ok ? 'correct' : 'wrong');
+            if(ok){
+                token.removeAttribute('style');
+                token.classList.remove('bg-yellow-200','text-slate-950');
+                token.classList.add('bg-green-300','text-emerald-950');
+                drop.appendChild(token);
+                feedback.innerHTML = `<span class="text-green-300"><i class="fa-solid fa-check mr-2"></i>${item.label}</span> belongs with ${categoryMeta[item.family].label}.`;
+                activeDrag = null;
+            } else {
+                feedback.innerHTML = `<span class="text-rose-300"><i class="fa-solid fa-xmark mr-2"></i>${item.label}</span> fits ${categoryMeta[item.family].label}. Try that family.`;
+                restoreToken();
+            }
+        }
+
+        function dropFromPoint(x, y){
+            return [...document.querySelectorAll('.drop-card')].find(card => {
+                const rect = card.getBoundingClientRect();
+                return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+            }) || null;
+        }
+
+        function restoreToken(){
+            if(!activeDrag) return;
+            activeDrag.token.removeAttribute('style');
+            activeDrag.home.appendChild(activeDrag.token);
+            activeDrag = null;
+        }
+
+        function resetDrops(){
+            renderDrops();
+        }
+
+        function renderBattle(){
+            const round = battles[battleIndex];
+            document.getElementById('battle-round').textContent = `${battleIndex + 1}/${battles.length}`;
+            document.getElementById('battle-score').textContent = battleScore;
+            document.getElementById('battle-streak').textContent = battleStreak;
+            document.getElementById('battle-question').textContent = round.q;
+            document.getElementById('battle-feedback').textContent = 'Choose the strongest taxonomy reading.';
+            document.getElementById('battle-next').classList.add('hidden');
+            document.getElementById('battle-options').innerHTML = round.options.map((option, index) => `
+                <button class="answer-btn rounded-2xl border border-white/15 bg-white/10 p-4 text-left font-black text-white" onclick="checkBattle(${index}, this)">
+                    ${option}
+                </button>
+            `).join('');
+        }
+
+        function checkBattle(index, btn){
+            const round = battles[battleIndex];
+            const buttons = [...document.querySelectorAll('.answer-btn')];
+            buttons.forEach(b => b.disabled = true);
+            const ok = index === round.a;
+            btn.classList.add(ok ? 'correct' : 'wrong');
+            buttons[round.a]?.classList.add('correct');
+            if(ok){
+                battleScore += 1;
+                battleStreak += 1;
+            } else {
+                battleStreak = 0;
+            }
+            document.getElementById('battle-score').textContent = battleScore;
+            document.getElementById('battle-streak').textContent = battleStreak;
+            document.getElementById('battle-feedback').innerHTML = `<span class="${ok ? 'text-green-300' : 'text-rose-300'}">${ok ? 'Correct.' : 'Not quite.'}</span> ${round.explain}`;
+            document.getElementById('battle-next').classList.remove('hidden');
+        }
+
+        function nextBattle(){
+            battleIndex = (battleIndex + 1) % battles.length;
+            renderBattle();
+        }
+
+        document.querySelectorAll('.scan-btn').forEach(btn => btn.addEventListener('click', () => renderScan(btn.dataset.scan)));
+        renderScan('intertidal');
+        renderPassport();
+        renderDrops();
+        renderBattle();
+    </script>
+</body>
+</html>

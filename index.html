@@ -180,6 +180,7 @@
                     </button>
                     <div id="nav-dropdown" class="hidden absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-[60] overflow-hidden">
                         <button onclick="switchTab('zones'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-layer-group w-5 text-center"></i> Zones</button>
+                        <button onclick="switchTab('taxonomy'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compass-drafting w-5 text-center"></i> Taxonomy Lab</button>
                         <button onclick="switchTab('adaptations'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-dna w-5 text-center"></i> Adaptations</button>
                         <button onclick="switchTab('migration'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-sort w-5 text-center"></i> Diel Vertical Migration</button>
                         <button onclick="switchTab('gradients'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-chart-bar w-5 text-center"></i> Gradients</button>
@@ -197,6 +198,7 @@
                 <div class="hidden lg:block flex-1 min-w-0">
                     <div class="flex items-center gap-1 font-bold text-sm overflow-x-auto nav-scroll-x whitespace-nowrap">
                         <button onclick="switchTab('zones')" id="btn-zones" class="tab-btn px-2 py-5 border-b-4 border-ocean-sunlight text-ocean-sunlight transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
+                        <button onclick="switchTab('taxonomy')" id="btn-taxonomy" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Taxonomy Lab</button>
                         <button onclick="switchTab('adaptations')" id="btn-adaptations" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
                         <button onclick="switchTab('migration')" id="btn-migration" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 leading-tight flex-shrink-0"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
                         <button onclick="switchTab('gradients')" id="btn-gradients" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
@@ -226,6 +228,7 @@
         </div>
         <div class="lg:hidden flex border-t border-gray-200 bg-white overflow-x-auto nav-scroll">
             <button onclick="switchTab('zones')" id="btn-zones-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-ocean-sunlight text-ocean-sunlight flex-shrink-0"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
+            <button onclick="switchTab('taxonomy')" id="btn-taxonomy-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Taxonomy Lab</button>
             <button onclick="switchTab('adaptations')" id="btn-adaptations-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
             <button onclick="switchTab('migration')" id="btn-migration-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0 leading-tight"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
             <button onclick="switchTab('gradients')" id="btn-gradients-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
@@ -285,6 +288,11 @@
         <!-- TAB 1: ZONES -->
         <div id="tab-zones" class="tab-pane hidden">
             <iframe src="zones.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
+        </div>
+
+        <!-- TAB: TAXONOMY LAB -->
+        <div id="tab-taxonomy" class="tab-pane hidden">
+            <iframe src="taxonomy.html" style="width:100%;height:100%;border:none;display:block;"></iframe>
         </div>
 
         <!-- TAB 2: ADAPTATIONS -->
