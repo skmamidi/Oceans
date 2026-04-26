@@ -31,6 +31,7 @@
     
     <title>Ocean Zones | The Living Ocean</title>
     <script src="badge-system.js"></script>
+    <script src="creature-data.js"></script>
     <style>
         body{background-color:#f0f8ff;overflow-x:hidden;}
         .gradient-ocean{background:linear-gradient(to bottom,#4ea8de 0%,#0077b6 15%,#03045e 35%,#01012b 60%,#000010 85%,#000000 100%);}
@@ -119,11 +120,12 @@
                                         <span onclick="openSpecies('barnacle')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="barnacle" title="Acorn Barnacle"></span>
                                         <span onclick="openSpecies('starfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="starfish" title="Ochre Sea Star"></span>
                                         <span onclick="openSpecies('anemone')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="anemone" title="Sea Anemone"></span>
+                                        <span onclick="openSpecies('mussel')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="mussel" title="California Mussel"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-0">
-                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 1/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-0">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 1/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-0">1</span>/7 Done</span></h3>
                                 <div id="qz-body-0"></div>
                             </div>
                         </div>
@@ -146,11 +148,15 @@
                                         <span onclick="openSpecies('queenangelfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="queenangelfish" title="Queen Angelfish"></span>
                                         <span onclick="openSpecies('urchin')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="urchin" title="Urchin"></span>
                                         <span onclick="openSpecies('xrayfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="xrayfish" title="X-ray Fish"></span>
+                                        <span onclick="openSpecies('butterflyfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="butterflyfish" title="Butterflyfish"></span>
+                                        <span onclick="openSpecies('angelfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="angelfish" title="Marine Angelfish"></span>
+                                        <span onclick="openSpecies('octopus')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="octopus" title="Octopus"></span>
+                                        <span onclick="openSpecies('cuttlefish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="cuttlefish" title="Cuttlefish"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-black/40 p-6 rounded-2xl border border-teal-300/30" id="quiz-container-1">
-                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 2/7</span><span class="text-sm font-normal text-teal-200"><span id="q-tracker-1">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 2/7</span><span class="text-sm font-normal text-teal-200"><span id="q-tracker-1">1</span>/7 Done</span></h3>
                                 <div id="qz-body-1"></div>
                             </div>
                         </div>
@@ -173,11 +179,18 @@
                                         <span onclick="openSpecies('whaleshark')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="whaleshark" title="Whale Shark"></span>
                                         <span onclick="openSpecies('yellowfintuna')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="yellowfintuna" title="Yellowfin Tuna"></span>
                                         <span onclick="openSpecies('zooplankton')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="zooplankton" title="Zooplankton"></span>
+                                        <span onclick="openSpecies('copepod')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="copepod" title="Copepod"></span>
+                                        <span onclick="openSpecies('krill')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="krill" title="Krill"></span>
+                                        <span onclick="openSpecies('salp')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="salp" title="Salp"></span>
+                                        <span onclick="openSpecies('pteropod')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="pteropod" title="Sea Butterfly"></span>
+                                        <span onclick="openSpecies('bluewhale')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="bluewhale" title="Blue Whale"></span>
+                                        <span onclick="openSpecies('dolphin')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="dolphin" title="Bottlenose Dolphin"></span>
+                                        <span onclick="openSpecies('penguin')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="penguin" title="Penguin"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-2">
-                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 3/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-2">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 3/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-2">1</span>/7 Done</span></h3>
                                 <div id="qz-body-2"></div>
                             </div>
                         </div>
@@ -196,11 +209,13 @@
                                         <span onclick="openSpecies('squid')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="squid" title="Vampire Squid"></span>
                                         <span onclick="openSpecies('hatchetfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="hatchetfish" title="Hatchetfish"></span>
                                         <span onclick="openSpecies('bristlemouth')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="bristlemouth" title="Bristlemouth"></span>
+                                        <span onclick="openSpecies('barreleye')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="barreleye" title="Barreleye Fish"></span>
+                                        <span onclick="openSpecies('siphonophore')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="siphonophore" title="Siphonophore"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-black/40 p-6 rounded-2xl border border-blue-300/30" id="quiz-container-3">
-                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 4/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-3">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-400 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 4/7</span><span class="text-sm font-normal text-blue-200"><span id="q-tracker-3">1</span>/7 Done</span></h3>
                                 <div id="qz-body-3"></div>
                             </div>
                         </div>
@@ -224,11 +239,12 @@
                                         <span onclick="openSpecies('tubeworm')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="tubeworm" title="Tubeworms"></span>
                                         <span onclick="openSpecies('japanesespidercrab')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="japanesespidercrab" title="Japanese Spider Crab"></span>
                                         <span onclick="openSpecies('nautilus')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="nautilus" title="Nautilus"></span>
+                                        <span onclick="openSpecies('blobfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="blobfish" title="Blobfish"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-gray-800/80 p-6 rounded-2xl border border-gray-600" id="quiz-container-4">
-                                <h3 class="font-heading font-bold text-yellow-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 5/7</span><span class="text-sm font-normal text-gray-400"><span id="q-tracker-4">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 5/7</span><span class="text-sm font-normal text-gray-400"><span id="q-tracker-4">1</span>/7 Done</span></h3>
                                 <div id="qz-body-4"></div>
                             </div>
                         </div>
@@ -252,7 +268,7 @@
                                 </div>
                             </div>
                             <div class="bg-gray-900 p-6 rounded-2xl border border-gray-700" id="quiz-container-5">
-                                <h3 class="font-heading font-bold text-yellow-600 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 6/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-5">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-yellow-600 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 6/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-5">1</span>/7 Done</span></h3>
                                 <div id="qz-body-5"></div>
                             </div>
                         </div>
@@ -273,7 +289,7 @@
                                 </div>
                             </div>
                             <div class="bg-gray-900 p-6 rounded-2xl border border-red-900" id="quiz-container-6">
-                                <h3 class="font-heading font-bold text-red-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 7/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-6">1</span>/6 Done</span></h3>
+                                <h3 class="font-heading font-bold text-red-500 text-xl mb-3 flex justify-between"><span><i class="fa-solid fa-circle-question"></i> Quiz 7/7</span><span class="text-sm font-normal text-gray-500"><span id="q-tracker-6">1</span>/7 Done</span></h3>
                                 <div id="qz-body-6"></div>
                             </div>
                         </div>
@@ -316,7 +332,8 @@
                                             <span onclick="openSpecies('crab')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Shore Crab <span class="tag-benthic">Benthic</span></span>, 
                                             <span onclick="openSpecies('barnacle')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Acorn Barnacle <span class="tag-benthic">Benthic</span></span>, 
                                             <span onclick="openSpecies('starfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Ochre Sea Star <span class="tag-benthic">Benthic</span></span>, 
-                                            <span onclick="openSpecies('anemone')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Anemone <span class="tag-benthic">Benthic</span></span>
+                                            <span onclick="openSpecies('anemone')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Anemone <span class="tag-benthic">Benthic</span></span>,
+                                            <span onclick="openSpecies('mussel')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">California Mussel <span class="tag-benthic">Benthic</span></span>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-white/5 transition duration-200">
@@ -331,7 +348,11 @@
                                             <span onclick="openSpecies('electricray')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Electric Ray <span class="tag-benthic">Benthic</span></span>,
                                             <span onclick="openSpecies('queenangelfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Queen Angelfish</span>,
                                             <span onclick="openSpecies('urchin')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Urchin <span class="tag-benthic">Benthic</span></span>,
-                                            <span onclick="openSpecies('xrayfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">X-ray Fish</span>
+                                            <span onclick="openSpecies('xrayfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">X-ray Fish</span>,
+                                            <span onclick="openSpecies('butterflyfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Butterflyfish</span>,
+                                            <span onclick="openSpecies('angelfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Marine Angelfish</span>,
+                                            <span onclick="openSpecies('octopus')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Octopus <span class="tag-benthic">Benthic</span></span>,
+                                            <span onclick="openSpecies('cuttlefish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Cuttlefish</span>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-white/5 transition duration-200">
@@ -346,7 +367,14 @@
                                             <span onclick="openSpecies('irukandji')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Irukandji Jellyfish <span class="tag-pelagic">Pelagic</span></span>,
                                             <span onclick="openSpecies('whaleshark')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Whale Shark</span>,
                                             <span onclick="openSpecies('yellowfintuna')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Yellowfin Tuna</span>,
-                                            <span onclick="openSpecies('zooplankton')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Zooplankton <span class="tag-pelagic">Pelagic</span></span>
+                                            <span onclick="openSpecies('zooplankton')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Zooplankton <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('copepod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Copepod <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('krill')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Krill <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('salp')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Salp <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('pteropod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Butterfly <span class="tag-pelagic">Pelagic</span></span>,
+                                            <span onclick="openSpecies('bluewhale')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Blue Whale</span>,
+                                            <span onclick="openSpecies('dolphin')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Bottlenose Dolphin</span>,
+                                            <span onclick="openSpecies('penguin')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Penguin</span>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-white/5 transition duration-200">
@@ -357,7 +385,9 @@
                                             <span onclick="openSpecies('lanternfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Lanternfish</span>, 
                                             <span onclick="openSpecies('squid')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Vampire Squid</span>, 
                                             <span onclick="openSpecies('hatchetfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Hatchetfish</span>, 
-                                            <span onclick="openSpecies('bristlemouth')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Bristlemouth</span>
+                                            <span onclick="openSpecies('bristlemouth')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Bristlemouth</span>,
+                                            <span onclick="openSpecies('barreleye')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Barreleye Fish</span>,
+                                            <span onclick="openSpecies('siphonophore')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Siphonophore <span class="tag-pelagic">Pelagic</span></span>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-white/5 transition duration-200">
@@ -370,7 +400,8 @@
                                             <span onclick="openSpecies('vampire')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Vampire Squid</span>, 
                                             <span onclick="openSpecies('dumbo')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Dumbo Octopus <span class="tag-benthopelagic">Benthopelagic</span></span>, <span onclick="openSpecies('isopod')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Giant Isopod <span class="tag-benthic">Benthic</span></span>, <span onclick="openSpecies('rattail')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Rattail Fish <span class="tag-benthopelagic">Benthopelagic</span></span>, <span onclick="openSpecies('tubeworm')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Riftia Tubeworm <span class="tag-benthic">Benthic</span></span>,
                                             <span onclick="openSpecies('japanesespidercrab')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Japanese Spider Crab <span class="tag-benthic">Benthic</span></span>,
-                                            <span onclick="openSpecies('nautilus')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Nautilus <span class="tag-benthopelagic">Benthopelagic</span></span>
+                                            <span onclick="openSpecies('nautilus')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Nautilus <span class="tag-benthopelagic">Benthopelagic</span></span>,
+                                            <span onclick="openSpecies('blobfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Blobfish <span class="tag-benthopelagic">Benthopelagic</span></span>
                                         </td>
                                     </tr>
                                     <tr class="hover:bg-white/5 transition duration-200">
@@ -459,6 +490,8 @@
             'yellowfintuna': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><ellipse cx="50" cy="50" rx="40" ry="15" fill="#1d4ed8"/><polygon points="10,50 0,30 5,50 0,70" fill="#1e3a8a"/><polygon points="56,35 68,16 63,36" fill="#facc15"/><polygon points="56,65 68,84 63,64" fill="#facc15"/><path d="M66 42 L82 36 M66 58 L82 64" stroke="#fde68a" stroke-width="3" stroke-linecap="round"/><circle cx="80" cy="45" r="2" fill="#0f172a"/></svg>',
             'zooplankton': '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><circle cx="34" cy="38" r="7" fill="rgba(255,255,255,0.85)"/><circle cx="58" cy="30" r="5" fill="rgba(125,211,252,0.85)"/><ellipse cx="62" cy="58" rx="10" ry="6" fill="rgba(251,191,36,0.8)"/><path d="M26 46 L16 58 M38 44 L46 54 M58 36 L68 22 M54 58 L40 70 M70 58 L82 64" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/><circle cx="34" cy="38" r="1.3" fill="#0f172a"/><circle cx="58" cy="30" r="1.1" fill="#0f172a"/></svg>'
         };
+        if(window.OceanCreatures?.SVGS) Object.assign(SVGS, window.OceanCreatures.SVGS);
+        function speciesSvg(id){return SVGS[id] || window.OceanCreatures?.svg(id) || '<div class="text-5xl">🐠</div>';}
 
         function closeModal() {
             document.getElementById('interactive-modal').style.opacity='0';
@@ -467,7 +500,7 @@
         }
         function openModal(t, key, c) {
             document.getElementById('modal-title').innerHTML=t;
-            document.getElementById('modal-emoji').innerHTML=SVGS[key];
+            document.getElementById('modal-emoji').innerHTML=speciesSvg(key);
             document.getElementById('modal-body').innerHTML=c;
             document.getElementById('interactive-modal').style.opacity='1';
             document.getElementById('interactive-modal').style.pointerEvents='auto';
@@ -503,18 +536,18 @@
         let globalScore = 0;
         let attemptedQuizzes = new Set();
         let zoneMissedQuestions = Array.from({length:7}, () => new Set());
-        let zoneQuestionCounts = [6,6,6,6,6,6,6];
+        let zoneQuestionCounts = [7,7,7,7,7,7,7];
         let zoneReviewMode = [false,false,false,false,false,false,false];
 
         function renderZoneQuizzes(filters = null, reviewFlags = null, onlyZone = null) {
             const q = [
-                [["To survive the hot sun during low tide, what do barnacles do?","Walk to water","Close shells tightly",1],["What is the scientific term for an animal fatally drying out?","Desiccation","Osmosis",0],["Mussels anchor using strong protein cables called:","Nematocysts","Byssal threads",1],["A transition area between two biological communities (like Intertidal) is a(n):","Ecotone","Estuary",0],["What type of tide provides maximum water movement for spawning?","Neap Tide","Spring Tide",1],["Intertidal snails scrape algae off rocks using a conveyor-belt-like tongue called a:","Radula","Esca",0]],
-                [["What physical feature defines the bottom of the Neritic Zone?","The Continental Shelf","The Abyssal Plain",0],["Which of these is a highly productive ecosystem found in cold Neritic waters?","Coral Reefs","Kelp Forests",1],["What process brings cold, nutrient-rich water from the deep to the Neritic Zone?","Upwelling","Downwelling",0],["Corals rely on symbiotic algae called what to produce food?","Zooxanthellae","Phytoplankton",0],["Compared to the open ocean, the Neritic Zone has:","Lower biodiversity","Higher biomass and nutrients",1],["Land runoff supplies the Neritic zone with important:","Toxic gases","Nutrients like nitrogen and phosphorus",1]],
-                [["Why do open-ocean predators use countershading?","Blend with deep ocean below/sunlight above","Absorb heat",0],["Which color is absorbed first, disappearing by 10m?","Blue","Red",1],["Torpedo-like body shape to reduce drag is called:","Fusiform","Sagittal",0],["Below what depth does photosynthesis become impossible?","1,000m","200m",1],["Fish that pull O2 from blood to fill their bladder use a:","Physostomous bladder","Physoclistous bladder",1],["Stinging cells used by jellyfish are called:","Nematocysts","Photophores",0]],
-                [["How do Lanternfish hide their shadows?","Swim faster","Counter-illumination",1],["What invisible barrier features a rapid drop in temp?","Thermocline","Halocline",0],["The layer where oxygen depletion is highest is the:","Anoxic Benthic Zone","Oxygen Minimum Zone (OMZ)",1],["Why do predators here have massive, upward-pointing eyes?","Spot silhouettes above","See mud below",0],["Why are deep-sea shrimp bright red?","Toxic warning","Red light doesn't penetrate here (appears black)",1],["Animals track specific dim light levels called:","Isolumes","Isobars",0]],
-                [["How do animals adapt to scarce food?","Huge mouths, slow metabolism","Swim to surface to eat",0],["What two chemicals create bioluminescence?","Chlorophyll & ATP","Luciferin & Luciferase",1],["What do many deep sea fish lack entirely due to high pressure?","A Swim Bladder","Gills",0],["How does the male Anglerfish guarantee he never loses his mate?","Singing a mating call","Sexual parasitism",1],["What was the 19th-century theory that claimed no life existed below 1,800 feet?","Azoic Hypothesis","Abyssal Void Theory",0],["Which 1870s voyage disproved the Azoic Hypothesis?","Beagle Expedition","Challenger Expedition",1]],
-                [["How does the Tripod Fish adapt to soft mud?","Rolls like a ball","Uses long fins as stilts",1],["Organisms living ON the seafloor are called:","Benthic","Pelagic",0],["Deep-sea creatures growing very large due to cold temps is called:","Bathypelagic Swelling","Abyssal Gigantism",1],["A massive food source like a dead whale falling is called:","A Whale Fall","A Pelagic Graveyard",0],["Because the Abyss relies entirely on external energy (marine snow), it is a(n) ________ ecosystem.","Autochthonous","Allochthonous",1],["Hydrostatic pressure increases 1 atm every ____ meters.","10m","100m",0]],
-                [["Which crustacean uses an aluminum shield to survive trench pressure?","Supergiant Amphipod","Giant Isopod",0],["What chemical compound acts as a shield (piezolyte)?","NaCl","TMAO",1],["Slow-leaking areas where methanotrophic mussels live are:","Cold Seeps","Brine Pools",0],["What is the deepest known living fish?","Mariana Snailfish","Cusk Eel",0],["Bacteria thriving >100°C at vents are classified as:","Hyperthermophiles","Cryophiles",0],["Vent ecosystems produce energy locally. This is a(n) ________ ecosystem.","Allochthonous","Autochthonous",1]]
+                [["To survive the hot sun during low tide, what do barnacles do?","Walk to water","Close shells tightly",1],["What is the scientific term for an animal fatally drying out?","Desiccation","Osmosis",0],["Mussels anchor using strong protein cables called:","Nematocysts","Byssal threads",1],["A transition area between two biological communities (like Intertidal) is a(n):","Ecotone","Estuary",0],["What type of tide provides maximum water movement for spawning?","Neap Tide","Spring Tide",1],["Intertidal snails scrape algae off rocks using a conveyor-belt-like tongue called a:","Radula","Esca",0],["California mussels survive waves by attaching with:","Byssal threads","Photophores",0]],
+                [["What physical feature defines the bottom of the Neritic Zone?","The Continental Shelf","The Abyssal Plain",0],["Which of these is a highly productive ecosystem found in cold Neritic waters?","Coral Reefs","Kelp Forests",1],["What process brings cold, nutrient-rich water from the deep to the Neritic Zone?","Upwelling","Downwelling",0],["Corals rely on symbiotic algae called what to produce food?","Zooxanthellae","Phytoplankton",0],["Compared to the open ocean, the Neritic Zone has:","Lower biodiversity","Higher biomass and nutrients",1],["Land runoff supplies the Neritic zone with important:","Toxic gases","Nutrients like nitrogen and phosphorus",1],["Butterflyfish and angelfish are shaped for:","Tight turns through coral","Deep trench pressure",0]],
+                [["Why do open-ocean predators use countershading?","Blend with deep ocean below/sunlight above","Absorb heat",0],["Which color is absorbed first, disappearing by 10m?","Blue","Red",1],["Torpedo-like body shape to reduce drag is called:","Fusiform","Sagittal",0],["Below what depth does photosynthesis become impossible?","1,000m","200m",1],["Fish that pull O2 from blood to fill their bladder use a:","Physostomous bladder","Physoclistous bladder",1],["Stinging cells used by jellyfish are called:","Nematocysts","Photophores",0],["Krill and copepods are important because they:","Move energy from plankton to bigger animals","Build coral skeletons",0]],
+                [["How do Lanternfish hide their shadows?","Swim faster","Counter-illumination",1],["What invisible barrier features a rapid drop in temp?","Thermocline","Halocline",0],["The layer where oxygen depletion is highest is the:","Anoxic Benthic Zone","Oxygen Minimum Zone (OMZ)",1],["Why do predators here have massive, upward-pointing eyes?","Spot silhouettes above","See mud below",0],["Why are deep-sea shrimp bright red?","Toxic warning","Red light doesn't penetrate here (appears black)",1],["Animals track specific dim light levels called:","Isolumes","Isobars",0],["A barreleye fish is famous for its:","Transparent head and tubular eyes","Shell plates for waves",0]],
+                [["How do animals adapt to scarce food?","Huge mouths, slow metabolism","Swim to surface to eat",0],["What two chemicals create bioluminescence?","Chlorophyll & ATP","Luciferin & Luciferase",1],["What do many deep sea fish lack entirely due to high pressure?","A Swim Bladder","Gills",0],["How does the male Anglerfish guarantee he never loses his mate?","Singing a mating call","Sexual parasitism",1],["What was the 19th-century theory that claimed no life existed below 1,800 feet?","Azoic Hypothesis","Abyssal Void Theory",0],["Which 1870s voyage disproved the Azoic Hypothesis?","Beagle Expedition","Challenger Expedition",1],["Blobfish hover deep without a gas bladder because they have:","Gelatinous, low-density tissue","Heavy coral skeletons",0]],
+                [["How does the Tripod Fish adapt to soft mud?","Rolls like a ball","Uses long fins as stilts",1],["Organisms living ON the seafloor are called:","Benthic","Pelagic",0],["Deep-sea creatures growing very large due to cold temps is called:","Bathypelagic Swelling","Abyssal Gigantism",1],["A massive food source like a dead whale falling is called:","A Whale Fall","A Pelagic Graveyard",0],["Because the Abyss relies entirely on external energy (marine snow), it is a(n) ________ ecosystem.","Autochthonous","Allochthonous",1],["Hydrostatic pressure increases 1 atm every ____ meters.","10m","100m",0],["Siphonophores and salps are examples of:","Open-water gelatinous animals","Rock-clinging intertidal snails",0]],
+                [["Which crustacean uses an aluminum shield to survive trench pressure?","Supergiant Amphipod","Giant Isopod",0],["What chemical compound acts as a shield (piezolyte)?","NaCl","TMAO",1],["Slow-leaking areas where methanotrophic mussels live are:","Cold Seeps","Brine Pools",0],["What is the deepest known living fish?","Mariana Snailfish","Cusk Eel",0],["Bacteria thriving >100°C at vents are classified as:","Hyperthermophiles","Cryophiles",0],["Vent ecosystems produce energy locally. This is a(n) ________ ecosystem.","Allochthonous","Autochthonous",1],["Hadal creatures need TMAO mainly to protect:","Proteins from crushing pressure","Coral algae from sunlight",0]]
             ];
             q.forEach((z,zi)=>{
                 if(onlyZone !== null && zi !== onlyZone) return;
@@ -652,13 +685,18 @@
         };
 
         function openSpecies(t){
-            const d=SP_DICT[t];
+            let d=SP_DICT[t];
+            if(!d && window.OceanCreatures?.creatures?.[t]) {
+                const c = window.OceanCreatures.creatures[t];
+                d = [c.name, '', c.description, c.diet, c.predators, c.funFacts || []];
+            }
             if(d){
                 const name = d[0];
                 const desc = d[2];
                 const diet = d[3];
                 const predators = d[4];
                 const facts = d[5];
+                const factItems = [facts[0], facts[1], facts[2]].filter(Boolean).map(f => `<li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${f}</span></li>`).join('');
 
                 const content = `
                     <p class="font-medium text-gray-700 leading-relaxed mb-5">${desc}</p>
@@ -674,9 +712,7 @@
                         <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
                             <strong class="text-purple-800 block mb-3 text-lg"><i class="fa-solid fa-lightbulb mr-2"></i>Fascinating Facts:</strong>
                             <ul class="list-none pl-1 text-gray-700 space-y-2 text-sm md:text-base">
-                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[0]}</span></li>
-                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[1]}</span></li>
-                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1"><i class="fa-solid fa-check-circle"></i></span> <span>${facts[2]}</span></li>
+                                ${factItems}
                             </ul>
                         </div>
                     </div>
@@ -693,23 +729,37 @@
             { name: "Acorn Barnacle <span class='tag-benthic'>BENTHIC</span>", sci: "Semibalanus balanoides", svgKey: "barnacle", zones: [0], zoneNames: "Intertidal Zone" },
             { name: "Ochre Sea Star <span class='tag-benthic'>BENTHIC</span>", sci: "Pisaster ochraceus", svgKey: "starfish", zones: [0], zoneNames: "Intertidal Zone" },
             { name: "Sea Anemone <span class='tag-benthic'>BENTHIC</span>", sci: "Actiniaria", svgKey: "anemone", zones: [0], zoneNames: "Intertidal Zone" },
+            { name: "California Mussel <span class='tag-benthic'>BENTHIC</span>", sci: "Mytilus californianus", svgKey: "mussel", zones: [0], zoneNames: "Intertidal Zone" },
             { name: "Sea Otter", sci: "Enhydra lutris", svgKey: "otter", zones: [1], zoneNames: "Neritic Zone" },
             { name: "Phytoplankton", sci: "Microalgae", svgKey: "phytoplankton", zones: [1], zoneNames: "Neritic Zone" },
             { name: "Reef-Building Coral <span class='tag-benthic'>BENTHIC</span>", sci: "Scleractinia", svgKey: "coral", zones: [1], zoneNames: "Neritic Zone" },
             { name: "Giant Kelp <span class='tag-benthic'>BENTHIC</span>", sci: "Macrocystis pyrifera", svgKey: "kelp", zones: [1], zoneNames: "Neritic Zone" },
             { name: "Clownfish", sci: "Amphiprion ocellaris", svgKey: "clownfish", zones: [1], zoneNames: "Neritic Zone" },
             { name: "Parrotfish", sci: "Scaridae", svgKey: "parrotfish", zones: [1], zoneNames: "Neritic Zone" },
+            { name: "Butterflyfish", sci: "Chaetodontidae", svgKey: "butterflyfish", zones: [1], zoneNames: "Neritic coral reefs" },
+            { name: "Marine Angelfish", sci: "Pomacanthidae", svgKey: "angelfish", zones: [1], zoneNames: "Neritic coral reefs" },
+            { name: "Octopus <span class='tag-benthic'>BENTHIC</span>", sci: "Octopoda", svgKey: "octopus", zones: [1], zoneNames: "Neritic reefs and seafloor habitats" },
+            { name: "Cuttlefish", sci: "Sepiida", svgKey: "cuttlefish", zones: [1], zoneNames: "Neritic coastal waters" },
             { name: "Ocean Sunfish", sci: "Mola mola", svgKey: "sunfish", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Mahi-Mahi", sci: "Coryphaena hippurus", svgKey: "mahimahi", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Bluefin Tuna", sci: "Thunnus thynnus", svgKey: "tuna", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Great White Shark", sci: "Carcharodon carcharias", svgKey: "shark", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Sea Turtle", sci: "Chelonioidea", svgKey: "turtle", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Manta Ray", sci: "Mobula birostris", svgKey: "manta", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Copepod <span class='tag-pelagic'>PELAGIC</span>", sci: "Copepoda", svgKey: "copepod", zones: [2, 3], zoneNames: "Epipelagic or Mesopelagic zones" },
+            { name: "Krill <span class='tag-pelagic'>PELAGIC</span>", sci: "Euphausiacea", svgKey: "krill", zones: [2, 3], zoneNames: "Epipelagic or Mesopelagic zones" },
+            { name: "Salp <span class='tag-pelagic'>PELAGIC</span>", sci: "Salpidae", svgKey: "salp", zones: [2, 3], zoneNames: "Open ocean epipelagic or mesopelagic zones" },
+            { name: "Sea Butterfly <span class='tag-pelagic'>PELAGIC</span>", sci: "Pteropoda", svgKey: "pteropod", zones: [2, 3], zoneNames: "Upper open-ocean zones" },
+            { name: "Blue Whale", sci: "Balaenoptera musculus", svgKey: "bluewhale", zones: [2], zoneNames: "Epipelagic open ocean" },
+            { name: "Bottlenose Dolphin", sci: "Tursiops truncatus", svgKey: "dolphin", zones: [2], zoneNames: "Epipelagic coastal and open ocean" },
+            { name: "Penguin", sci: "Spheniscidae", svgKey: "penguin", zones: [2], zoneNames: "Cold epipelagic coastal waters" },
             { name: "Swordfish", sci: "Xiphias gladius", svgKey: "swordfish", zones: [3], zoneNames: "Mesopelagic Zone" },
             { name: "Comb Jelly", sci: "Ctenophora", svgKey: "ctenophore", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "almost all ocean zones" },
             { name: "Lanternfish", sci: "Myctophidae", svgKey: "lanternfish", zones: [3], zoneNames: "Mesopelagic Zone" },
             { name: "Hatchetfish", sci: "Sternoptychidae", svgKey: "hatchetfish", zones: [3], zoneNames: "Mesopelagic Zone" },
             { name: "Bristlemouth", sci: "Gonostomatidae", svgKey: "bristlemouth", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Barreleye Fish", sci: "Macropinna microstoma", svgKey: "barreleye", zones: [3], zoneNames: "Mesopelagic Zone" },
+            { name: "Siphonophore <span class='tag-pelagic'>PELAGIC</span>", sci: "Siphonophorae", svgKey: "siphonophore", zones: [2, 3, 4], zoneNames: "Open ocean at many depths" },
             { name: "Deep Sea Dragonfish", sci: "Stomiidae", svgKey: "dragonfish", zones: [4], zoneNames: "Bathypelagic Zone" },
             { name: "Snipe Eel", sci: "Nemichthyidae", svgKey: "snipeeel", zones: [3, 4], zoneNames: "Mesopelagic or Bathypelagic zones" },
             { name: "Anglerfish", sci: "Melanocetus johnsonii", svgKey: "anglerfish", zones: [4], zoneNames: "Bathypelagic Zone" },
@@ -728,6 +778,7 @@
             { name: "Foraminifera <span class='tag-multi'>BENTHIC & PLANKTONIC</span>", sci: "Foraminifera", svgKey: "foraminifera", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "All zones (Planktonic & Benthic)" },
             { name: "Mariana Snailfish <span class='tag-benthic'>BENTHIC</span>", sci: "Pseudoliparis swirei", svgKey: "snailfish", zones: [6], zoneNames: "Hadal Zone" },
             { name: "Riftia Tubeworm <span class='tag-benthic'>BENTHIC</span>", sci: "Riftia pachyptila", svgKey: "tubeworm", zones: [4], zoneNames: "Bathyal Hydrothermal Vents" },
+            { name: "Blobfish <span class='tag-benthopelagic'>BENTHOPELAGIC</span>", sci: "Psychrolutes marcidus", svgKey: "blobfish", zones: [4, 5], zoneNames: "Bathyal to Abyssal seafloor" },
             { name: "Supergiant Amphipod <span class='tag-benthic'>BENTHIC</span>", sci: "Alicella gigantea", svgKey: "amphipod", zones: [5, 6], zoneNames: "Lower Abyssal / Hadal Zone" },
             { name: "Cusk Eel <span class='tag-benthopelagic'>BENTHOPELAGIC</span>", sci: "Ophidiidae", svgKey: "cuskeel", zones: [6], zoneNames: "Hadal Zone" }
         ];
@@ -764,7 +815,7 @@
                 <div class="h-48 md:h-80 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-blue-900 to-black mb-6 border-2 border-gray-700 relative">
                     <div class="w-full h-full flex items-center justify-center filter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-110 transition-transform duration-300 cursor-pointer select-none">
                         <div class="w-32 h-32 md:w-48 md:h-48">
-                            ${SVGS[data.svgKey]}
+                            ${speciesSvg(data.svgKey)}
                         </div>
                     </div>
                 </div>
@@ -841,8 +892,8 @@
             // Inject SVGs into grid spans
             document.querySelectorAll('.species-icon').forEach(el => {
                 const speciesKey = el.dataset.species;
-                if(SVGS[speciesKey]) {
-                    el.innerHTML = SVGS[speciesKey];
+                if(speciesSvg(speciesKey)) {
+                    el.innerHTML = speciesSvg(speciesKey);
                 }
             });
 
