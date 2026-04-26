@@ -329,7 +329,103 @@ const ADAPTATION_BY_CREATURE = {
 Object.entries(ADAPTATION_BY_CREATURE).forEach(([id, facts])=>{
   if(creatures[id]) creatures[id].adaptationsShown = uniqueFacts([...(creatures[id].adaptationsShown||[]), ...facts]);
 });
+const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
+  phytoplankton:[98,'Very high: foundational producer, photosynthesis, oxygen, and food-web questions are common elementary ocean themes.'],
+  zooplankton:[96,'Very high: primary consumer, plankton ID, and daily vertical migration are frequent ocean-life targets.'],
+  coral:[95,'Very high: coral reefs, symbiosis, bleaching, and neritic biodiversity are classic elementary marine-science topics.'],
+  kelp:[94,'Very high: kelp forests, producers, sea otter food webs, and coastal habitats are common study targets.'],
+  shark:[93,'Very high: familiar epipelagic predator used often for countershading, food webs, and adaptations.'],
+  turtle:[92,'Very high: familiar epipelagic reptile used for migration, food webs, and conservation-style questions.'],
+  tuna:[91,'Very high: streamlined open-ocean fish used for epipelagic zones, predator-prey chains, and fusiform shape.'],
+  crab:[90,'Very high: easy intertidal/benthic animal for adaptations, food webs, and tide-pool identification.'],
+  starfish:[90,'Very high: keystone predator, regeneration, tube feet, and intertidal habitat make it a strong elementary pick.'],
+  barnacle:[89,'High: attached intertidal crustacean, shell closing, and filter feeding are common adaptation examples.'],
+  mussel:[89,'High: intertidal filter feeder and byssal-thread anchoring are likely in elementary tide-pool questions.'],
+  anemone:[88,'High: cnidarian, stinging tentacles, tide-pool survival, and symbiosis make it likely.'],
+  limpet:[87,'High: rocky-shore snail, radula, and clinging/desiccation adaptations are strong intertidal examples.'],
+  otter:[87,'High: keystone kelp-forest mammal and sea-urchin predator in elementary food-web questions.'],
+  urchin:[86,'High: kelp-grazing benthic echinoderm and sea-otter prey are common coastal-ecosystem examples.'],
+  clownfish:[86,'High: reef fish and anemone mutualism are memorable elementary-level examples.'],
+  parrotfish:[85,'High: coral-reef grazer and sand production make it a strong reef-ecology candidate.'],
+  lanternfish:[85,'High: deep scattering layer, bioluminescence, and vertical migration are likely ocean-zone questions.'],
+  krill:[85,'High: planktonic crustacean, whale food, carbon pump, and swarming behavior are likely.'],
+  copepod:[84,'High: extremely important zooplankton and a direct plankton-food-web link.'],
+  anglerfish:[84,'High: iconic deep-sea bioluminescent lure and bathypelagic adaptation questions.'],
+  ctenophore:[83,'High: comb jellies are useful for gelatinous plankton and transparency questions.'],
+  hatchetfish:[83,'High: mesopelagic fish, tubular eyes, and photophores map cleanly to twilight-zone adaptations.'],
+  vampire:[83,'High: memorable deep-sea/OMZ animal often used for low oxygen and dark-zone adaptations.'],
+  octopus:[82,'High: camouflage, cephalopod intelligence, and reef/seafloor adaptations are likely.'],
+  cuttlefish:[82,'High: chromatophores, camouflage, and buoyancy make it a strong adaptations candidate.'],
+  dolphin:[82,'High: familiar marine mammal for echolocation, food webs, and surface-zone questions.'],
+  bluewhale:[82,'High: baleen feeding, krill food chains, and whale pump/carbon-cycle connections.'],
+  penguin:[81,'High: countershading, diving, krill food webs, and cold epipelagic habitats.'],
+  seapig:[80,'High: abyssal-zone creature frequently used to represent abyssal plains and detritus feeding.'],
+  tripod:[80,'High: classic abyssal benthic fish for soft-mud and deep-sea adaptation questions.'],
+  dumbo:[80,'High: iconic deep-sea octopus for bathyal/abyssal identification.'],
+  tubeworm:[80,'High: hydrothermal vents and chemosynthesis are major deep-ocean elementary concepts.'],
+  snailfish:[79,'High: deepest known fish and pressure adaptation make it likely for hadal-zone questions.'],
+  amphipod:[79,'High: trench scavenger and pressure-survival example for hadal habitats.'],
+  foraminifera:[78,'High: shells, planktonic/benthic forms, and sediment/fossil links make it useful in oceanography.'],
+  isopod:[78,'High: deep-sea scavenger and abyssal gigantism are strong elementary deep-ocean examples.'],
+  bristlemouth:[77,'High: abundant mesopelagic fish, food webs, and deep scattering layer connections.'],
+  butterflyfish:[77,'High: coral-reef identification and laterally compressed body shape.'],
+  angelfish:[76,'High: reef fish body shape and coral-habitat identification.'],
+  sculpin:[75,'Moderate-high: tide-pool fish for intertidal survival, though less universally familiar.'],
+  seaspider:[75,'Moderate-high: abyssal/invertebrate identification and deep-sea oddity questions.'],
+  basketstar:[74,'Moderate-high: abyssal/bathyal benthic invertebrate and suspension-feeding example.'],
+  cucumber:[74,'Moderate-high: benthic detritivore and abyssal seafloor food-web role.'],
+  swordfish:[73,'Moderate-high: open-ocean predator and vertical-migration example, but less central than tuna/sharks.'],
+  manta:[73,'Moderate-high: filter feeding and epipelagic open-ocean identification.'],
+  whaleshark:[73,'Moderate-high: largest fish and filter-feeding shark, likely as a memorable epipelagic example.'],
+  sunfish:[72,'Moderate-high: epipelagic fish and diving behavior, useful but less core than tuna/sharks.'],
+  mahimahi:[70,'Moderate-high: epipelagic fish identification, but less tied to core elementary concepts.'],
+  salp:[70,'Moderate-high: gelatinous plankton and carbon-pump link; likely in enriched elementary material.'],
+  pteropod:[70,'Moderate-high: planktonic snail and ocean-acidification indicator.'],
+  siphonophore:[69,'Moderate: gelatinous colony and open-ocean predator, useful but a little advanced.'],
+  barreleye:[68,'Moderate: memorable mesopelagic adaptation, but more specialized than lanternfish or anglerfish.'],
+  blobfish:[68,'Moderate: pressure/buoyancy adaptation, likely as a popular deep-sea example.'],
+  dragonfish:[68,'Moderate: deep-sea predator and bioluminescence, but more advanced than anglerfish.'],
+  gulper:[67,'Moderate: expandable jaws and scarce-food adaptation, likely in deep-sea units.'],
+  rattail:[66,'Moderate: benthopelagic deep-sea fish, useful but less iconic for elementary teams.'],
+  pyrosome:[65,'Moderate: glowing gelatinous colony; more likely in enrichment than core identification.'],
+  medusa:[84,'High: jellyfish are common cnidarian models, and Atolla is a likely bioluminescent twilight-zone example.'],
+  humboldt:[63,'Moderate: squid predator and DVM link, but less common than generic squid/vampire squid.'],
+  nautilus:[62,'Moderate: shell/buoyancy and living fossil, but less likely in elementary zone lists.'],
+  electricray:[61,'Moderate: benthic ray with electrical adaptation, plausible but not central.'],
+  queenangelfish:[60,'Moderate: reef fish ID; less likely than general angelfish/butterflyfish.'],
+  xrayfish:[58,'Moderate-low: transparency example, but more niche and not strictly marine in many contexts.'],
+  yellowfintuna:[58,'Moderate-low: overlaps with tuna; species-level ID is less likely in elementary.'],
+  snipeeel:[57,'Moderate-low: deep-sea fish but less recognizable.'],
+  cuskeel:[56,'Moderate-low: hadal example, but less likely than snailfish/amphipod.'],
+  japanesespidercrab:[55,'Moderate-low: impressive deep crab, but geography/species-specific.'],
+  swimcucumber:[55,'Moderate-low: abyssopelagic sea cucumber, more specialized than sea cucumber/sea pig.'],
+  arrowworm:[54,'Moderate-low: important plankton predator but more technical for elementary division.'],
+  ostracod:[52,'Moderate-low: planktonic crustacean, usually less likely than copepods/krill.'],
+  irukandji:[50,'Moderate-low: box jellyfish example, but species-specific and safety-heavy.']
+};
+function elementaryLikelihoodFor(id, c){
+  const specific = ELEMENTARY_OLYMPIAD_LIKELIHOOD[id];
+  const score = specific ? specific[0] : 45;
+  const reason = specific ? specific[1] : 'General ocean creature in the app; useful for comparison but less central to elementary ocean-zone and food-web questions.';
+  const band = score >= 85 ? 'Very likely' : score >= 75 ? 'Likely' : score >= 65 ? 'Possible' : score >= 55 ? 'Less likely' : 'Niche';
+  return {
+    division: 'Elementary',
+    score,
+    band,
+    reason,
+    basis: 'Scored from elementary Deep Blue Sea-style emphasis on ocean fauna/flora identification, zone placement, food webs, and simple adaptations.'
+  };
+}
+Object.entries(creatures).forEach(([id, c])=>{
+  c.olympiadLikelihood = elementaryLikelihoodFor(id, c);
+});
 function svg(id){return SVGS[id]||SVGS[creatures[id]?.svgKey]||'<div class="text-5xl">🐠</div>';}
 function render(id, className){return svg(id).replace('class="w-full h-full drop-shadow-md"','class="'+(className||'w-full h-full')+' drop-shadow-md"');}
-window.OceanCreatures={SVGS, creatures, svg, render, list:()=>Object.values(creatures).sort((a,b)=>a.name.localeCompare(b.name))};
+function list(sortMode='alphabetical'){
+  const items = Object.values(creatures);
+  if(sortMode === 'olympiad') return items.slice().sort((a,b)=>(b.olympiadLikelihood?.score||0)-(a.olympiadLikelihood?.score||0)||a.name.localeCompare(b.name));
+  if(sortMode === 'random') return items.slice().sort(()=>Math.random()-0.5);
+  return items.slice().sort((a,b)=>a.name.localeCompare(b.name));
+}
+window.OceanCreatures={SVGS, creatures, svg, render, list};
 })();
