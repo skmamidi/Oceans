@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Region Taxonomy Lab | The Living Ocean</title>
+    <title>Ocean Region Taxonomy Journey | The Living Ocean</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
@@ -13,393 +13,289 @@
                 extend: {
                     fontFamily: { sans: ['Nunito','sans-serif'], heading: ['Poppins','sans-serif'] },
                     colors: {
-                        ink: '#101828',
-                        reef: '#00b4d8',
-                        kelp: '#10b981',
-                        coral: '#fb7185',
+                        deep: '#07111f',
+                        ink: '#102033',
+                        water: '#0ea5e9',
+                        reef: '#14b8a6',
                         sun: '#facc15',
-                        trench: '#271033'
+                        coral: '#fb7185'
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
-        :root{
-            --surface:#87e0ff;
-            --shelf:#12b9c8;
-            --slope:#2272a8;
-            --basin:#24306e;
-            --deep:#090b2b;
-            --floor:#231324;
-        }
         *{box-sizing:border-box}
         body{
             margin:0;
-            min-height:100vh;
             overflow-x:hidden;
-            color:#f8fafc;
+            color:#102033;
             background:
-                radial-gradient(circle at 12% 8%,rgba(250,204,21,0.28),transparent 18rem),
-                radial-gradient(circle at 82% 18%,rgba(45,212,191,0.22),transparent 20rem),
-                linear-gradient(180deg,#0f86b7 0%,#074267 35%,#120d32 68%,#070411 100%);
+                linear-gradient(180deg,#e0f7ff 0%,#d7f3ee 36%,#eef7ff 100%);
         }
-        body::before{
-            content:"";
-            position:fixed;
-            inset:0;
-            pointer-events:none;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.07) 1px,transparent 1px),
-                linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
-            background-size:56px 56px;
-            mask-image:linear-gradient(to bottom,rgba(0,0,0,0.45),rgba(0,0,0,0.05));
+        .shell{
+            max-width:1180px;
+            margin:0 auto;
+            padding-left:1rem;
+            padding-right:1rem;
         }
-        .soft-panel{
-            background:rgba(4,12,28,0.68);
-            border:1px solid rgba(186,230,253,0.22);
-            box-shadow:0 24px 70px rgba(0,0,0,0.26);
-            backdrop-filter:blur(14px);
-        }
-        .ocean-stage > .soft-panel{pointer-events:none}
-        .top-link{
-            background:rgba(255,255,255,0.12);
-            border:1px solid rgba(255,255,255,0.18);
-        }
-        .ocean-stage{
+        .hero{
+            min-height:clamp(560px,86vh,760px);
+            display:grid;
+            align-items:end;
             position:relative;
-            min-height:560px;
             overflow:hidden;
-            border:1px solid rgba(186,230,253,0.25);
-            background:linear-gradient(180deg,var(--surface) 0%,var(--shelf) 22%,var(--slope) 44%,var(--basin) 67%,var(--deep) 100%);
-            box-shadow:inset 0 0 70px rgba(255,255,255,0.14),0 26px 70px rgba(0,0,0,0.34);
+            color:white;
+            background:
+                linear-gradient(180deg,rgba(6,95,136,0.06),rgba(2,6,23,0.12)),
+                linear-gradient(180deg,#74d9ff 0%,#0ea5e9 22%,#075985 48%,#172554 73%,#050817 100%);
         }
-        .ocean-stage::before{
+        .hero::before{
             content:"";
             position:absolute;
             inset:0;
             background:
-                radial-gradient(circle at 18% 10%,rgba(255,255,255,0.44),transparent 10rem),
-                linear-gradient(110deg,rgba(255,255,255,0.18),transparent 22%,transparent 78%,rgba(0,0,0,0.36));
+                radial-gradient(circle at 18% 12%,rgba(255,255,255,0.72),transparent 12rem),
+                linear-gradient(110deg,rgba(255,255,255,0.18),transparent 28%,transparent 76%,rgba(0,0,0,0.34));
             pointer-events:none;
         }
-        .sea-floor{
+        .hero-floor{
             position:absolute;
             left:0;
             right:0;
             bottom:0;
-            height:38%;
-            background:linear-gradient(180deg,rgba(111,64,39,0.18),rgba(20,9,22,0.96));
-            clip-path:polygon(0 36%,12% 28%,25% 34%,36% 47%,48% 58%,60% 57%,70% 42%,78% 30%,85% 43%,91% 70%,100% 76%,100% 100%,0 100%);
+            height:42%;
+            background:linear-gradient(180deg,rgba(180,83,9,0.16),rgba(34,17,24,0.96));
+            clip-path:polygon(0 28%,15% 24%,27% 31%,39% 50%,50% 64%,61% 60%,70% 39%,77% 55%,83% 32%,89% 67%,100% 74%,100% 100%,0 100%);
         }
-        .shelf-shape{
+        .card{
+            background:rgba(255,255,255,0.92);
+            border:1px solid rgba(14,116,144,0.16);
+            box-shadow:0 22px 60px rgba(15,23,42,0.13);
+        }
+        .dark-card{
+            background:rgba(4,12,28,0.76);
+            border:1px solid rgba(186,230,253,0.22);
+            color:white;
+            box-shadow:0 22px 60px rgba(15,23,42,0.22);
+            backdrop-filter:blur(14px);
+        }
+        .lesson-title{
+            letter-spacing:0;
+            line-height:1.02;
+        }
+        .map-btn{
             position:absolute;
-            left:0;
-            bottom:25%;
-            width:45%;
-            height:18%;
-            background:linear-gradient(165deg,rgba(252,211,77,0.55),rgba(180,83,9,0.1));
-            clip-path:polygon(0 14%,54% 14%,100% 100%,0 100%);
-        }
-        .ridge-shape{
-            position:absolute;
-            left:55%;
-            bottom:0;
-            width:25%;
-            height:30%;
-            background:linear-gradient(155deg,rgba(45,212,191,0.42),rgba(20,184,166,0.06));
-            clip-path:polygon(0 100%,24% 42%,43% 67%,58% 26%,77% 62%,100% 100%);
-            filter:drop-shadow(0 0 18px rgba(45,212,191,0.35));
-        }
-        .trench-shape{
-            position:absolute;
-            right:-1%;
-            bottom:0;
-            width:25%;
-            height:33%;
-            background:linear-gradient(135deg,rgba(248,113,113,0.04),rgba(127,29,29,0.74));
-            clip-path:polygon(16% 0,56% 88%,100% 12%,100% 100%,0 100%);
-        }
-        .arc-islands{
-            position:absolute;
-            right:13%;
-            bottom:28%;
-            display:flex;
-            gap:0.45rem;
-            transform:rotate(-12deg);
-        }
-        .arc-islands span{
-            width:2.4rem;
-            height:1rem;
-            border-radius:50% 50% 45% 45%;
-            background:linear-gradient(180deg,#166534,#84cc16);
-            box-shadow:0 7px 0 rgba(87,83,78,0.75);
-        }
-        .vent{
-            position:absolute;
-            left:65%;
-            bottom:23%;
-            width:3.2rem;
-            height:5.4rem;
-            background:linear-gradient(180deg,rgba(229,231,235,0.18),rgba(76,29,149,0.92));
-            clip-path:polygon(35% 100%,66% 100%,56% 20%,74% 0,43% 18%);
-        }
-        .vent::before{
-            content:"";
-            position:absolute;
-            left:50%;
-            bottom:72%;
-            width:5rem;
-            height:6rem;
-            transform:translateX(-50%);
-            background:radial-gradient(circle,rgba(216,180,254,0.5),transparent 62%);
-            animation:smoke 2.7s infinite ease-in-out;
-        }
-        @keyframes smoke{50%{transform:translate(-50%,-12px) scale(1.12);opacity:0.55}}
-        .scan-btn{
-            position:absolute;
-            width:2.7rem;
-            height:2.7rem;
+            width:2.9rem;
+            height:2.9rem;
             border-radius:999px;
-            color:#082f49;
             background:#fef08a;
-            border:3px solid rgba(255,255,255,0.85);
-            box-shadow:0 0 0 0 rgba(250,204,21,0.65),0 16px 28px rgba(0,0,0,0.25);
+            color:#0f172a;
+            border:3px solid white;
             display:flex;
             align-items:center;
             justify-content:center;
-            transition:transform 0.18s ease,background 0.18s ease;
-            animation:pulse 2s infinite;
+            box-shadow:0 14px 26px rgba(0,0,0,0.28);
+            transition:transform 0.16s ease,background 0.16s ease;
         }
-        .scan-btn:hover,.scan-btn.active{transform:scale(1.12);background:#fff;color:#0e7490}
-        @keyframes pulse{70%{box-shadow:0 0 0 15px rgba(250,204,21,0),0 16px 28px rgba(0,0,0,0.25)}}
-        .badge-chip{
-            border:1px solid rgba(255,255,255,0.18);
-            background:rgba(255,255,255,0.1);
+        .map-btn:hover,.map-btn.active{transform:scale(1.1);background:white;color:#0369a1}
+        .map-label{
+            position:absolute;
+            transform:translate(-50%,-50%);
+            white-space:nowrap;
+            padding:0.36rem 0.6rem;
+            border-radius:999px;
+            background:rgba(255,255,255,0.86);
+            color:#0f172a;
+            font-size:0.76rem;
+            font-weight:900;
+            box-shadow:0 8px 18px rgba(0,0,0,0.16);
+            pointer-events:none;
         }
-        .category-btn,.answer-btn,.drop-card{
+        .section-gap{padding-top:4.5rem;padding-bottom:4.5rem}
+        .lens-tab,.stamp-btn,.quiz-btn{
             transition:transform 0.16s ease,background 0.16s ease,border-color 0.16s ease,box-shadow 0.16s ease;
         }
-        .category-btn:hover,.answer-btn:hover,.drop-card:hover{transform:translateY(-2px)}
-        .category-btn.selected{
-            background:rgba(250,204,21,0.22);
-            border-color:rgba(250,204,21,0.82);
-            box-shadow:0 0 0 3px rgba(250,204,21,0.12);
+        .lens-tab:hover,.stamp-btn:hover,.quiz-btn:hover{transform:translateY(-1px)}
+        .lens-tab.active,.stamp-btn.selected{
+            background:#fef08a;
+            color:#0f172a;
+            border-color:#facc15;
+            box-shadow:0 0 0 4px rgba(250,204,21,0.18);
         }
-        .answer-btn.correct,.drop-card.correct{
-            background:rgba(34,197,94,0.22)!important;
-            border-color:rgba(74,222,128,0.88)!important;
+        .stamp-btn.correct,.quiz-btn.correct{
+            background:#bbf7d0!important;
+            color:#064e3b!important;
+            border-color:#22c55e!important;
         }
-        .answer-btn.wrong,.drop-card.wrong{
-            background:rgba(239,68,68,0.24)!important;
-            border-color:rgba(248,113,113,0.88)!important;
-            animation:shake 0.35s ease;
+        .stamp-btn.wrong,.quiz-btn.wrong{
+            background:#fecdd3!important;
+            color:#7f1d1d!important;
+            border-color:#fb7185!important;
         }
-        @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
-        .token{
-            touch-action:none;
-            user-select:none;
-            cursor:grab;
+        .feature-glow{filter:drop-shadow(0 0 13px rgba(250,204,21,0.85))}
+        .canvas-wrap svg{
+            width:100%;
+            height:auto;
+            display:block;
         }
-        .token.dragging{
-            cursor:grabbing;
-            z-index:70;
-            box-shadow:0 18px 42px rgba(0,0,0,0.4);
+        .depth-meter{
+            background:linear-gradient(180deg,#7dd3fc 0%,#0284c7 24%,#075985 45%,#1e1b4b 66%,#020617 100%);
         }
-        .drop-card.hovered{
-            background:rgba(14,165,233,0.24);
-            border-color:rgba(125,211,252,0.88);
-        }
-        .creature-dot{
-            position:absolute;
-            width:5.5rem;
-            height:2.8rem;
-            filter:drop-shadow(0 8px 10px rgba(0,0,0,0.32));
-            opacity:0.94;
-        }
-        .creature-dot::before{
-            content:"";
-            position:absolute;
-            inset:20% 10% 20% 0;
-            border-radius:999px 65% 65% 999px;
-            background:linear-gradient(90deg,#fef3c7,#fb7185);
-        }
-        .creature-dot::after{
-            content:"";
-            position:absolute;
-            right:0;
-            top:28%;
-            border-left:1.25rem solid #fb7185;
-            border-top:0.65rem solid transparent;
-            border-bottom:0.65rem solid transparent;
-        }
-        .swim-a{animation:swimA 8s infinite ease-in-out}
-        .swim-b{animation:swimB 10s infinite ease-in-out}
-        .swim-c{animation:swimC 12s infinite ease-in-out}
-        @keyframes swimA{50%{transform:translate(54px,-14px) scale(0.92)}}
-        @keyframes swimB{50%{transform:translate(-70px,18px) scale(1.06)}}
-        @keyframes swimC{50%{transform:translate(32px,22px) rotate(-5deg)}}
-        @media (max-width:700px){
-            .ocean-stage{min-height:620px}
-            .scan-btn{width:2.35rem;height:2.35rem}
-            .creature-dot{width:4.4rem;height:2.2rem}
+        @media (max-width:720px){
+            .hero{min-height:720px}
+            .map-btn{width:2.45rem;height:2.45rem}
+            .map-label{font-size:0.62rem;padding:0.28rem 0.44rem}
+            .section-gap{padding-top:3rem;padding-bottom:3rem}
         }
     </style>
 </head>
 <body class="font-sans">
-    <main class="relative z-10">
-        <section class="px-4 pt-6 pb-4">
-            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-                <a href="index.html" class="top-link inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black text-white hover:bg-white/20">
-                    <i class="fa-solid fa-water"></i>
-                    OceanExplorer
-                </a>
-                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-cyan-100">
-                    <i class="fa-solid fa-compass-drafting text-yellow-300"></i>
-                    Region Taxonomy Lab
-                </div>
+    <main>
+        <section class="hero">
+            <div class="hero-floor"></div>
+            <div class="absolute left-[5%] top-[19%] w-20 h-10 opacity-80">
+                <svg viewBox="0 0 120 60" aria-hidden="true"><path fill="#fda4af" d="M12 30c18-18 48-19 76-8l20-13v42L88 38c-28 12-58 10-76-8z"/><circle cx="82" cy="25" r="4" fill="#111827"/></svg>
             </div>
-        </section>
-
-        <section class="px-4 pb-8">
-            <div class="max-w-7xl mx-auto grid lg:grid-cols-[0.88fr_1.12fr] gap-5 items-stretch">
-                <div class="soft-panel rounded-3xl p-5 sm:p-7 flex flex-col justify-between">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-300 text-slate-950 text-xs font-black uppercase tracking-[0.16em] mb-5">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            No flat worksheet zone
-                        </div>
-                        <h1 class="font-heading text-4xl sm:text-5xl xl:text-6xl font-black leading-tight text-white">
-                            Master Ocean Region Taxonomy
-                        </h1>
-                        <p class="mt-4 text-lg sm:text-xl text-cyan-50/86 font-bold max-w-2xl">
-                            Explore how one ocean place can be a depth zone, a habitat, a seafloor province, a tectonic feature, and a geographic region all at once.
+            <div class="absolute left-[68%] top-[43%] w-14 h-7 opacity-80">
+                <svg viewBox="0 0 120 60" aria-hidden="true"><path fill="#a7f3d0" d="M12 30c18-18 48-19 76-8l20-13v42L88 38c-28 12-58 10-76-8z"/><circle cx="82" cy="25" r="4" fill="#111827"/></svg>
+            </div>
+            <div class="relative z-10 shell pb-8 sm:pb-12">
+                <div class="grid lg:grid-cols-[0.95fr_1.05fr] gap-5 items-end">
+                    <div class="dark-card rounded-3xl p-6 sm:p-8">
+                        <a href="index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/12 border border-white/20 text-sm font-black hover:bg-white/20">
+                            <i class="fa-solid fa-water"></i> OceanExplorer
+                        </a>
+                        <p class="mt-8 text-sm font-black uppercase tracking-[0.18em] text-yellow-200">A slow, playful map lesson</p>
+                        <h1 class="lesson-title mt-3 font-heading text-4xl sm:text-6xl font-black">Ocean Region Taxonomy Journey</h1>
+                        <p class="mt-5 text-lg sm:text-xl font-bold text-cyan-50">
+                            Today we are not memorizing a giant list. We are learning to look at one ocean place through different science lenses.
                         </p>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-8">
-                        <button onclick="scrollToMode('scanner')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
-                            <i class="fa-solid fa-location-crosshairs text-yellow-300 text-2xl"></i>
-                            <span class="block mt-2 text-sm font-black">Scan</span>
-                        </button>
-                        <button onclick="scrollToMode('passport')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
-                            <i class="fa-solid fa-stamp text-teal-300 text-2xl"></i>
-                            <span class="block mt-2 text-sm font-black">Classify</span>
-                        </button>
-                        <button onclick="scrollToMode('challenge')" class="badge-chip rounded-2xl px-3 py-4 text-left hover:bg-white/16">
-                            <i class="fa-solid fa-bolt text-rose-300 text-2xl"></i>
-                            <span class="block mt-2 text-sm font-black">Battle</span>
-                        </button>
+
+                    <div id="map-stage" class="relative min-h-[520px] rounded-3xl overflow-hidden border border-white/25 shadow-2xl bg-sky-900/25">
+                        <div class="absolute inset-0 bg-gradient-to-b from-cyan-200 via-sky-600 to-slate-950"></div>
+                        <div class="absolute left-0 right-0 bottom-0 h-[45%] bg-stone-900" style="clip-path:polygon(0 35%,16% 28%,30% 34%,43% 56%,55% 66%,65% 52%,73% 33%,81% 56%,88% 30%,94% 76%,100% 70%,100% 100%,0 100%)"></div>
+                        <div class="absolute left-0 bottom-[22%] w-[44%] h-[16%] bg-yellow-200/45" style="clip-path:polygon(0 18%,58% 18%,100% 100%,0 100%)"></div>
+                        <div class="absolute left-[61%] bottom-[12%] w-[17%] h-[25%] bg-teal-200/40" style="clip-path:polygon(0 100%,26% 38%,43% 70%,60% 22%,82% 66%,100% 100%)"></div>
+                        <div class="absolute right-0 bottom-0 w-[21%] h-[38%] bg-rose-900/50" style="clip-path:polygon(8% 0,48% 92%,92% 3%,100% 100%,0 100%)"></div>
+                        <div class="absolute left-[66%] bottom-[33%] w-16 h-24 bg-purple-300/50" style="clip-path:polygon(36% 100%,66% 100%,56% 22%,75% 0,42% 18%)"></div>
+                        <button class="map-btn active" data-feature="shelf" style="left:25%;top:50%" aria-label="Explore continental shelf"><i class="fa-solid fa-layer-group"></i></button>
+                        <button class="map-btn" data-feature="slope" style="left:41%;top:61%" aria-label="Explore continental slope"><i class="fa-solid fa-arrow-trend-down"></i></button>
+                        <button class="map-btn" data-feature="plain" style="left:55%;top:72%" aria-label="Explore abyssal plain"><i class="fa-solid fa-ruler-horizontal"></i></button>
+                        <button class="map-btn" data-feature="ridge" style="left:69%;top:65%" aria-label="Explore mid-ocean ridge"><i class="fa-solid fa-mountain"></i></button>
+                        <button class="map-btn" data-feature="vent" style="left:68%;top:52%" aria-label="Explore hydrothermal vent"><i class="fa-solid fa-fire-flame-curved"></i></button>
+                        <button class="map-btn" data-feature="trench" style="left:91%;top:70%" aria-label="Explore trench"><i class="fa-solid fa-angles-down"></i></button>
+                        <span class="map-label" style="left:25%;top:41%">continental shelf</span>
+                        <span class="map-label" style="left:55%;top:63%">abyssal plain</span>
+                        <span class="map-label" style="left:70%;top:78%">ridge</span>
+                        <span class="map-label" style="left:91%;top:58%">trench</span>
                     </div>
                 </div>
-
-                <div id="scanner" class="ocean-stage rounded-3xl">
-                    <div class="creature-dot swim-a" style="left:17%;top:20%"></div>
-                    <div class="creature-dot swim-b" style="left:72%;top:43%;transform:scale(0.72)"></div>
-                    <div class="creature-dot swim-c" style="left:38%;top:65%;transform:scale(0.55)"></div>
-                    <div class="shelf-shape"></div>
-                    <div class="sea-floor"></div>
-                    <div class="ridge-shape"></div>
-                    <div class="trench-shape"></div>
-                    <div class="arc-islands"><span></span><span></span><span></span></div>
-                    <div class="vent"></div>
-                    <button class="scan-btn active" style="left:8%;top:28%" data-scan="intertidal" aria-label="Scan intertidal zone"><i class="fa-solid fa-person-rays"></i></button>
-                    <button class="scan-btn" style="left:28%;top:23%" data-scan="shelf" aria-label="Scan continental shelf"><i class="fa-solid fa-layer-group"></i></button>
-                    <button class="scan-btn" style="left:38%;top:48%" data-scan="slope" aria-label="Scan continental slope"><i class="fa-solid fa-arrow-trend-down"></i></button>
-                    <button class="scan-btn" style="left:55%;top:58%" data-scan="plain" aria-label="Scan abyssal plain"><i class="fa-solid fa-ruler-horizontal"></i></button>
-                    <button class="scan-btn" style="left:67%;top:62%" data-scan="ridge" aria-label="Scan mid-ocean ridge"><i class="fa-solid fa-mountain"></i></button>
-                    <button class="scan-btn" style="left:68%;top:47%" data-scan="vent" aria-label="Scan hydrothermal vent"><i class="fa-solid fa-fire-flame-curved"></i></button>
-                    <button class="scan-btn" style="left:84%;top:56%" data-scan="arc" aria-label="Scan island arc"><i class="fa-solid fa-volcano"></i></button>
-                    <button class="scan-btn" style="left:91%;top:61%" data-scan="trench" aria-label="Scan trench"><i class="fa-solid fa-angles-down"></i></button>
-                    <div class="absolute left-4 right-4 bottom-4 soft-panel rounded-2xl p-4 sm:p-5">
-                        <div class="flex flex-wrap items-start justify-between gap-3">
-                            <div>
-                                <div id="scan-kicker" class="text-xs uppercase tracking-[0.2em] font-black text-yellow-200">Scanner locked</div>
-                                <h2 id="scan-title" class="font-heading text-2xl sm:text-3xl font-black text-white mt-1">Intertidal / Littoral Zone</h2>
-                            </div>
-                            <div id="scan-depth" class="px-3 py-2 rounded-xl bg-cyan-300 text-slate-950 font-black text-sm">Tide zone</div>
+                <div id="map-card" class="card rounded-3xl p-5 sm:p-6 mt-5 text-ink">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Stop 1: read the shape</p>
+                            <h2 id="map-title" class="font-heading text-2xl sm:text-3xl font-black mt-1">Continental Shelf</h2>
                         </div>
-                        <div id="scan-tags" class="flex flex-wrap gap-2 mt-4"></div>
-                        <p id="scan-copy" class="mt-4 text-cyan-50 font-bold"></p>
+                        <div id="map-depth" class="px-4 py-2 rounded-2xl bg-sky-100 text-sky-900 font-black">Low tide to about 200 m</div>
+                    </div>
+                    <p id="map-copy" class="mt-4 text-lg font-bold text-slate-700"></p>
+                    <div id="map-tags" class="flex flex-wrap gap-2 mt-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-gap">
+            <div class="shell">
+                <div class="text-center max-w-3xl mx-auto">
+                    <p class="text-sm font-black uppercase tracking-[0.18em] text-sky-700">Stop 2: three lenses</p>
+                    <h2 class="lesson-title font-heading text-4xl sm:text-5xl font-black text-ink mt-2">The trick: one place can wear many name tags</h2>
+                    <p class="mt-4 text-lg font-bold text-slate-600">Scientists name ocean regions by asking different questions. Where is it from shore? How deep is the water? What shape is the seafloor?</p>
+                </div>
+                <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-5 mt-10 items-stretch">
+                    <div class="card rounded-3xl p-5 sm:p-7">
+                        <div id="lens-tabs" class="grid gap-3"></div>
+                    </div>
+                    <div class="card rounded-3xl p-4 sm:p-6 canvas-wrap">
+                        <div id="lens-canvas"></div>
+                        <div class="mt-5 rounded-2xl bg-slate-50 border border-slate-200 p-5">
+                            <h3 id="lens-title" class="font-heading text-2xl font-black text-ink"></h3>
+                            <p id="lens-copy" class="mt-2 text-lg font-bold text-slate-600"></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="px-4 py-8">
-            <div class="max-w-7xl mx-auto grid xl:grid-cols-[0.95fr_1.05fr] gap-5">
-                <div id="passport" class="soft-panel rounded-3xl p-5 sm:p-7">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <div class="text-xs uppercase tracking-[0.2em] font-black text-teal-200">Taxonomy Passport</div>
-                            <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Stamp Every Identity</h2>
+        <section class="section-gap bg-white/55">
+            <div class="shell">
+                <div class="grid lg:grid-cols-[0.95fr_1.05fr] gap-5 items-start">
+                    <div class="card rounded-3xl p-5 sm:p-7">
+                        <p class="text-sm font-black uppercase tracking-[0.18em] text-teal-700">Stop 3: taxonomy passport</p>
+                        <h2 class="lesson-title font-heading text-4xl sm:text-5xl font-black text-ink mt-2">Stamp the labels that truly belong</h2>
+                        <p class="mt-4 text-lg font-bold text-slate-600">Read the little scene. Then stamp every scientific category that applies. Some places get one stamp. Some get four.</p>
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <div class="rounded-2xl bg-teal-50 border border-teal-100 p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.14em] text-teal-700">Mission</div>
+                                <div id="mission-count" class="text-2xl font-black text-teal-900">1 / 1</div>
+                            </div>
+                            <div class="rounded-2xl bg-yellow-50 border border-yellow-100 p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.14em] text-yellow-700">Score</div>
+                                <div id="passport-score" class="text-2xl font-black text-yellow-800">0</div>
+                            </div>
                         </div>
-                        <div class="px-3 py-2 rounded-2xl bg-white/10 border border-white/15 font-black">
-                            Score <span id="passport-score" class="text-yellow-300">0</span>
+                        <div id="passport-feedback" class="mt-6 min-h-[6rem] rounded-2xl bg-slate-50 border border-slate-200 p-5 text-base font-bold text-slate-700"></div>
+                    </div>
+                    <div class="card rounded-3xl p-5 sm:p-7">
+                        <div id="mission-scene" class="canvas-wrap rounded-3xl overflow-hidden border border-slate-200 bg-sky-50"></div>
+                        <h3 id="mission-title" class="font-heading text-2xl sm:text-3xl font-black text-ink mt-5"></h3>
+                        <p id="mission-clue" class="mt-2 text-lg font-bold text-slate-600"></p>
+                        <div id="stamp-grid" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+                        <div class="flex flex-wrap gap-3 mt-5">
+                            <button onclick="checkPassport()" class="px-5 py-3 rounded-2xl bg-teal-500 text-white font-black hover:bg-teal-600 active:scale-95">
+                                <i class="fa-solid fa-stamp mr-2"></i>Check Stamps
+                            </button>
+                            <button onclick="nextPassport()" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-black hover:bg-slate-800 active:scale-95">
+                                Next Scene <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="mt-5 rounded-2xl border border-white/15 bg-white/8 p-4">
-                        <div id="passport-icon" class="w-16 h-16 rounded-2xl bg-cyan-200 text-slate-950 flex items-center justify-center text-3xl shadow-lg"></div>
-                        <h3 id="passport-title" class="font-heading text-2xl font-black text-white mt-4"></h3>
-                        <p id="passport-clue" class="mt-2 text-cyan-50 font-bold"></p>
-                    </div>
-                    <div id="category-grid" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
-                    <div class="flex flex-wrap gap-3 mt-5">
-                        <button onclick="checkPassport()" class="px-5 py-3 rounded-2xl bg-yellow-300 text-slate-950 font-black hover:bg-yellow-200 active:scale-95">
-                            <i class="fa-solid fa-circle-check mr-2"></i>Check Stamps
-                        </button>
-                        <button onclick="nextPassport()" class="px-5 py-3 rounded-2xl bg-white/12 border border-white/20 text-white font-black hover:bg-white/20 active:scale-95">
-                            <i class="fa-solid fa-shuffle mr-2"></i>New Mission
-                        </button>
-                    </div>
-                    <div id="passport-feedback" class="mt-4 min-h-[4.5rem] rounded-2xl border border-white/12 bg-black/18 p-4 text-sm sm:text-base font-bold text-cyan-50"></div>
-                </div>
-
-                <div class="soft-panel rounded-3xl p-5 sm:p-7">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <div class="text-xs uppercase tracking-[0.2em] font-black text-rose-200">Drag Deck</div>
-                            <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Drop Features Into Families</h2>
-                        </div>
-                        <button onclick="resetDrops()" class="px-4 py-2 rounded-xl bg-white/10 border border-white/15 font-black hover:bg-white/18">
-                            <i class="fa-solid fa-rotate-right mr-2"></i>Reset
-                        </button>
-                    </div>
-                    <div id="token-row" class="flex flex-wrap gap-3 mt-5 min-h-[4.5rem]"></div>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5" id="drop-zones"></div>
-                    <div id="drop-feedback" class="mt-4 min-h-[3.5rem] rounded-2xl border border-white/12 bg-black/18 p-4 font-bold text-cyan-50"></div>
                 </div>
             </div>
         </section>
 
-        <section id="challenge" class="px-4 py-8 pb-14">
-            <div class="max-w-7xl mx-auto soft-panel rounded-3xl p-5 sm:p-7">
-                <div class="grid lg:grid-cols-[0.8fr_1.2fr] gap-5 items-start">
-                    <div>
-                        <div class="text-xs uppercase tracking-[0.2em] font-black text-yellow-200">Boss Quiz</div>
-                        <h2 class="font-heading text-3xl sm:text-4xl font-black text-white mt-1">Ocean Identity Battle</h2>
-                        <p class="mt-3 text-cyan-50 font-bold">Fast rounds mix geography, ecology, depth, landforms, and tectonics. Beat all rounds to prove you can read the ocean like a layered map.</p>
-                        <div class="grid grid-cols-3 gap-3 mt-5">
-                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
-                                <div class="text-xs uppercase font-black text-cyan-200">Round</div>
-                                <div id="battle-round" class="text-2xl font-black text-white">1/1</div>
-                            </div>
-                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
-                                <div class="text-xs uppercase font-black text-cyan-200">Wins</div>
-                                <div id="battle-score" class="text-2xl font-black text-yellow-300">0</div>
-                            </div>
-                            <div class="rounded-2xl bg-white/10 border border-white/15 p-3">
-                                <div class="text-xs uppercase font-black text-cyan-200">Streak</div>
-                                <div id="battle-streak" class="text-2xl font-black text-teal-300">0</div>
+        <section id="challenge" class="section-gap">
+            <div class="shell">
+                <div class="card rounded-3xl p-5 sm:p-8">
+                    <div class="grid lg:grid-cols-[0.85fr_1.15fr] gap-6">
+                        <div>
+                            <p class="text-sm font-black uppercase tracking-[0.18em] text-rose-700">Stop 4: mastery check</p>
+                            <h2 class="lesson-title font-heading text-4xl sm:text-5xl font-black text-ink mt-2">Can you think like an ocean mapper?</h2>
+                            <p class="mt-4 text-lg font-bold text-slate-600">Short questions, careful feedback, no trickery. The goal is not speed. The goal is seeing the layers.</p>
+                            <div class="grid grid-cols-3 gap-3 mt-6">
+                                <div class="rounded-2xl bg-sky-50 border border-sky-100 p-4">
+                                    <div class="text-xs font-black uppercase text-sky-700">Round</div>
+                                    <div id="battle-round" class="text-2xl font-black text-sky-900">1/1</div>
+                                </div>
+                                <div class="rounded-2xl bg-green-50 border border-green-100 p-4">
+                                    <div class="text-xs font-black uppercase text-green-700">Correct</div>
+                                    <div id="battle-score" class="text-2xl font-black text-green-900">0</div>
+                                </div>
+                                <div class="rounded-2xl bg-yellow-50 border border-yellow-100 p-4">
+                                    <div class="text-xs font-black uppercase text-yellow-700">Streak</div>
+                                    <div id="battle-streak" class="text-2xl font-black text-yellow-800">0</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="rounded-3xl border border-white/15 bg-white/8 p-5">
-                        <div id="battle-question" class="font-heading text-2xl sm:text-3xl font-black text-white"></div>
-                        <div id="battle-options" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
-                        <div id="battle-feedback" class="mt-4 min-h-[4rem] rounded-2xl border border-white/12 bg-black/20 p-4 font-bold"></div>
-                        <button id="battle-next" onclick="nextBattle()" class="hidden mt-4 px-5 py-3 rounded-2xl bg-yellow-300 text-slate-950 font-black hover:bg-yellow-200">
-                            Next Round <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </button>
+                        <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5 sm:p-6">
+                            <div id="battle-question" class="font-heading text-2xl sm:text-3xl font-black text-ink"></div>
+                            <div id="battle-options" class="grid sm:grid-cols-2 gap-3 mt-5"></div>
+                            <div id="battle-feedback" class="mt-5 min-h-[5rem] rounded-2xl bg-white border border-slate-200 p-5 font-bold text-slate-700"></div>
+                            <button id="battle-next" onclick="nextBattle()" class="hidden mt-5 px-5 py-3 rounded-2xl bg-yellow-300 text-slate-950 font-black hover:bg-yellow-200">
+                                Next Question <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -407,316 +303,287 @@
     </main>
 
     <script>
-        const scanData = {
-            intertidal: {
-                title: 'Intertidal / Littoral Zone',
-                depth: 'Tide zone',
-                tags: ['Horizontal ecological region','Benthic depth region','Biological habitat'],
-                copy: 'Between high and low tide, organisms switch between seawater and air. Tide pools, rocky shores, beaches, mudflats, salt marshes, and mangroves can all live in this identity.'
-            },
+        const featureData = {
             shelf: {
-                title: 'Continental Shelf / Neritic Zone',
+                title: 'Continental Shelf',
                 depth: 'Low tide to about 200 m',
-                tags: ['Seafloor province','Horizontal ecological region','Sublittoral benthic'],
-                copy: 'The shallow underwater edge of a continent is often productive because light and nutrients overlap. Reefs, kelp, seagrass, banks, shoals, and shelf seas belong here.'
+                copy: 'This is the shallow underwater edge of a continent. Because sunlight can reach shallow water and nutrients are often available, shelf seas can be very productive.',
+                tags: ['Seafloor province', 'Neritic water above', 'Sublittoral benthic bottom']
             },
             slope: {
-                title: 'Continental Slope and Submarine Canyon',
+                title: 'Continental Slope',
                 depth: 'About 200-4,000 m',
-                tags: ['Seafloor province','Bathyal region','Landform habitat'],
-                copy: 'The slope is the steep descent after the shelf break. Canyons, gullies, scarps, slope basins, and cold-water corals are common clues.'
+                copy: 'After the shelf break, the bottom descends more steeply toward the deep ocean. Submarine canyons, gullies, and slope basins are common here.',
+                tags: ['Seafloor province', 'Bathyal bottom', 'Canyons and scarps']
             },
             plain: {
-                title: 'Abyssal Plain and Abyssal Hills',
+                title: 'Abyssal Plain',
                 depth: 'About 4,000-6,000 m',
-                tags: ['Deep-ocean basin','Abyssal benthic','Abyssopelagic above'],
-                copy: 'Abyssal plains are extremely flat deep seafloor. Abyssal hills and lower ridge flanks interrupt the plain with low rounded terrain.'
+                copy: 'Abyssal plains are extremely flat deep seafloor. The water above can be abyssopelagic, while the bottom itself is abyssal benthic habitat.',
+                tags: ['Deep-ocean basin', 'Abyssal benthic', 'Abyssopelagic water above']
             },
             ridge: {
-                title: 'Mid-Ocean Ridge Province',
-                depth: 'Deep basin highland',
-                tags: ['Tectonic region','Seafloor province','Ridge flank / rift valley'],
-                copy: 'This is a divergent plate boundary where new ocean crust forms. Look for a ridge axis, rift valley, transform faults, fracture zones, and vent fields.'
+                title: 'Mid-Ocean Ridge',
+                depth: 'Deep seafloor highland',
+                copy: 'A mid-ocean ridge is a long submarine mountain system at a divergent plate boundary, where new ocean crust forms.',
+                tags: ['Tectonic region', 'Ridge province', 'Rift valley and ridge flanks']
             },
             vent: {
                 title: 'Hydrothermal Vent Field',
                 depth: 'Usually deep seafloor',
-                tags: ['Biological habitat','Tectonic setting','Chemosynthetic ecosystem'],
-                copy: 'Hot mineral-rich fluids exit the seafloor near ridges, arcs, back-arcs, or hotspots. Life here is powered by chemistry instead of sunlight.'
-            },
-            arc: {
-                title: 'Island Arc / Back-Arc Province',
-                depth: 'Subduction neighborhood',
-                tags: ['Tectonic region','Geographic province','Volcanic habitat'],
-                copy: 'Island arcs, forearc basins, back-arc basins, and remnant arcs often form around convergent margins where plates interact.'
+                copy: 'Hot mineral-rich fluids leave the seafloor here. The ecosystem is powered by chemosynthesis, not sunlight.',
+                tags: ['Biological habitat', 'Often ridge or arc related', 'Chemosynthetic life']
             },
             trench: {
                 title: 'Trench / Hadal Province',
                 depth: 'Deeper than 6,000 m',
-                tags: ['Tectonic region','Hadal benthic','Hadopelagic water'],
-                copy: 'Trenches are long, narrow, very deep depressions at many subduction zones. Trench walls, axes, basins, and accretionary wedges are part of the system.'
+                copy: 'Trenches are long, narrow, very deep depressions, usually at subduction zones. They are both tectonic features and hadal habitats.',
+                tags: ['Tectonic region', 'Hadal benthic', 'Hadopelagic water']
             }
         };
 
-        const categoryMeta = {
-            geographic: { label: 'Geographic ocean region', icon: 'fa-earth-americas', hint: 'World Ocean, basin, sea, gulf, bay, strait, sound, fjord, ria.' },
-            horizontal: { label: 'Horizontal ecological region', icon: 'fa-arrows-left-right', hint: 'Supratidal, intertidal, subtidal, neritic, oceanic, pelagic, benthic, demersal.' },
-            vertical: { label: 'Vertical light/depth zone', icon: 'fa-arrow-down-long', hint: 'Euphotic, mesopelagic, bathypelagic, abyssopelagic, hadopelagic.' },
-            seafloor: { label: 'Seafloor province', icon: 'fa-mountain-sun', hint: 'Shelf, slope, rise, abyssal province, ridge, trench, island arc.' },
-            tectonic: { label: 'Tectonic region', icon: 'fa-volcano', hint: 'Ridges, transform faults, trenches, island arcs, back-arc basins.' },
-            habitat: { label: 'Biological habitat', icon: 'fa-seedling', hint: 'Reefs, kelp forests, vents, seeps, marshes, mangroves, mudflats.' },
-            benthicDepth: { label: 'Benthic depth name', icon: 'fa-anchor', hint: 'Littoral, sublittoral, bathyal, abyssal, hadal.' }
-        };
-
-        const passportMissions = [
+        const lenses = [
             {
-                title: 'Hydrothermal vent field on a mid-ocean ridge',
-                clue: 'Hot mineral-rich fluid pours from the seafloor; tube-shaped animals and chemosynthetic microbes crowd around it.',
-                icon: 'fa-fire-flame-curved',
-                answers: ['seafloor','tectonic','habitat','benthicDepth'],
-                explain: 'It is a vent habitat, often on a ridge tectonic province, located on the seafloor, and it also has a benthic depth identity.'
+                id: 'shore',
+                tab: 'Shore to open ocean',
+                icon: 'fa-arrows-left-right',
+                title: 'Lens 1: How far from shore?',
+                copy: 'This lens gives names like intertidal, subtidal, neritic, and oceanic. It asks: are we at the coast, over the shelf, or beyond the shelf break?',
+                svg: `
+                <svg viewBox="0 0 900 420" role="img" aria-label="Shore to open ocean diagram">
+                    <rect width="900" height="420" fill="#e0f2fe"/>
+                    <rect y="115" width="900" height="305" fill="#38bdf8"/>
+                    <path d="M0 205 C110 185 205 200 300 210 C410 222 520 260 900 278 L900 420 L0 420 Z" fill="#7c4a2d"/>
+                    <path d="M0 156 L205 156 L320 210 L0 210 Z" fill="#fde68a"/>
+                    <line x1="205" y1="120" x2="205" y2="390" stroke="#0f172a" stroke-width="3" stroke-dasharray="8 8"/>
+                    <line x1="360" y1="120" x2="360" y2="390" stroke="#0f172a" stroke-width="3" stroke-dasharray="8 8"/>
+                    <text x="78" y="94" font-size="28" font-weight="900" fill="#0f172a">Intertidal</text>
+                    <text x="227" y="94" font-size="28" font-weight="900" fill="#0f172a">Neritic</text>
+                    <text x="568" y="94" font-size="28" font-weight="900" fill="#0f172a">Oceanic</text>
+                    <text x="210" y="145" font-size="18" font-weight="800" fill="#075985">over continental shelf</text>
+                    <text x="500" y="145" font-size="18" font-weight="800" fill="#075985">beyond shelf break</text>
+                </svg>`
             },
             {
-                title: 'Coral reef on the continental shelf',
-                clue: 'Sunlight reaches the bottom; reef builders and algae cooperate in shallow coastal water.',
-                icon: 'fa-spa',
-                answers: ['horizontal','seafloor','habitat','benthicDepth'],
-                explain: 'The shelf is a seafloor province, the water is neritic, the reef is a habitat, and the bottom is sublittoral shelf benthic.'
+                id: 'depth',
+                tab: 'Light and depth',
+                icon: 'fa-arrow-down-long',
+                title: 'Lens 2: How much sunlight reaches here?',
+                copy: 'This lens gives names like epipelagic, mesopelagic, bathypelagic, abyssopelagic, and hadopelagic. Light disappears with depth, so food and adaptations change too.',
+                svg: `
+                <svg viewBox="0 0 900 420" role="img" aria-label="Depth and light zone diagram">
+                    <defs><linearGradient id="depthGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="0.26" stop-color="#0284c7"/><stop offset="0.48" stop-color="#075985"/><stop offset="0.72" stop-color="#1e1b4b"/><stop offset="1" stop-color="#020617"/></linearGradient></defs>
+                    <rect width="900" height="420" fill="url(#depthGrad)"/>
+                    <g font-weight="900" fill="white">
+                        <text x="44" y="58" font-size="26">Epipelagic / sunlight</text>
+                        <text x="44" y="142" font-size="26">Mesopelagic / twilight</text>
+                        <text x="44" y="232" font-size="26">Bathypelagic / midnight</text>
+                        <text x="44" y="322" font-size="26">Abyssopelagic</text>
+                        <text x="44" y="392" font-size="26">Hadopelagic in trenches</text>
+                    </g>
+                    <g stroke="rgba(255,255,255,0.55)" stroke-width="2">
+                        <line x1="0" y1="92" x2="900" y2="92"/><line x1="0" y1="182" x2="900" y2="182"/><line x1="0" y1="272" x2="900" y2="272"/><line x1="0" y1="356" x2="900" y2="356"/>
+                    </g>
+                    <g font-weight="800" fill="#fef08a">
+                        <text x="720" y="58" font-size="22">0-200 m</text><text x="690" y="142" font-size="22">200-1,000 m</text><text x="690" y="232" font-size="22">1,000-4,000 m</text><text x="690" y="322" font-size="22">4,000-6,000 m</text><text x="720" y="392" font-size="22">&gt;6,000 m</text>
+                    </g>
+                </svg>`
             },
             {
-                title: 'Drake Passage',
-                clue: 'A narrow connection lets large water bodies exchange water between continents.',
-                icon: 'fa-route',
-                answers: ['geographic'],
-                explain: 'A passage, channel, or strait is a geographic ocean-region term rather than a depth or habitat by itself.'
-            },
-            {
-                title: 'Abyssal plain under abyssopelagic water',
-                clue: 'A very flat deep basin floor sits below dark open water far beyond the shelf break.',
-                icon: 'fa-ruler-horizontal',
-                answers: ['vertical','seafloor','benthicDepth','horizontal'],
-                explain: 'The floor is an abyssal seafloor province and benthic depth region; the water above is abyssopelagic and part of the oceanic/pelagic realm.'
-            },
-            {
-                title: 'Mangrove forest in a tidal estuary',
-                clue: 'Tree roots stand in brackish coastal water where river flow and tides mix.',
-                icon: 'fa-tree',
-                answers: ['horizontal','habitat','geographic','benthicDepth'],
-                explain: 'An estuary is a geographic/coastal system, mangrove forest is a habitat, and the tide zone maps to intertidal/littoral benthic terms.'
-            },
-            {
-                title: 'Hadal trench axis',
-                clue: 'The deepest long valley lies at a convergent plate boundary below 6,000 meters.',
-                icon: 'fa-angles-down',
-                answers: ['vertical','seafloor','tectonic','benthicDepth'],
-                explain: 'A trench is a tectonic/seafloor province; below 6,000 m the bottom is hadal and the water is hadopelagic.'
+                id: 'floor',
+                tab: 'Seafloor shape',
+                icon: 'fa-mountain-sun',
+                title: 'Lens 3: What is the bottom shaped like?',
+                copy: 'This lens gives names like shelf, slope, rise, abyssal plain, ridge, seamount, and trench. It is the ocean floor map.',
+                svg: `
+                <svg viewBox="0 0 900 420" role="img" aria-label="Seafloor province diagram">
+                    <rect width="900" height="420" fill="#bae6fd"/>
+                    <rect y="128" width="900" height="292" fill="#0ea5e9"/>
+                    <path d="M0 190 L195 190 L305 250 L405 312 L540 324 L620 292 L685 334 L755 226 L830 346 L900 316 L900 420 L0 420 Z" fill="#543622"/>
+                    <path d="M0 175 L195 175 L305 250 L0 250 Z" fill="#fde68a"/>
+                    <path d="M610 320 L650 238 L685 334 L722 248 L765 342 Z" fill="#2dd4bf" opacity="0.75"/>
+                    <path d="M815 248 L865 390 L900 300 L900 420 L790 420 Z" fill="#7f1d1d" opacity="0.75"/>
+                    <g font-weight="900" fill="#0f172a" font-size="21">
+                        <text x="53" y="155">shelf</text><text x="236" y="235">slope</text><text x="382" y="300">rise</text><text x="470" y="294">abyssal plain</text><text x="633" y="220">ridge</text><text x="800" y="226">trench</text>
+                    </g>
+                </svg>`
             }
         ];
 
-        const drops = [
-            { label: 'Gulf of Mexico', family: 'geographic' },
-            { label: 'Neritic zone', family: 'horizontal' },
-            { label: 'Mesopelagic', family: 'vertical' },
-            { label: 'Continental rise', family: 'seafloor' },
-            { label: 'Transform fault', family: 'tectonic' },
-            { label: 'Kelp forest', family: 'habitat' },
-            { label: 'Bathyal', family: 'benthicDepth' },
-            { label: 'Submarine canyon', family: 'seafloor' },
-            { label: 'Cold seep', family: 'habitat' },
-            { label: 'Marginal sea', family: 'geographic' }
+        const categoryMeta = {
+            geographic: { label: 'Geographic region', icon: 'fa-earth-americas' },
+            horizontal: { label: 'Shore-to-open ecological region', icon: 'fa-arrows-left-right' },
+            vertical: { label: 'Vertical light/depth zone', icon: 'fa-arrow-down-long' },
+            seafloor: { label: 'Seafloor province or landform', icon: 'fa-mountain-sun' },
+            tectonic: { label: 'Tectonic region', icon: 'fa-volcano' },
+            habitat: { label: 'Biological habitat', icon: 'fa-seedling' },
+            benthicDepth: { label: 'Benthic depth name', icon: 'fa-anchor' }
+        };
+
+        const missions = [
+            {
+                title: 'Hydrothermal vent field on a mid-ocean ridge',
+                clue: 'Hot mineral-rich fluid rises from the seafloor. The animals here depend on chemosynthetic microbes.',
+                answers: ['seafloor','tectonic','habitat','benthicDepth'],
+                explain: 'A vent is a biological habitat, often located in a tectonic ridge province, on the seafloor. Because it is on the bottom, it also has a benthic depth identity.',
+                scene: 'vent'
+            },
+            {
+                title: 'Coral reef on a continental shelf',
+                clue: 'Sunlit shallow water covers a hard reef built by living organisms over the shelf.',
+                answers: ['horizontal','seafloor','habitat','benthicDepth'],
+                explain: 'The water is neritic, the bottom is shelf benthic, the reef is a habitat, and the continental shelf is a seafloor province.',
+                scene: 'reef'
+            },
+            {
+                title: 'A narrow passage between two large water bodies',
+                clue: 'Water flows through a narrow connection, like a strait, channel, or passage.',
+                answers: ['geographic'],
+                explain: 'A strait, channel, or passage is a geographic ocean-region label. It does not automatically tell us depth or habitat.',
+                scene: 'strait'
+            },
+            {
+                title: 'Hadal trench axis',
+                clue: 'A very deep, narrow valley lies below 6,000 meters at a subduction zone.',
+                answers: ['vertical','seafloor','tectonic','benthicDepth'],
+                explain: 'A trench is a seafloor and tectonic feature. Deeper than 6,000 m, the water is hadopelagic and the bottom is hadal.',
+                scene: 'trench'
+            }
         ];
 
         const battles = [
             {
-                q: 'Which pair best describes water over the continental shelf?',
-                options: ['Neritic + usually productive', 'Hadopelagic + trench wall', 'Back-arc + abyssal hill', 'Oceanic + below 6,000 m'],
+                q: 'Why is one ocean place allowed to have several region names?',
+                options: ['Because geography, depth, biology, and tectonics overlap', 'Because scientists like extra names', 'Because every region is the same depth', 'Because seafloor shape is never important'],
                 a: 0,
-                explain: 'Neritic water lies over the shelf and is often productive because light and nutrients can overlap.'
+                explain: 'Exactly. The same place can be a habitat, a depth zone, and a seafloor province at the same time.'
             },
             {
-                q: 'A flat-topped underwater mountain is called a...',
-                options: ['Guyot or tablemount', 'Ria', 'Forearc basin', 'Turbidite levee'],
+                q: 'Water over the continental shelf is usually called...',
+                options: ['Neritic', 'Hadopelagic', 'Back-arc', 'Fracture zone'],
                 a: 0,
-                explain: 'A guyot is a flat-topped seamount, often eroded near sea level before it subsided.'
+                explain: 'Neritic water lies over the continental shelf, from near low tide to roughly the shelf edge.'
             },
             {
-                q: 'Which is the best correction for using "abyssal slope" as a main label?',
-                options: ['Use a more precise local feature such as ridge flank, trench wall, seamount slope, or continental rise', 'Always replace it with continental shelf', 'Use it only for beaches', 'Call every deep feature hadal'],
+                q: 'Which label is best for a flat-topped seamount?',
+                options: ['Guyot or tablemount', 'Ria', 'Salt marsh', 'Shelf break'],
                 a: 0,
-                explain: 'The PDF notes that "abyssal slope" is usually descriptive, not a major standardized province.'
+                explain: 'A guyot, also called a tablemount, is a flat-topped seamount.'
             },
             {
-                q: 'Which category connects ridges, transform faults, trenches, island arcs, and back-arc basins?',
-                options: ['Tectonic region', 'Supratidal region', 'Estuary habitat', 'Bight classification'],
+                q: 'Which set is mostly tectonic?',
+                options: ['Mid-ocean ridge, transform fault, trench, island arc', 'Kelp forest, coral reef, mudflat, oyster reef', 'Gulf, bay, strait, sound', 'Epipelagic, mesopelagic, bathypelagic, hadopelagic'],
                 a: 0,
-                explain: 'Those terms describe plate-boundary or plate-related structure.'
+                explain: 'Ridges, faults, trenches, and island arcs are tied to plate movement.'
             },
             {
-                q: 'What makes a taxonomy map more accurate than one single ocean-region list?',
-                options: ['Depth, biology, geography, and tectonics overlap at the same place', 'Every place has only one correct label', 'Depth never changes across basins', 'Habitats are separate from physical regions'],
+                q: 'What is the safer teaching label than using "abyssal slope" as a main province?',
+                options: ['Use the precise feature, such as ridge flank, trench wall, seamount slope, or continental rise', 'Call all slopes intertidal', 'Use abyssal slope for every deep place', 'Avoid seafloor labels completely'],
                 a: 0,
-                explain: 'One location can belong to several systems at once, which is the central idea of this taxonomy.'
-            },
-            {
-                q: 'Which set belongs mostly to individual seafloor landforms and habitats?',
-                options: ['Seamount, trench, cold seep, submarine canyon', 'World Ocean, Pacific Basin, gulf, strait', 'Euphotic, mesopelagic, bathypelagic', 'Pelagic, benthic, demersal'],
-                a: 0,
-                explain: 'Those are recognizable features or habitats on the seafloor.'
+                explain: 'Right. The PDF treats "abyssal slope" as a descriptive phrase, not a major standard province.'
             }
         ];
 
-        let passportIndex = 0;
+        let currentLens = 0;
+        let missionIndex = 0;
         let passportScore = 0;
         let battleIndex = 0;
         let battleScore = 0;
         let battleStreak = 0;
-        let activeDrag = null;
 
-        function scrollToMode(id){
-            document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+        function renderFeature(key){
+            const data = featureData[key];
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.feature === key));
+            document.getElementById('map-title').textContent = data.title;
+            document.getElementById('map-depth').textContent = data.depth;
+            document.getElementById('map-copy').textContent = data.copy;
+            document.getElementById('map-tags').innerHTML = data.tags.map(tag => `<span class="px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-sm font-black">${tag}</span>`).join('');
         }
 
-        function renderScan(key){
-            const data = scanData[key];
-            document.querySelectorAll('.scan-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.scan === key));
-            document.getElementById('scan-title').textContent = data.title;
-            document.getElementById('scan-depth').textContent = data.depth;
-            document.getElementById('scan-copy').textContent = data.copy;
-            document.getElementById('scan-tags').innerHTML = data.tags.map(tag => `<span class="badge-chip px-3 py-1 rounded-full text-xs font-black text-cyan-50">${tag}</span>`).join('');
+        function renderLens(){
+            const lens = lenses[currentLens];
+            document.getElementById('lens-tabs').innerHTML = lenses.map((item, index) => `
+                <button class="lens-tab ${index === currentLens ? 'active' : ''} rounded-2xl border border-slate-200 bg-white p-4 text-left" onclick="currentLens=${index};renderLens();">
+                    <i class="fa-solid ${item.icon} text-sky-700 text-xl"></i>
+                    <span class="block mt-2 font-black">${item.tab}</span>
+                </button>
+            `).join('');
+            document.getElementById('lens-canvas').innerHTML = lens.svg;
+            document.getElementById('lens-title').textContent = lens.title;
+            document.getElementById('lens-copy').textContent = lens.copy;
+        }
+
+        function sceneSvg(kind){
+            const base = {
+                reef: `
+                    <svg viewBox="0 0 760 360" role="img" aria-label="Coral reef on continental shelf">
+                        <rect width="760" height="360" fill="#bae6fd"/><rect y="80" width="760" height="280" fill="#38bdf8"/>
+                        <path d="M0 260 L760 260 L760 360 L0 360 Z" fill="#fcd34d"/>
+                        <path d="M110 260 c20-55 45-55 58 0 M175 260 c10-42 35-42 46 0 M235 260 c24-66 58-66 82 0" fill="none" stroke="#fb7185" stroke-width="16" stroke-linecap="round"/>
+                        <text x="42" y="52" font-size="28" font-weight="900" fill="#0f172a">sunlit shelf water</text><text x="430" y="303" font-size="24" font-weight="900" fill="#78350f">continental shelf</text>
+                    </svg>`,
+                vent: `
+                    <svg viewBox="0 0 760 360" role="img" aria-label="Hydrothermal vent at mid-ocean ridge">
+                        <rect width="760" height="360" fill="#172554"/><path d="M0 300 L160 300 L240 250 L320 305 L405 220 L500 306 L760 300 L760 360 L0 360 Z" fill="#312e81"/>
+                        <path d="M385 288 L410 288 L402 180 L430 155 L390 172 Z" fill="#a78bfa"/><path d="M380 160 C340 120 365 83 405 54 C390 108 460 95 430 160" fill="#c4b5fd" opacity="0.72"/>
+                        <text x="42" y="54" font-size="28" font-weight="900" fill="#e0f2fe">mid-ocean ridge province</text><text x="435" y="196" font-size="24" font-weight="900" fill="#fde68a">vent field</text>
+                    </svg>`,
+                strait: `
+                    <svg viewBox="0 0 760 360" role="img" aria-label="Strait connecting water bodies">
+                        <rect width="760" height="360" fill="#7dd3fc"/><path d="M0 0 L250 0 C190 95 195 240 260 360 L0 360 Z" fill="#65a30d"/>
+                        <path d="M760 0 L510 0 C570 98 565 245 500 360 L760 360 Z" fill="#65a30d"/>
+                        <path d="M295 150 C355 118 405 118 465 150" fill="none" stroke="#fef08a" stroke-width="12" stroke-linecap="round"/>
+                        <text x="280" y="80" font-size="28" font-weight="900" fill="#0f172a">strait / channel</text><text x="270" y="225" font-size="22" font-weight="900" fill="#075985">narrow water connection</text>
+                    </svg>`,
+                trench: `
+                    <svg viewBox="0 0 760 360" role="img" aria-label="Hadal trench">
+                        <defs><linearGradient id="trenchDepth" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0369a1"/><stop offset="1" stop-color="#020617"/></linearGradient></defs>
+                        <rect width="760" height="360" fill="url(#trenchDepth)"/><path d="M0 215 L190 215 L325 320 L460 160 L590 215 L760 215 L760 360 L0 360 Z" fill="#3f1d2b"/>
+                        <line x1="380" y1="38" x2="380" y2="326" stroke="#fef08a" stroke-width="4" stroke-dasharray="9 10"/>
+                        <text x="42" y="56" font-size="28" font-weight="900" fill="#e0f2fe">deeper than 6,000 m</text><text x="405" y="286" font-size="24" font-weight="900" fill="#fecdd3">trench axis</text>
+                    </svg>`
+            };
+            return base[kind];
         }
 
         function renderPassport(){
-            const mission = passportMissions[passportIndex];
-            document.getElementById('passport-title').textContent = mission.title;
-            document.getElementById('passport-clue').textContent = mission.clue;
-            document.getElementById('passport-icon').innerHTML = `<i class="fa-solid ${mission.icon}"></i>`;
-            document.getElementById('category-grid').innerHTML = Object.entries(categoryMeta).map(([key, cat]) => `
-                <button type="button" class="category-btn rounded-2xl border border-white/15 bg-white/10 p-4 text-left" data-cat="${key}" onclick="toggleCategory('${key}')">
-                    <i class="fa-solid ${cat.icon} text-yellow-200 text-xl"></i>
-                    <span class="block mt-2 font-black text-white">${cat.label}</span>
-                    <span class="block mt-1 text-xs font-bold text-cyan-100/80">${cat.hint}</span>
+            const mission = missions[missionIndex];
+            document.getElementById('mission-count').textContent = `${missionIndex + 1} / ${missions.length}`;
+            document.getElementById('mission-scene').innerHTML = sceneSvg(mission.scene);
+            document.getElementById('mission-title').textContent = mission.title;
+            document.getElementById('mission-clue').textContent = mission.clue;
+            document.getElementById('stamp-grid').innerHTML = Object.entries(categoryMeta).map(([key, cat]) => `
+                <button class="stamp-btn rounded-2xl border border-slate-200 bg-white p-4 text-left font-black" data-stamp="${key}" onclick="toggleStamp('${key}')">
+                    <i class="fa-solid ${cat.icon} text-sky-700 mr-2"></i>${cat.label}
                 </button>
             `).join('');
-            document.getElementById('passport-feedback').textContent = 'Pick every category that belongs to this place. Some missions need more than one stamp.';
+            document.getElementById('passport-feedback').textContent = 'Choose the labels that belong to this scene. Then check your stamps.';
         }
 
-        function toggleCategory(key){
-            document.querySelector(`[data-cat="${key}"]`)?.classList.toggle('selected');
+        function toggleStamp(key){
+            document.querySelector(`[data-stamp="${key}"]`)?.classList.toggle('selected');
         }
 
         function checkPassport(){
-            const selected = [...document.querySelectorAll('.category-btn.selected')].map(btn => btn.dataset.cat).sort();
-            const mission = passportMissions[passportIndex];
-            const answers = [...mission.answers].sort();
-            const ok = selected.length === answers.length && selected.every((v, i) => v === answers[i]);
-            const feedback = document.getElementById('passport-feedback');
+            const selected = [...document.querySelectorAll('.stamp-btn.selected')].map(btn => btn.dataset.stamp).sort();
+            const mission = missions[missionIndex];
+            const answer = [...mission.answers].sort();
+            const ok = selected.length === answer.length && selected.every((value, index) => value === answer[index]);
+            document.querySelectorAll('.stamp-btn').forEach(btn => {
+                const should = answer.includes(btn.dataset.stamp);
+                btn.classList.toggle('correct', should);
+                btn.classList.toggle('wrong', btn.classList.contains('selected') && !should);
+            });
             if(ok){
                 passportScore += 10;
                 document.getElementById('passport-score').textContent = passportScore;
-                feedback.innerHTML = `<span class="text-green-300"><i class="fa-solid fa-check mr-2"></i>Stamped perfectly.</span> ${mission.explain}`;
-            } else {
-                const missing = answers.filter(a => !selected.includes(a)).map(a => categoryMeta[a].label);
-                const extras = selected.filter(a => !answers.includes(a)).map(a => categoryMeta[a].label);
-                feedback.innerHTML = `<span class="text-rose-300"><i class="fa-solid fa-xmark mr-2"></i>Almost.</span> ${missing.length ? 'Missing: ' + missing.join(', ') + '. ' : ''}${extras.length ? 'Extra: ' + extras.join(', ') + '. ' : ''}${mission.explain}`;
             }
+            document.getElementById('passport-feedback').innerHTML = `<span class="${ok ? 'text-green-700' : 'text-rose-700'} font-black">${ok ? 'Beautifully mapped.' : 'Good thinking. Adjust your map.'}</span> ${mission.explain}`;
         }
 
         function nextPassport(){
-            passportIndex = (passportIndex + 1) % passportMissions.length;
+            missionIndex = (missionIndex + 1) % missions.length;
             renderPassport();
-        }
-
-        function renderDrops(){
-            const tokenRow = document.getElementById('token-row');
-            tokenRow.innerHTML = drops.map((item, index) => `
-                <button class="token px-4 py-3 rounded-2xl bg-yellow-200 text-slate-950 font-black shadow-lg" data-token="${index}" aria-label="Drag ${item.label}">
-                    ${item.label}
-                </button>
-            `).join('');
-            document.getElementById('drop-zones').innerHTML = Object.entries(categoryMeta).map(([key, cat]) => `
-                <div class="drop-card min-h-[7rem] rounded-2xl border border-white/15 bg-white/10 p-4" data-drop="${key}">
-                    <i class="fa-solid ${cat.icon} text-cyan-200 text-xl"></i>
-                    <div class="mt-2 font-black text-white">${cat.label}</div>
-                    <div class="mt-2 text-xs text-cyan-100/75 font-bold">Drop matching cards here.</div>
-                </div>
-            `).join('');
-            document.querySelectorAll('.token').forEach(token => token.addEventListener('pointerdown', beginDrag));
-            document.getElementById('drop-feedback').textContent = 'Drag a term into its best taxonomy family.';
-        }
-
-        function beginDrag(e){
-            if(e.button !== undefined && e.button !== 0) return;
-            const token = e.currentTarget;
-            const rect = token.getBoundingClientRect();
-            activeDrag = { token, home: token.parentElement, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
-            token.classList.add('dragging');
-            token.style.position = 'fixed';
-            token.style.left = `${rect.left}px`;
-            token.style.top = `${rect.top}px`;
-            token.style.width = `${rect.width}px`;
-            token.style.margin = '0';
-            document.body.appendChild(token);
-            token.setPointerCapture?.(e.pointerId);
-            window.addEventListener('pointermove', moveDrag);
-            window.addEventListener('pointerup', endDrag, { once:true });
-            e.preventDefault();
-        }
-
-        function moveDrag(e){
-            if(!activeDrag) return;
-            activeDrag.token.style.left = `${e.clientX - activeDrag.offsetX}px`;
-            activeDrag.token.style.top = `${e.clientY - activeDrag.offsetY}px`;
-            document.querySelectorAll('.drop-card').forEach(card => card.classList.remove('hovered'));
-            const drop = dropFromPoint(e.clientX, e.clientY);
-            drop?.classList.add('hovered');
-        }
-
-        function endDrag(e){
-            if(!activeDrag) return;
-            window.removeEventListener('pointermove', moveDrag);
-            document.querySelectorAll('.drop-card').forEach(card => card.classList.remove('hovered'));
-            const drop = dropFromPoint(e.clientX, e.clientY);
-            const token = activeDrag.token;
-            token.classList.remove('dragging');
-            if(!drop){
-                restoreToken();
-                return;
-            }
-            const item = drops[Number(token.dataset.token)];
-            const ok = item.family === drop.dataset.drop;
-            const feedback = document.getElementById('drop-feedback');
-            drop.classList.remove('correct','wrong');
-            void drop.offsetWidth;
-            drop.classList.add(ok ? 'correct' : 'wrong');
-            if(ok){
-                token.removeAttribute('style');
-                token.classList.remove('bg-yellow-200','text-slate-950');
-                token.classList.add('bg-green-300','text-emerald-950');
-                drop.appendChild(token);
-                feedback.innerHTML = `<span class="text-green-300"><i class="fa-solid fa-check mr-2"></i>${item.label}</span> belongs with ${categoryMeta[item.family].label}.`;
-                activeDrag = null;
-            } else {
-                feedback.innerHTML = `<span class="text-rose-300"><i class="fa-solid fa-xmark mr-2"></i>${item.label}</span> fits ${categoryMeta[item.family].label}. Try that family.`;
-                restoreToken();
-            }
-        }
-
-        function dropFromPoint(x, y){
-            return [...document.querySelectorAll('.drop-card')].find(card => {
-                const rect = card.getBoundingClientRect();
-                return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-            }) || null;
-        }
-
-        function restoreToken(){
-            if(!activeDrag) return;
-            activeDrag.token.removeAttribute('style');
-            activeDrag.home.appendChild(activeDrag.token);
-            activeDrag = null;
-        }
-
-        function resetDrops(){
-            renderDrops();
         }
 
         function renderBattle(){
@@ -725,10 +592,10 @@
             document.getElementById('battle-score').textContent = battleScore;
             document.getElementById('battle-streak').textContent = battleStreak;
             document.getElementById('battle-question').textContent = round.q;
-            document.getElementById('battle-feedback').textContent = 'Choose the strongest taxonomy reading.';
+            document.getElementById('battle-feedback').textContent = 'Pick the best answer. Then read why it works.';
             document.getElementById('battle-next').classList.add('hidden');
             document.getElementById('battle-options').innerHTML = round.options.map((option, index) => `
-                <button class="answer-btn rounded-2xl border border-white/15 bg-white/10 p-4 text-left font-black text-white" onclick="checkBattle(${index}, this)">
+                <button class="quiz-btn rounded-2xl border border-slate-200 bg-white p-4 text-left font-black text-slate-800" onclick="checkBattle(${index}, this)">
                     ${option}
                 </button>
             `).join('');
@@ -736,20 +603,16 @@
 
         function checkBattle(index, btn){
             const round = battles[battleIndex];
-            const buttons = [...document.querySelectorAll('.answer-btn')];
-            buttons.forEach(b => b.disabled = true);
+            const buttons = [...document.querySelectorAll('.quiz-btn')];
+            buttons.forEach(button => button.disabled = true);
             const ok = index === round.a;
             btn.classList.add(ok ? 'correct' : 'wrong');
             buttons[round.a]?.classList.add('correct');
-            if(ok){
-                battleScore += 1;
-                battleStreak += 1;
-            } else {
-                battleStreak = 0;
-            }
+            battleScore += ok ? 1 : 0;
+            battleStreak = ok ? battleStreak + 1 : 0;
             document.getElementById('battle-score').textContent = battleScore;
             document.getElementById('battle-streak').textContent = battleStreak;
-            document.getElementById('battle-feedback').innerHTML = `<span class="${ok ? 'text-green-300' : 'text-rose-300'}">${ok ? 'Correct.' : 'Not quite.'}</span> ${round.explain}`;
+            document.getElementById('battle-feedback').innerHTML = `<span class="${ok ? 'text-green-700' : 'text-rose-700'} font-black">${ok ? 'Correct.' : 'Not quite.'}</span> ${round.explain}`;
             document.getElementById('battle-next').classList.remove('hidden');
         }
 
@@ -758,10 +621,10 @@
             renderBattle();
         }
 
-        document.querySelectorAll('.scan-btn').forEach(btn => btn.addEventListener('click', () => renderScan(btn.dataset.scan)));
-        renderScan('intertidal');
+        document.querySelectorAll('.map-btn').forEach(btn => btn.addEventListener('click', () => renderFeature(btn.dataset.feature)));
+        renderFeature('shelf');
+        renderLens();
         renderPassport();
-        renderDrops();
         renderBattle();
     </script>
 </body>

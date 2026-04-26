@@ -95,7 +95,7 @@
                     <header class="p-4 z-50 flex flex-col xl:flex-row justify-between items-center transition-colors duration-1000 bg-cyan-100/80 text-cyan-900 backdrop-blur-md border-b border-white/20 gap-4" id="diel-header">
                         <div class="flex items-center gap-3">
                             <div class="bg-yellow-400 p-2 rounded-full shadow-lg"><i class="fa-solid fa-trophy w-6 h-6 text-yellow-900 flex items-center justify-center text-lg"></i></div>
-                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 24</p></div>
+                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 25</p></div>
                         </div>
 
                         <div class="flex flex-wrap justify-center items-center gap-2 md:gap-4 bg-white/20 p-2 rounded-full border border-white/30 backdrop-blur-sm">
@@ -132,7 +132,7 @@
                     <div id="diel-success-banner" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 z-50">
                         <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-full shadow-2xl border-4 border-white flex items-center gap-4 animate-bounce">
                             <i class="fa-solid fa-trophy w-8 h-8 text-yellow-100 flex items-center justify-center text-2xl"></i>
-                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 24 DVM species!</p></div>
+                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 25 DVM species!</p></div>
                         </div>
                     </div>
 
@@ -378,10 +378,18 @@
             "The 'Deep Scattering Layer' is so dense with animals it confused early sonar into thinking it was the seafloor!",
             "Animals have internal circadian clocks that tell them when to migrate, even in 24-hour darkness.",
             "Some epipelagic predators, such as swordfish, make deep daytime feeding dives into the twilight zone instead of living there full time.",
-            "Reverse DVM can happen when predators move deeper while many prey animals stay shallower or hidden."
+            "Reverse DVM can happen when predators move deeper while many prey animals stay shallower or hidden.",
+            "In a classic marine example, Pseudocalanus copepods in Dabob Bay reduced overlap with nocturnal invertebrate predators by using reverse DVM.",
+            "Deep resident animals such as vent shrimp and bigfin squid are important zone examples, but they are not automatically DVM animals."
         ];
 
-        const DIEL_OCEAN_ZONES=[{name:'Sunlight Zone',depth:'0m - 200m',color:'text-cyan-100',border:'border-cyan-300/30'},{name:'Twilight Zone',depth:'200m - 1,000m',color:'text-blue-200',border:'border-blue-500/30'},{name:'Midnight Zone',depth:'1,000m - 4,000m',color:'text-indigo-200',border:'border-indigo-800/30'}];
+        const DIEL_OCEAN_ZONES=[
+            {name:'Surface / Neritic',depth:'shelf - 200m',color:'text-cyan-100',border:'border-cyan-300/30'},
+            {name:'Twilight Zone',depth:'200m - 1,000m',color:'text-blue-200',border:'border-blue-500/30'},
+            {name:'Midnight Zone',depth:'1,000m - 4,000m',color:'text-indigo-200',border:'border-indigo-800/30'},
+            {name:'Abyssal Deep',depth:'4,000m - 6,000m',color:'text-slate-200',border:'border-slate-600/30'},
+            {name:'Benthic Vent / Trench Contrast',depth:'seafloor habitats',color:'text-rose-100',border:'border-rose-700/30'}
+        ];
         
         const DIEL_SPECIES_DATA=[
             ['copepod','Copepod','🦠','45%','10%','400m','10m','15%','text-3xl','Phytoplankton',
@@ -455,7 +463,10 @@
                 'Malacosteus niger', ['🐟','🦑','🐋']],
             ['glasssquid','Glass Squid','🔍','66%','16%','600m','90m','32%','text-5xl','Small fish, crustaceans, and planktonic animals',
                 ['A transparent body makes it difficult for predators to spot in midwater.','Photophores near the eyes can help erase shadows from above.','Many glass squids live in the twilight zone and rise shallower at night.','Some species look like little glass balloons with arms held over the head.','Transparency is an active habitat clue for open midwater, not a tide-pool clue.'],
-                'Cranchiidae', ['🐋','🐬','🐟']]
+                'Cranchiidae', ['🐋','🐬','🐟']],
+            ['reversecopepod','Reverse-Migrating Copepod','↕️','18%','46%','50m','400m','20%','text-3xl','Phytoplankton and tiny particles',
+                ['This card shows reverse DVM: shallower in the day and deeper at night.','The classic marine example is Pseudocalanus in Dabob Bay, Washington.','Reverse DVM can reduce overlap with nocturnal invertebrate predators that rise at night.','It is less common than the usual night-up, day-down pattern, which makes it a great test question.','The same animal group can show different migration patterns depending on predator pressure.'],
+                'Pseudocalanus sp.', ['🦐','🪼','🐟']]
         ].map(s=>({id:s[0],name:s[1],emoji:s[2],dayDepth:s[3],nightDepth:s[4],dayDepthText:s[5],nightDepthText:s[6],xPos:s[7],size:s[8],diet:s[9],funFacts:s[10],scientificName:s[11],predators:s[12]}));
 
         function getAnimalIcon(id, emoji, sizeCls) {
@@ -997,7 +1008,7 @@
             updateDielUI();
         }
 
-        const MIG_QUIZ_DATA=[["Primary reason zooplankton wait for nightfall to migrate?","Phytoplankton only exist at night","Hide from visual predators",1],["Navy technology that accidentally discovered DSL?","Sonar / Acoustics","Radar",0],["Migrators pooping carbon in deep ocean regulates climate via:","Ocean Acidification","Biological Carbon Pump",1],["Specific light intensity levels organisms track:","Isolumes","Thermoclines",0],["In polar winters (no sunlight), how do they migrate?","Magnetic fields","Internal Circadian Clocks",1],['"Hunger/Satiation Hypothesis" - what if stomach is full?',"Stay deep to save energy","Migrate anyway",0],["Reverse Migration (migrating DOWN at night) is used to:","Find warm water","Avoid larger predators migrating up",1],["Squid delay upward migration if they hear:","Risso's Dolphins echolocation","Shark fin beats",0],["How is carbon physically transported down?","Carried in claws","Fast-sinking dense fecal pellets",1],["Why hide in the OMZ during the day?","Apex predators can't breathe there","It's warmer",0],["Order of migration at sunset:","Large fish first","Small zooplankton first; large fish last",1],["Energy expended by all migrating zooplankton annually?","Total energy consumption of US in a year","Single hurricane",0],["Why don't Phytoplankton migrate deep?","Too heavy","Must remain in sunlight to photosynthesize",1]];
+        const MIG_QUIZ_DATA=[["Primary reason zooplankton wait for nightfall to migrate?","Phytoplankton only exist at night","Hide from visual predators",1],["Navy technology that accidentally discovered DSL?","Sonar / Acoustics","Radar",0],["Migrators pooping carbon in deep ocean regulates climate via:","Ocean Acidification","Biological Carbon Pump",1],["Specific light intensity levels organisms track:","Isolumes","Thermoclines",0],["In polar winters (no sunlight), how do they migrate?","Magnetic fields","Internal Circadian Clocks",1],['"Hunger/Satiation Hypothesis" - what if stomach is full?',"Stay deep to save energy","Migrate anyway",0],["Reverse Migration (migrating DOWN at night) is used to:","Find warm water","Avoid larger predators migrating up",1],["Classic reverse-DVM marine example added here:","Pseudocalanus copepods","Giant kelp",0],["Abyssal vent shrimp are shown best as:","Routine night-up DVM animals","Deep benthic contrast animals",1],["Squid delay upward migration if they hear:","Risso's Dolphins echolocation","Shark fin beats",0],["How is carbon physically transported down?","Carried in claws","Fast-sinking dense fecal pellets",1],["Why hide in the OMZ during the day?","Apex predators can't breathe there","It's warmer",0],["Order of migration at sunset:","Large fish first","Small zooplankton first; large fish last",1],["Energy expended by all migrating zooplankton annually?","Total energy consumption of US in a year","Single hurricane",0],["Why don't Phytoplankton migrate deep?","Too heavy","Must remain in sunlight to photosynthesize",1]];
         let migMissedQuestions=new Set(), migActiveQuestions=[], migReviewMode=false;
         function renderMigQuiz(filter=null, reviewOnly=false){migProgress=0;migReviewMode=reviewOnly;migActiveQuestions=filter&&filter.length?filter:MIG_QUIZ_DATA.map((_,i)=>i);document.getElementById('q-tracker-mig').innerText=1;document.getElementById('migration-victory').classList.add('hidden');let h='';migActiveQuestions.forEach((originalI,step)=>{const qq=MIG_QUIZ_DATA[originalI];const label=reviewOnly?'Review':'Q';h+=`<div id="quiz-block-mig-${step}" class="mig-step ${step>0?'hidden':''}"><p class="mb-4 font-semibold text-lg text-${step%2===0?'white':'yellow-200'}">${label}${step+1}: ${qq[0]}</p><div class="grid sm:grid-cols-2 gap-3"><button onclick="handleMigQuiz(${originalI},${step},${qq[3]===0},this)" class="mig-btn">A) ${qq[1]}</button><button onclick="handleMigQuiz(${originalI},${step},${qq[3]===1},this)" class="mig-btn">B) ${qq[2]}</button></div></div>`;});const b=document.getElementById('mig-quiz-body');if(b)b.innerHTML=h;}
         function showMigQuizComplete(){const missedCount=migMissedQuestions.size;const victory=document.getElementById('migration-victory');const reviewButton=missedCount>0?`<button onclick="reviewMigMissed()" class="mt-5 px-5 py-3 rounded-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-bold transition">Review Missed Only (${missedCount})</button>`:`<p class="mt-5 text-green-300 font-bold">Perfect run. No missed questions to review.</p>`;victory.innerHTML=`<i class="fa-solid fa-medal text-6xl text-yellow-400 mb-4 drop-shadow-[0_0_15px_gold]"></i><h2 class="text-3xl font-heading font-black text-white mb-2">${migReviewMode?'Review Complete!':'Migration Commander!'}</h2><div class="flex flex-col sm:flex-row gap-3 items-center justify-center">${reviewButton}<button onclick="retakeMigQuiz()" class="mt-5 px-5 py-3 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white font-bold transition">Retake Full Quiz</button></div>`;victory.classList.remove('hidden');if(!migReviewMode){awardBadge('migration');checkAllBadges();}}
