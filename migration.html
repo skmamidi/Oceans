@@ -95,7 +95,7 @@
                     <header class="p-4 z-50 flex flex-col xl:flex-row justify-between items-center transition-colors duration-1000 bg-cyan-100/80 text-cyan-900 backdrop-blur-md border-b border-white/20 gap-4" id="diel-header">
                         <div class="flex items-center gap-3">
                             <div class="bg-yellow-400 p-2 rounded-full shadow-lg"><i class="fa-solid fa-trophy w-6 h-6 text-yellow-900 flex items-center justify-center text-lg"></i></div>
-                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 23</p></div>
+                            <div><h1 class="font-bold text-xl md:text-2xl tracking-tight">The Great Ocean Migration</h1><p class="text-sm opacity-80 font-medium" id="diel-score-text">Animals Discovered: 0 / 24</p></div>
                         </div>
 
                         <div class="flex flex-wrap justify-center items-center gap-2 md:gap-4 bg-white/20 p-2 rounded-full border border-white/30 backdrop-blur-sm">
@@ -132,7 +132,7 @@
                     <div id="diel-success-banner" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 z-50">
                         <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-full shadow-2xl border-4 border-white flex items-center gap-4 animate-bounce">
                             <i class="fa-solid fa-trophy w-8 h-8 text-yellow-100 flex items-center justify-center text-2xl"></i>
-                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 23 DVM species!</p></div>
+                            <div><h3 class="font-black text-xl">Ocean Explorer Extraordinaire!</h3><p class="text-sm font-medium">You found all 24 DVM species!</p></div>
                         </div>
                     </div>
 
@@ -377,7 +377,8 @@
             "Some tiny zooplankton travel over 1,000 meters daily—like a human running a marathon!",
             "The 'Deep Scattering Layer' is so dense with animals it confused early sonar into thinking it was the seafloor!",
             "Animals have internal circadian clocks that tell them when to migrate, even in 24-hour darkness.",
-            "Reverse DVM happens when small predators move DOWN at night to hunt animals hiding in the deep!"
+            "Some epipelagic predators, such as swordfish, make deep daytime feeding dives into the twilight zone instead of living there full time.",
+            "Reverse DVM can happen when predators move deeper while many prey animals stay shallower or hidden."
         ];
 
         const DIEL_OCEAN_ZONES=[{name:'Sunlight Zone',depth:'0m - 200m',color:'text-cyan-100',border:'border-cyan-300/30'},{name:'Twilight Zone',depth:'200m - 1,000m',color:'text-blue-200',border:'border-blue-500/30'},{name:'Midnight Zone',depth:'1,000m - 4,000m',color:'text-indigo-200',border:'border-indigo-800/30'}];
@@ -395,6 +396,9 @@
             ['humboldt','Humboldt Squid','🦑','55%','25%','500m','150m','55%','text-6xl','Lanternfish',
                 ['Also known as the Jumbo Squid.','They can flash red and white rapidly to communicate or confuse prey.','Armed with barbed suckers on their tentacles for grabbing prey.','They are incredibly fast swimmers, using jet propulsion to dart through the water.','They hunt in large, aggressive packs called shoals.'],
                 'Dosidicus gigas', ['🐳','🦈']],
+            ['swordfish','Swordfish','⚔️','58%','8%','300-800m','0-100m','92%','text-5xl','Squid and pelagic fish',
+                ['Swordfish are epipelagic open-ocean predators, not permanent twilight-zone residents.','They often spend nights in shallower epipelagic water and descend into the mesopelagic during daylight to feed.','Their eye-and-brain heater helps them hunt in cold, dim water.','The bill is used to slash and stun prey, not to spear it like a skewer.','This is a predator deep-dive pattern layered onto prey-community diel migration.'],
+                'Xiphias gladius', ['🦈','🐋']],
             ['siphonophore','Siphonophore','🫧','50%','18%','400m','75m','85%','text-5xl','Small crustaceans',
                 ['A colony of tiny connected clones.','The Portuguese Man o War is a famous (and venomous) surface-dwelling relative.','Some deep-sea species can grow longer than a blue whale!','They use bioluminescent lures that look like twitching fish to attract prey.','Each clone in the colony has a specific job, like swimming, eating, or reproducing.'],
                 'Siphonophorae', ['🐢','🐟','🐌']],

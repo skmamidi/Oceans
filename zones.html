@@ -234,6 +234,7 @@
                                         <span onclick="openSpecies('shark')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="shark" title="Great White Shark"></span>
                                         <span onclick="openSpecies('turtle')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="turtle" title="Sea Turtle"></span>
                                         <span onclick="openSpecies('manta')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="manta" title="Manta Ray"></span>
+                                        <span onclick="openSpecies('swordfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="swordfish" title="Swordfish"></span>
                                         <span onclick="openSpecies('irukandji')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="irukandji" title="Irukandji Jellyfish"></span>
                                         <span onclick="openSpecies('whaleshark')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="whaleshark" title="Whale Shark"></span>
                                         <span onclick="openSpecies('yellowfintuna')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="yellowfintuna" title="Yellowfin Tuna"></span>
@@ -275,7 +276,6 @@
                                 <div><p class="mb-4">Only faint blue light makes it here. Animals use large eyes and counter-illumination.</p><div class="sci-oly-box p-4 rounded-xl text-white"><h4 class="font-bold text-purple-300 text-sm uppercase mb-1">SciOly Pro-Tip</h4><p class="text-sm">Contains the <strong>Oxygen Minimum Zone (OMZ)</strong> where bacterial respiration of marine snow depletes oxygen.</p></div></div>
                                 <div class="glass-card-dark p-6 rounded-xl border border-white/20"><h4 class="font-bold text-lg mb-3 border-b border-white/20 pb-2">Species</h4>
                                     <div class="flex flex-wrap gap-4 text-4xl">
-                                        <span onclick="openSpecies('swordfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="swordfish" title="Swordfish"></span>
                                         <span onclick="openSpecies('ctenophore')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="ctenophore" title="Comb Jelly"></span>
                                         <span onclick="openSpecies('lanternfish')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="lanternfish" title="Lanternfish"></span>
                                         <span onclick="openSpecies('squid')" class="species-icon cursor-pointer hover:scale-125 transition bg-white/10 p-2 rounded-lg w-16 h-16 flex items-center justify-center" data-species="squid" title="Vampire Squid"></span>
@@ -474,6 +474,7 @@
                                             <span onclick="openSpecies('shark')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Great White Shark</span>, 
                                             <span onclick="openSpecies('turtle')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Sea Turtle</span>, 
                                             <span onclick="openSpecies('manta')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Manta Ray</span>,
+                                            <span onclick="openSpecies('swordfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Swordfish <span class="tag-pelagic">Daytime Deep Diver</span></span>,
                                             <span onclick="openSpecies('irukandji')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Irukandji Jellyfish <span class="tag-pelagic">Pelagic</span></span>,
                                             <span onclick="openSpecies('whaleshark')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Whale Shark</span>,
                                             <span onclick="openSpecies('yellowfintuna')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Yellowfin Tuna</span>,
@@ -503,7 +504,6 @@
                                     <tr class="hover:bg-white/5 transition duration-200">
                                         <td class="p-4 md:p-6 font-semibold"><a href="#z-meso" class="text-indigo-300 hover:text-white transition block"><i class="fa-solid fa-moon mr-2 opacity-50"></i>Mesopelagic Zone</a></td>
                                         <td class="p-4 md:p-6 leading-relaxed">
-                                            <span onclick="openSpecies('swordfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Swordfish</span>, 
                                             <span onclick="openSpecies('ctenophore')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Comb Jelly</span>, 
                                             <span onclick="openSpecies('lanternfish')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Lanternfish</span>, 
                                             <span onclick="openSpecies('squid')" class="cursor-pointer hover:text-yellow-300 hover:underline transition">Vampire Squid</span>, 
@@ -904,6 +904,7 @@
             { name: "Great White Shark", sci: "Carcharodon carcharias", svgKey: "shark", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Sea Turtle", sci: "Chelonioidea", svgKey: "turtle", zones: [2], zoneNames: "Epipelagic Zone" },
             { name: "Manta Ray", sci: "Mobula birostris", svgKey: "manta", zones: [2], zoneNames: "Epipelagic Zone" },
+            { name: "Swordfish", sci: "Xiphias gladius", svgKey: "swordfish", zones: [2], zoneNames: "Epipelagic open ocean; daytime dives into the Mesopelagic Zone to feed" },
             { name: "Copepod <span class='tag-pelagic'>PELAGIC</span>", sci: "Copepoda", svgKey: "copepod", zones: [2, 3], zoneNames: "Epipelagic or Mesopelagic zones" },
             { name: "Krill <span class='tag-pelagic'>PELAGIC</span>", sci: "Euphausiacea", svgKey: "krill", zones: [2, 3], zoneNames: "Epipelagic or Mesopelagic zones" },
             { name: "Salp <span class='tag-pelagic'>PELAGIC</span>", sci: "Salpidae", svgKey: "salp", zones: [2, 3], zoneNames: "Open ocean epipelagic or mesopelagic zones" },
@@ -919,7 +920,6 @@
             { name: "Orca / Killer Whale", sci: "Orcinus orca", svgKey: "orca", zones: [2], zoneNames: "Epipelagic coastal and open ocean" },
             { name: "Hammerhead Shark", sci: "Sphyrnidae", svgKey: "hammerhead", zones: [2], zoneNames: "Epipelagic warm coastal and open waters" },
             { name: "Cookiecutter Shark", sci: "Isistius brasiliensis", svgKey: "cookiecutter", zones: [2, 3], zoneNames: "Epipelagic at night and Mesopelagic by day" },
-            { name: "Swordfish", sci: "Xiphias gladius", svgKey: "swordfish", zones: [3], zoneNames: "Mesopelagic Zone" },
             { name: "Comb Jelly", sci: "Ctenophora", svgKey: "ctenophore", zones: [0, 1, 2, 3, 4, 5, 6], zoneNames: "almost all ocean zones" },
             { name: "Lanternfish", sci: "Myctophidae", svgKey: "lanternfish", zones: [3], zoneNames: "Mesopelagic Zone" },
             { name: "Hatchetfish", sci: "Sternoptychidae", svgKey: "hatchetfish", zones: [3], zoneNames: "Mesopelagic Zone" },
@@ -1031,7 +1031,7 @@
             orca: 'Orcas are air-breathing apex predators of surface and coastal waters, not deep resident fish.',
             hammerhead: 'Hammerheads patrol warm upper waters and shallow coasts, scanning for rays with their wide heads.',
             cookiecutter: 'Cookiecutter sharks hide deeper by day and rise at night; either upper surface-at-night or twilight is the visual clue.',
-            swordfish: 'Swordfish commonly hunt in the twilight zone and rise or dive to follow prey.',
+            swordfish: 'Swordfish are epipelagic open-ocean predators that make deep daytime dives into the twilight zone to feed.',
             ctenophore: 'Comb jellies are a rare all-depth answer: their transparent bodies can drift across many layers.',
             lanternfish: 'Lanternfish are classic twilight-zone migrants with photophores.',
             hatchetfish: 'Hatchetfish use belly lights and upward eyes in the twilight zone.',
