@@ -489,11 +489,15 @@ const ZONES_DATA = [
             { name: 'Purple Sea Urchin', emoji: '🦔', role: 'Primary Consumer', level: 2, fact: "Urchins use five calcium-carbonate teeth to chew through the tough stalks (holdfasts) of kelp.", q: "What happens when too many sea urchins live in a kelp forest?", opts: ["They chew through the holdfasts, destroying the entire kelp forest", "They protect the kelp from other predators", "They turn into kelp themselves"], ans: 0 },
             { name: 'Sea Otter', emoji: '🦦', role: 'Keystone Predator', level: 3, fact: "Sea otters don't have blubber! They rely on the thickest fur in the animal kingdom (1 million hairs per square inch) to stay warm.", q: "How do sea otters eat spiky sea urchins?", opts: ["They use rocks as tools to smash them open on their bellies", "They swallow them whole", "They dissolve them with acid spit"], ans: 0 },
             { name: 'Coastal Phyto', emoji: '🦠', role: 'Producer', level: 1, fact: "Coastal waters are murky green because they are packed with billions of phytoplankton thriving on nutrients washed from the land.", q: "Why are coastal waters greener than the open ocean?", opts: ["Higher concentrations of phytoplankton", "Reflection from the green grass on the shore", "Pollution from green paint factories"], ans: 0 },
-            { name: 'Anchovy', emoji: '🐟', role: 'Planktivore', level: 2, fact: "Anchovies swim with their mouths wide open, filtering out tiny plankton from the water as they school in the millions.", q: "Why do anchovies swim in massive, synchronized schools?", opts: ["To confuse predators and make it hard to target a single fish", "To keep each other warm", "To communicate via telepathy"], ans: 0 }
+            { name: 'Anchovy', emoji: '🐟', role: 'Planktivore', level: 2, fact: "Anchovies swim with their mouths wide open, filtering out tiny plankton from the water as they school in the millions.", q: "Why do anchovies swim in massive, synchronized schools?", opts: ["To confuse predators and make it hard to target a single fish", "To keep each other warm", "To communicate via telepathy"], ans: 0 },
+            { name: 'Seagrass', emoji: '🌱', role: 'Producer Habitat', level: 1, fact: "Seagrass is a true flowering plant that stabilizes sediment and creates nursery habitat.", q: "What helps seagrass meadows hold the seafloor together?", opts: ["Underground roots and rhizomes", "Bioluminescent glue", "Coral skeletons"], ans: 0 },
+            { name: 'Quahog Clam', emoji: '🦪', role: 'Filter Feeder', level: 2, fact: "Quahog clams burrow in sand or mud and filter microscopic algae from seawater.", q: "How does a thick shell help a quahog?", opts: ["It closes tightly against predators and drying", "It lets the clam fly away", "It turns sunlight into food"], ans: 0 },
+            { name: 'Manatee', emoji: '🐋', role: 'Herbivore', level: 2, fact: "Manatees graze on seagrasses and other aquatic plants in warm shallow water.", q: "Why do manatees stay close to warm shallow waters?", opts: ["They need seagrass food and cannot tolerate long cold exposure", "They photosynthesize", "They only hunt deep squid"], ans: 0 },
+            { name: 'Longfin Squid', emoji: '🦑', role: 'Predator', level: 3, fact: "Longfin squid hunt fish and crustaceans and move upward in the water column at night.", q: "What adaptation lets squid flash color patterns quickly?", opts: ["Chromatophores in the skin", "A calcium shell", "Baleen plates"], ans: 0 }
         ],
         fw: { 
-            nodes: [ {x:15, y:80}, {x:40, y:60}, {x:75, y:40}, {x:15, y:20}, {x:40, y:20} ],
-            conns: [ [0,1], [1,2], [3,4], [4,2] ] 
+            nodes: [ {x:12, y:78}, {x:34, y:62}, {x:58, y:42}, {x:14, y:24}, {x:38, y:24}, {x:70, y:78}, {x:54, y:78}, {x:88, y:54}, {x:72, y:24} ],
+            conns: [ [0,1], [1,2], [3,4], [4,8], [5,6], [3,7], [6,7], [4,7] ] 
         },
         crisis: {
             title: 'Keystone Collapse', badge: 'Kelp Guardian', badgemoji: '🛡️', vocab: 'KEYSTONE SPECIES',
@@ -580,11 +584,12 @@ const ZONES_DATA = [
             { name: 'Humboldt Squid', emoji: '🦑', role: 'Aggressive Pack Hunter', level: 3, fact: "Humboldt squid hunt in packs of hundreds, flashing red and white color signals.", q: "Humboldt squid flash color signals rapidly. This is used for:", opts: ["Communicating tactics with each other", "Photosynthesis from bioluminescence", "Attracting phytoplankton"], ans: 0 },
             { name: 'Sperm Whale', emoji: '🐋', role: 'Deep-Diving Apex', level: 4, fact: "Sperm whales dive 3,000 meters deep and hold their breath for 90 minutes!", q: "Sperm whales produce a powerful click. This may:", opts: ["Stun squid prey before catching them", "Call for help from distant whales", "Echo-locate bottom sediments"], ans: 0 },
             { name: 'Copepod', emoji: '🦐', role: 'Primary Consumer', level: 2, fact: "Copepods have a single red eye and are the 'insects of the sea'.", q: "Why are copepods crucial to the twilight zone?", opts: ["They are the main food source for lanternfish", "They produce light for the whole zone", "They eat giant squids"], ans: 0 },
-            { name: 'Viperfish', emoji: '🐡', role: 'Ambush Predator', level: 3, fact: "Viperfish have teeth so large they don't fit inside their mouth!", q: "Why do deep-sea predators like viperfish have such huge teeth?", opts: ["To ensure prey cannot escape since meals are rare", "To chew through coral reefs", "To filter tiny plankton"], ans: 0 }
+            { name: 'Viperfish', emoji: '🐡', role: 'Ambush Predator', level: 3, fact: "Viperfish have teeth so large they don't fit inside their mouth!", q: "Why do deep-sea predators like viperfish have such huge teeth?", opts: ["To ensure prey cannot escape since meals are rare", "To chew through coral reefs", "To filter tiny plankton"], ans: 0 },
+            { name: 'Eye-flash Squid', emoji: '💡', role: 'Counterilluminator', level: 3, fact: "Eye-flash squid glow on their undersides to erase their shadows from predators below.", q: "What is counterillumination?", opts: ["Using light to match the background and hide a silhouette", "Having a dark back and light belly", "Making electricity to stun prey"], ans: 0 }
         ],
         fw: { 
-            nodes: [ {x:40, y:60}, {x:65, y:40}, {x:85, y:20}, {x:15, y:80}, {x:30, y:30} ], 
-            conns: [ [3,0], [0,1], [1,2], [3,4], [4,1] ] 
+            nodes: [ {x:38, y:64}, {x:62, y:42}, {x:84, y:20}, {x:14, y:82}, {x:30, y:30}, {x:56, y:76} ], 
+            conns: [ [3,0], [0,1], [1,2], [3,4], [4,1], [3,5], [5,2] ] 
         },
         crisis: {
             title: 'Industrial Deep-Sea Trawling', badge: 'Twilight Defender', badgemoji: '🛡️', vocab: 'CARBON PUMP',
@@ -1509,11 +1514,16 @@ const ECOLOGY_CREATURE_ALIASES = {
     'Great White Shark': 'shark',
     'Jellyfish': 'moonjelly',
     'Sea Turtle': 'turtle',
+    'Seagrass': 'seagrass',
+    'Quahog Clam': 'quahog',
+    'Manatee': 'manatee',
+    'Longfin Squid': 'longfinsquid',
     'Lanternfish': 'lanternfish',
     'Humboldt Squid': 'humboldt',
     'Sperm Whale': 'spermwhale',
     'Copepod': 'copepod',
     'Viperfish': 'viperfish',
+    'Eye-flash Squid': 'eyeflashsquid',
     'Giant Squid': 'giantsquid',
     'Vampire Squid': 'vampire',
     'Blobfish': 'blobfish',

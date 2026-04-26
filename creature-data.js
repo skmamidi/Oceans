@@ -254,7 +254,15 @@ const EXTRA_SVGS = {
   giantsquid: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 10 Q26 38 34 68 Q42 84 50 88 Q58 84 66 68 Q74 38 50 10 Z" fill="#a16207"/><path d="M34 42 L10 30 L32 56" fill="#78350f"/><path d="M66 42 L90 30 L68 56" fill="#78350f"/><circle cx="43" cy="48" r="7" fill="#fef3c7"/><circle cx="57" cy="48" r="7" fill="#fef3c7"/><circle cx="43" cy="48" r="3" fill="#111827"/><circle cx="57" cy="48" r="3" fill="#111827"/><path d="M38 84 Q22 92 14 98 M44 86 Q38 96 34 100 M56 86 Q62 96 66 100 M62 84 Q78 92 86 98" stroke="#92400e" stroke-width="4" fill="none" stroke-linecap="round"/></svg>',
   spermwhale: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M10 54 Q24 30 62 34 Q88 37 94 52 Q86 70 58 70 Q25 70 10 54 Z" fill="#64748b"/><path d="M10 54 L2 42 L4 54 L2 66 Z" fill="#475569"/><path d="M68 40 Q76 26 84 42" fill="#475569"/><circle cx="79" cy="48" r="2" fill="#0f172a"/><path d="M28 58 Q46 64 70 58" stroke="#cbd5e1" stroke-width="2" fill="none" opacity=".65"/></svg>',
   scaleworm: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M18 56 Q34 28 58 34 Q78 40 84 62 Q60 76 34 72 Q20 68 18 56 Z" fill="#7f1d1d"/><path d="M28 48 L18 36 M38 42 L32 26 M50 40 L52 24 M62 46 L76 32 M30 66 L20 82 M46 70 L42 88 M62 70 L72 86" stroke="#fca5a5" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M28 50 Q38 42 48 48 Q58 38 70 52 M26 60 Q42 70 56 62 Q68 72 80 62" stroke="#f97316" stroke-width="3" fill="none" opacity=".8"/></svg>',
-  xenophyophore: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 16 Q76 22 82 48 Q86 74 58 84 Q30 90 18 62 Q10 34 50 16 Z" fill="#e5e7eb" opacity=".85" stroke="#94a3b8" stroke-width="2"/><path d="M34 28 Q58 30 66 48 Q72 66 48 76 Q28 70 26 52 Q24 38 34 28 Z" fill="none" stroke="#64748b" stroke-width="4" opacity=".75"/><path d="M50 20 Q44 36 56 48 Q66 60 50 82 M20 58 Q40 54 54 64 Q66 72 82 58" stroke="#cbd5e1" stroke-width="3" fill="none"/><circle cx="42" cy="50" r="4" fill="#94a3b8" opacity=".7"/></svg>'
+  xenophyophore: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 16 Q76 22 82 48 Q86 74 58 84 Q30 90 18 62 Q10 34 50 16 Z" fill="#e5e7eb" opacity=".85" stroke="#94a3b8" stroke-width="2"/><path d="M34 28 Q58 30 66 48 Q72 66 48 76 Q28 70 26 52 Q24 38 34 28 Z" fill="none" stroke="#64748b" stroke-width="4" opacity=".75"/><path d="M50 20 Q44 36 56 48 Q66 60 50 82 M20 58 Q40 54 54 64 Q66 72 82 58" stroke="#cbd5e1" stroke-width="3" fill="none"/><circle cx="42" cy="50" r="4" fill="#94a3b8" opacity=".7"/></svg>',
+  manatee: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M12 56 Q26 30 62 34 Q86 38 92 54 Q84 72 54 74 Q24 72 12 56 Z" fill="#94a3b8"/><path d="M16 58 L5 48 L7 65 Z" fill="#64748b"/><path d="M40 68 Q34 84 46 86" stroke="#64748b" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M64 46 Q72 34 82 46" fill="#64748b"/><circle cx="76" cy="50" r="2.2" fill="#0f172a"/><path d="M80 58 Q74 62 68 58" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  seagrass: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M12 88 Q30 78 50 88 Q70 78 88 88" stroke="#a16207" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M28 88 Q20 52 34 16 M40 88 Q42 54 54 22 M52 88 Q58 56 72 24 M64 88 Q66 60 82 36" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M26 68 Q40 54 48 38 M54 72 Q70 58 80 44" stroke="#86efac" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+  diatom: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><defs><linearGradient id="diatom-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(240,249,255,0.95)"/><stop offset="100%" stop-color="rgba(125,211,252,0.5)"/></linearGradient></defs><ellipse cx="50" cy="50" rx="24" ry="38" fill="url(#diatom-glass)" stroke="#7dd3fc" stroke-width="2"/><path d="M50 16 L50 84 M34 28 L66 28 M30 40 L70 40 M28 52 L72 52 M32 64 L68 64 M38 76 L62 76" stroke="#0284c7" stroke-width="2" opacity=".75"/><circle cx="50" cy="50" r="8" fill="rgba(34,197,94,0.45)"/></svg>',
+  quahog: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M18 58 Q26 28 52 20 Q78 28 86 58 Q72 82 50 84 Q28 82 18 58 Z" fill="#a8a29e" stroke="#57534e" stroke-width="2"/><path d="M50 22 Q36 40 32 78 M50 22 Q50 42 50 84 M50 22 Q64 40 68 78" stroke="#78716c" stroke-width="2" fill="none"/><path d="M26 54 Q50 62 78 54 M30 66 Q50 72 72 66" stroke="#e7e5e4" stroke-width="2" fill="none" opacity=".8"/></svg>',
+  americanlobster: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M48 28 Q34 42 38 66 Q50 78 62 66 Q66 42 52 28 Z" fill="#dc2626"/><path d="M40 66 L28 84 M60 66 L72 84 M42 44 L18 34 M58 44 L82 34" stroke="#b91c1c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M18 34 Q6 26 14 18 Q28 20 24 36 M82 34 Q94 26 86 18 Q72 20 76 36" fill="#ef4444"/><path d="M46 28 L36 12 M54 28 L64 12" stroke="#f87171" stroke-width="3" stroke-linecap="round"/><circle cx="44" cy="36" r="2" fill="#111827"/><circle cx="56" cy="36" r="2" fill="#111827"/></svg>',
+  longfinsquid: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 14 Q28 36 34 66 Q42 84 50 88 Q58 84 66 66 Q72 36 50 14 Z" fill="#fb7185"/><path d="M34 42 L14 34 L32 56" fill="#f43f5e"/><path d="M66 42 L86 34 L68 56" fill="#f43f5e"/><circle cx="44" cy="48" r="4" fill="#f8fafc"/><circle cx="56" cy="48" r="4" fill="#f8fafc"/><circle cx="44" cy="48" r="1.8" fill="#111827"/><circle cx="56" cy="48" r="1.8" fill="#111827"/><path d="M40 84 L30 98 M47 86 L44 100 M53 86 L56 100 M60 84 L70 98" stroke="#fb7185" stroke-width="3.5" stroke-linecap="round"/></svg>',
+  eyeflashsquid: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 16 Q32 38 36 66 Q42 82 50 88 Q58 82 64 66 Q68 38 50 16 Z" fill="#7c2d12"/><path d="M36 44 L16 38 L34 58" fill="#9a3412"/><path d="M64 44 L84 38 L66 58" fill="#9a3412"/><circle cx="43" cy="47" r="5" fill="#fde68a"/><circle cx="57" cy="47" r="5" fill="#fde68a"/><circle cx="43" cy="47" r="2" fill="#111827"/><circle cx="57" cy="47" r="2" fill="#111827"/><g fill="#67e8f9"><circle cx="42" cy="60" r="2"/><circle cx="50" cy="64" r="2"/><circle cx="58" cy="60" r="2"/><circle cx="46" cy="72" r="1.8"/><circle cx="54" cy="72" r="1.8"/></g><path d="M40 84 L32 98 M47 86 L45 100 M53 86 L55 100 M60 84 L68 98" stroke="#9a3412" stroke-width="3.5" stroke-linecap="round"/></svg>',
+  veinedsquid: '<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"><path d="M50 14 Q30 36 35 68 Q42 84 50 90 Q58 84 65 68 Q70 36 50 14 Z" fill="#c084fc"/><path d="M38 34 Q50 48 38 66 M62 34 Q50 48 62 66 M46 22 Q42 52 48 82 M54 22 Q58 52 52 82" stroke="#7e22ce" stroke-width="2" fill="none" opacity=".75"/><path d="M35 45 L14 38 L34 58 M65 45 L86 38 L66 58" fill="#a855f7"/><circle cx="44" cy="50" r="4" fill="#f8fafc"/><circle cx="56" cy="50" r="4" fill="#f8fafc"/><circle cx="44" cy="50" r="1.7" fill="#111827"/><circle cx="56" cy="50" r="1.7" fill="#111827"/><path d="M40 86 L30 98 M47 88 L44 100 M53 88 L56 100 M60 86 L70 98" stroke="#9333ea" stroke-width="3.5" stroke-linecap="round"/></svg>'
 };
 Object.assign(SVGS, EXTRA_SVGS);
 SVGS.vampire = SVGS.squid;
@@ -315,6 +323,14 @@ addCreature('giantsquid',{name:'Giant Squid',scientificName:'Architeuthis dux',d
 addCreature('spermwhale',{name:'Sperm Whale',scientificName:'Physeter macrocephalus',description:'A deep-diving toothed whale that breathes air at the surface but hunts squid in dark mesopelagic and bathypelagic waters.',diet:'Giant squid, other squid, octopus, and deep-water fish',predators:'Orcas may threaten calves',habitatZone:'Epipelagic surface between deep Mesopelagic/Bathypelagic foraging dives',dvm:{status:'non_migrant',note:'Sperm whales make deep foraging dives, but these breath-hold dives are not the same as classic plankton-style diel vertical migration.'},funFacts:['They use powerful echolocation clicks to hunt in total darkness.','They are the largest toothed whales.']});
 addCreature('scaleworm',{name:'Scale Worm',scientificName:'Polynoidae',description:'A segmented deep-sea worm with overlapping protective scales, often found around vents, whale falls, and other deep seafloor habitats.',diet:'Small animals, detritus, suspended organic matter, or host tissue depending on species',predators:'Deep-sea fish, crabs, and other benthic predators',habitatZone:'Bathyal to Hadal benthic habitats, including hydrothermal vents',dvm:{status:'non_migrant',note:'Scale worms are benthic animals that crawl on or near the seafloor, not open-water diel vertical migrators.'},funFacts:['Some deep-sea scale worms have elaborate gills beneath their scales for low-oxygen habitats.','Their overlapping scales give them an armored look.']});
 addCreature('xenophyophore',{name:'Xenophyophore',scientificName:'Xenophyophorea',description:'A giant single-celled deep-sea organism that builds a delicate sediment test and can live on hadal trench floors.',diet:'Bacteria, tiny particles, and dissolved or fine organic matter',predators:'Small deep-sea invertebrates and deposit feeders',habitatZone:'Abyssal to Hadal seafloor',dvm:{status:'non_migrant',note:'Xenophyophores are benthic single-celled organisms fixed on or within deep seafloor sediments.'},funFacts:['One cell can grow large enough to be seen easily without a microscope.','Their fragile tests can create tiny habitat structure on the deep seafloor.']});
+addCreature('manatee',{name:'Manatee',scientificName:'Trichechus manatus',description:'A slow-moving herbivorous marine mammal that grazes in warm shallow coastal waters, estuaries, rivers, and seagrass beds.',diet:'Seagrasses and other aquatic vegetation',predators:'Few natural predators; calves may be threatened by large sharks or crocodiles',habitatZone:'Neritic shallow coastal waters and estuaries',dvm:{status:'non_migrant',note:'Manatees travel seasonally for warm water and forage, but they are not diel vertical migrators.'},funFacts:['They use flexible lips to pull seagrass and other plants into the mouth.','They must surface to breathe air and cannot tolerate prolonged cold water.']});
+addCreature('seagrass',{name:'Seagrass',scientificName:'Thalassia testudinum, Halophila johnsonii, and related marine flowering plants',description:'A true flowering plant of shallow coastal waters that anchors sediment, produces oxygen, and forms nursery habitat for many animals.',diet:'Photosynthesis',predators:'Manatees, green sea turtles, urchins, and grazing snails or fishes',habitatZone:'Neritic shallow coastal seagrass meadows',dvm:{status:'non_migrant',note:'Seagrasses are rooted benthic producers, not vertical migrators.'},funFacts:['Turtle grass and Johnsons seagrass are examples highlighted in elementary marine study guides.','Underground rhizomes help stabilize sediment and spread new shoots.']});
+addCreature('diatom',{name:'Diatom',scientificName:'Bacillariophyta',description:'A photosynthetic phytoplankton with a glassy silica shell, important in coastal productivity and ocean carbon export.',diet:'Photosynthesis using sunlight, carbon dioxide, and dissolved nutrients',predators:'Copepods, krill, clams, and other filter feeders or grazers',habitatZone:'Epipelagic and neritic sunlit waters',dvm:{status:'non_migrant',note:'Diatoms are drifting primary producers; many are mixed by water movement rather than animal-style DVM.'},funFacts:['Their silica shell is called a frustule.','Diatoms make fatty acids that move up food webs to fish, birds, and mammals.']});
+addCreature('quahog',{name:'Quahog Clam',scientificName:'Arctica islandica and Mercenaria mercenaria',description:'A thick-shelled benthic clam that burrows into sandy or muddy coastal seafloor and filter-feeds on microscopic algae.',diet:'Microscopic algae and suspended organic particles filtered from water',predators:'Sea stars, crabs, fish, snails, and seabirds',habitatZone:'Intertidal to Neritic sandy and muddy seafloor',dvm:{status:'non_migrant',note:'Quahogs are burrowing benthic filter feeders, not diel vertical migrators.'},funFacts:['A thick shell and burrowing behavior protect quahogs from many predators.','Ocean quahogs can live for a very long time compared with most clams.']});
+addCreature('americanlobster',{name:'American Lobster',scientificName:'Homarus americanus',description:'A large benthic crustacean that shelters in rocky crevices or burrows on coastal and continental-shelf seafloors.',diet:'Clams, mussels, sea urchins, worms, crabs, fish, and carrion',predators:'Cod, wolffish, skates, seals, and humans',habitatZone:'Neritic and shelf benthic habitats',dvm:{status:'non_migrant',note:'American lobsters can migrate seasonally along the shelf, but they are benthic crawlers rather than diel vertical migrators.'},funFacts:['They use claws for crushing and cutting prey.','They molt their hard exoskeleton to grow.']});
+addCreature('longfinsquid',{name:'Longfin Squid',scientificName:'Doryteuthis pealeii',description:'A coastal shelf squid that hunts fish and crustaceans, uses chromatophores for rapid color change, and moves vertically between bottom and surface waters.',diet:'Small fish, crustaceans, plankton when young, and sometimes other squid',predators:'Marine mammals, diving birds, sharks, and finfish',habitatZone:'Neritic continental shelf and upper slope',dvm:{status:'migrates',day:'near seabed over shelf mud or sand',night:'upper water column and toward the surface',note:'NOAA Fisheries describes longfin squid as remaining near the seabed by day and moving toward the surface at night.'},funFacts:['Egg capsules are attached in clusters to the ocean bottom.','They are aggressive hunters and can eat prey larger than themselves.']});
+addCreature('eyeflashsquid',{name:'Eye-flash Squid',scientificName:'Abralia veranyi',description:'A small mesopelagic squid whose ventral photophores produce counterillumination, hiding its silhouette from predators below.',diet:'Small planktonic crustaceans and other invertebrates',predators:'Larger fishes, squids, dolphins, and deep-diving predators',habitatZone:'Mesopelagic midwater',dvm:{status:'migrates',day:'deep mesopelagic waters',night:'nearer the surface to feed',note:'Eye-flash squid are widely described as daily vertical migrators from deeper daytime water to shallower nighttime feeding depths.'},funFacts:['Photophores on the underside glow to match dim light from above.','This is counterillumination, not passive countershading.']});
+addCreature('veinedsquid',{name:'Veined Squid',scientificName:'Loligo forbesii',description:'A coastal and shelf squid used in climate examples because warming and bottom temperature shifts can change its seasonal arrival timing.',diet:'Fish, crustaceans, and other cephalopods',predators:'Marine mammals, large fish, seabirds, and humans',habitatZone:'Neritic coastal shelf and slope waters',dvm:{status:'unknown',note:'Veined squid make seasonal and depth-related movements, but this app does not assign one simple day/night DVM pair.'},funFacts:['Warm years can shift seasonal squid arrival timing dramatically.','Like other squids, it uses jet propulsion and rapid color-changing chromatophores.']});
 const ADAPTATION_BY_CREATURE = {
   limpet:['Operculum seals in moisture','Strong foot clamps to rocks'],
   starfish:['Tube feet grip rocks and pry prey'],
@@ -328,6 +344,11 @@ const ADAPTATION_BY_CREATURE = {
   moonjelly:['Soft gelatinous body','Stinging cells for catching plankton'],
   flyingfish:['Wing-like pectoral fins for gliding','Streamlined body for surface bursts'],
   sardineherring:['Schooling behavior','Silvery countershading and reflective scales'],
+  manatee:['Flexible upper lip for grazing','Air-breathing mammal adapted to shallow warm waters'],
+  seagrass:['Rhizomes anchor sediment','Photosynthetic flowering plant in salty water'],
+  diatom:['Silica frustule shell','Photosynthesis and carbon export'],
+  quahog:['Thick shell that closes tightly','Burrowing filter-feeding lifestyle'],
+  americanlobster:['Large claws for crushing and cutting','Hard exoskeleton molted for growth'],
   dumbo:['Camouflage and soft body for deep water'],
   coral:['Symbiosis with zooxanthellae','Calcium carbonate reef building'],
   tuna:['Fusiform body for speed','Countershading'],
@@ -338,20 +359,24 @@ const ADAPTATION_BY_CREATURE = {
   hatchetfish:['Tubular eyes','Counter-illumination with photophores'],
   lanternfish:['Counter-illumination with photophores','Diel vertical migration'],
   vampire:['Low oxygen tolerance','Blue copper-based blood'],
+  longfinsquid:['Jet propulsion','Chromatophores for rapid color signaling','Diel vertical migration'],
+  eyeflashsquid:['Ventral photophores for counterillumination','Daily vertical migration'],
+  veinedsquid:['Jet propulsion','Temperature-sensitive seasonal migration'],
   viperfish:['Huge fangs for rare prey','Photophores and lure for dim water'],
   strawberrysquid:['Mismatched eyes for twilight hunting','Red body appears dark in deep water'],
   bristlemouth:['Energy-saving stasis','Tiny body suited to scarce food'],
-  anglerfish:['Bioluminescent lure','Extreme mate-finding adaptation'],
-  gulper:['Huge expandable jaws'],
+  anglerfish:['Bioluminescent bacterial lure','Extreme mate-finding adaptation'],
+  gulper:['Huge expandable jaws','Distensible stomach for rare large meals'],
   giantsquid:['Enormous eyes for detecting faint light','Long feeding tentacles'],
   spermwhale:['Deep breath-hold diving','Echolocation for dark-water hunting'],
   blobfish:['Gelatinous body','Reduced ossification for buoyancy'],
-  snailfish:['Gelatinous body','No gas spaces','Pressure-tolerant enzymes'],
+  snailfish:['Gelatinous body','No gas spaces','Pressure-tolerant enzymes','Flexible cartilage and reduced bone mineralization'],
   isopod:['Abyssal gigantism','Scavenging chemoreception'],
   amphipod:['Chemoreception','Pressure protection with TMAO and minerals'],
   tripod:['Stilt-like fins for standing above soft mud'],
   scaleworm:['Protective overlapping scales','Benthic crawling in low-oxygen deep habitats'],
-  xenophyophore:['Sediment test building','Extreme pressure tolerance on trench floors']
+  xenophyophore:['Sediment test building','Extreme pressure tolerance on trench floors'],
+  tubeworm:['Chemosynthetic bacteria in a trophosome','No mouth or gut as an adult']
 };
 Object.entries(ADAPTATION_BY_CREATURE).forEach(([id, facts])=>{
   if(creatures[id]) creatures[id].adaptationsShown = uniqueFacts([...(creatures[id].adaptationsShown||[]), ...facts]);
@@ -361,17 +386,21 @@ const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
   zooplankton:[96,'Very high: primary consumer, plankton ID, and daily vertical migration are frequent ocean-life targets.'],
   coral:[95,'Very high: coral reefs, symbiosis, bleaching, and neritic biodiversity are classic elementary marine-science topics.'],
   kelp:[94,'Very high: kelp forests, producers, sea otter food webs, and coastal habitats are common study targets.'],
+  seagrass:[94,'Very high: the ecology report names Johnsons seagrass and turtle grass for shallow-water producer, nursery, and manatee food questions.'],
   shark:[93,'Very high: familiar epipelagic predator used often for countershading, food webs, and adaptations.'],
   turtle:[92,'Very high: familiar epipelagic reptile used for migration, food webs, and conservation-style questions.'],
   tuna:[91,'Very high: streamlined open-ocean fish used for epipelagic zones, predator-prey chains, and fusiform shape.'],
   sardineherring:[91,'Very high: the Division A guide calls out sardines/herring for schooling, shiny scales, and epipelagic food-web roles.'],
+  diatom:[90,'Very high: the ecology report highlights diatoms as phytoplankton producers with silica shells and carbon-cycle importance.'],
   crab:[90,'Very high: easy intertidal/benthic animal for adaptations, food webs, and tide-pool identification.'],
   starfish:[90,'Very high: keystone predator, regeneration, tube feet, and intertidal habitat make it a strong elementary pick.'],
   barnacle:[89,'High: attached intertidal crustacean, shell closing, and filter feeding are common adaptation examples.'],
   mussel:[89,'High: intertidal filter feeder and byssal-thread anchoring are likely in elementary tide-pool questions.'],
+  quahog:[88,'High: the ecology report names quahog clams for benthic filter feeding, shells, and coastal food-web questions.'],
   anemone:[88,'High: cnidarian, stinging tentacles, tide-pool survival, and symbiosis make it likely.'],
   limpet:[87,'High: rocky-shore snail, radula, and clinging/desiccation adaptations are strong intertidal examples.'],
   otter:[87,'High: keystone kelp-forest mammal and sea-urchin predator in elementary food-web questions.'],
+  manatee:[87,'High: the ecology report calls out manatees as herbivorous marine mammals tied to seagrass food webs and air-breathing adaptations.'],
   urchin:[86,'High: kelp-grazing benthic echinoderm and sea-otter prey are common coastal-ecosystem examples.'],
   clownfish:[86,'High: reef fish and anemone mutualism are memorable elementary-level examples.'],
   parrotfish:[85,'High: coral-reef grazer and sand production make it a strong reef-ecology candidate.'],
@@ -379,6 +408,7 @@ const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
   krill:[85,'High: planktonic crustacean, whale food, carbon pump, and swarming behavior are likely.'],
   copepod:[84,'High: extremely important zooplankton and a direct plankton-food-web link.'],
   anglerfish:[84,'High: iconic deep-sea bioluminescent lure and bathypelagic adaptation questions.'],
+  eyeflashsquid:[84,'High: the ecology report uses eye-flash squid to contrast counterillumination with countershading.'],
   ctenophore:[83,'High: comb jellies are useful for gelatinous plankton and transparency questions.'],
   hatchetfish:[83,'High: mesopelagic fish, tubular eyes, and photophores map cleanly to twilight-zone adaptations.'],
   vampire:[83,'High: memorable deep-sea/OMZ animal often used for low oxygen and dark-zone adaptations.'],
@@ -388,6 +418,7 @@ const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
   cuttlefish:[82,'High: chromatophores, camouflage, and buoyancy make it a strong adaptations candidate.'],
   dolphin:[82,'High: familiar marine mammal for echolocation, food webs, and surface-zone questions.'],
   bluewhale:[82,'High: baleen feeding, krill food chains, and whale pump/carbon-cycle connections.'],
+  longfinsquid:[82,'High: the ecology report names longfin squid for jet propulsion, chromatophores, and coastal-shelf squid ID.'],
   penguin:[81,'High: countershading, diving, krill food webs, and cold epipelagic habitats.'],
   seapig:[80,'High: abyssal-zone creature frequently used to represent abyssal plains and detritus feeding.'],
   tripod:[80,'High: classic abyssal benthic fish for soft-mud and deep-sea adaptation questions.'],
@@ -403,6 +434,7 @@ const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
   viperfish:[76,'High: the guide highlights viperfish for twilight-zone fangs, lures, and diel migration.'],
   sculpin:[75,'Moderate-high: tide-pool fish for intertidal survival, though less universally familiar.'],
   seaspider:[75,'Moderate-high: abyssal/invertebrate identification and deep-sea oddity questions.'],
+  americanlobster:[75,'Moderate-high: the ecology report uses American lobster for climate-velocity and coastal shelf habitat examples.'],
   basketstar:[74,'Moderate-high: abyssal/bathyal benthic invertebrate and suspension-feeding example.'],
   cucumber:[74,'Moderate-high: benthic detritivore and abyssal seafloor food-web role.'],
   swordfish:[73,'Moderate-high: open-ocean predator and vertical-migration example, but less central than tuna/sharks.'],
@@ -424,6 +456,7 @@ const ELEMENTARY_OLYMPIAD_LIKELIHOOD = {
   medusa:[84,'High: jellyfish are common cnidarian models, and Atolla is a likely bioluminescent twilight-zone example.'],
   humboldt:[63,'Moderate: squid predator and DVM link, but less common than generic squid/vampire squid.'],
   strawberrysquid:[63,'Moderate: the guide mentions strawberry squid for big-eye twilight-zone squid adaptations.'],
+  veinedsquid:[63,'Moderate: the ecology report uses veined squid for temperature-linked seasonal timing and climate-change questions.'],
   nautilus:[62,'Moderate: shell/buoyancy and living fossil, but less likely in elementary zone lists.'],
   scaleworm:[62,'Moderate: the guide includes scale worms for hadal/vent seafloor adaptations.'],
   xenophyophore:[61,'Moderate: the guide includes xenophyophores as giant single-celled hadal organisms.'],
