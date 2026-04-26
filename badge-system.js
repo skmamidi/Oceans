@@ -10,6 +10,7 @@
         'ecology',
         'biocode',
         'scholar',
+        'oceanregions',
         'bathymetry',
         'carbonpump',
         'plankton'

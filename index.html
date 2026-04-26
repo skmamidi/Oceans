@@ -180,7 +180,7 @@
                     </button>
                     <div id="nav-dropdown" class="hidden absolute left-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-[60] overflow-hidden">
                         <button onclick="switchTab('zones'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-layer-group w-5 text-center"></i> Zones</button>
-                        <button onclick="switchTab('taxonomy'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compass-drafting w-5 text-center"></i> Taxonomy Lab</button>
+                        <button onclick="switchTab('taxonomy'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-compass-drafting w-5 text-center"></i> Ocean Regions</button>
                         <button onclick="switchTab('adaptations'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-dna w-5 text-center"></i> Adaptations</button>
                         <button onclick="switchTab('migration'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-sort w-5 text-center"></i> Diel Vertical Migration</button>
                         <button onclick="switchTab('gradients'); toggleNavDropdown()" class="w-full text-left px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-ocean-sunlight transition flex items-center gap-2"><i class="fa-solid fa-chart-bar w-5 text-center"></i> Gradients</button>
@@ -198,7 +198,7 @@
                 <div class="hidden lg:block flex-1 min-w-0">
                     <div class="flex items-center gap-1 font-bold text-sm overflow-x-auto nav-scroll-x whitespace-nowrap">
                         <button onclick="switchTab('zones')" id="btn-zones" class="tab-btn px-2 py-5 border-b-4 border-ocean-sunlight text-ocean-sunlight transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
-                        <button onclick="switchTab('taxonomy')" id="btn-taxonomy" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Taxonomy Lab</button>
+                        <button onclick="switchTab('taxonomy')" id="btn-taxonomy" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Ocean Regions</button>
                         <button onclick="switchTab('adaptations')" id="btn-adaptations" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
                         <button onclick="switchTab('migration')" id="btn-migration" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 leading-tight flex-shrink-0"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
                         <button onclick="switchTab('gradients')" id="btn-gradients" class="tab-btn px-2 py-5 border-b-4 border-transparent text-gray-500 transition hover:bg-gray-50 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
@@ -217,7 +217,7 @@
                     <div id="badge-hub-master-icon" class="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white text-sky-600 shadow-inner overflow-hidden"></div>
                     <div class="text-left min-w-0">
                         <div class="text-[11px] uppercase tracking-[0.18em] text-sky-500 font-black">Badges</div>
-                        <div id="badge-progress-text" class="text-sm font-black text-slate-700 leading-tight">0 / 12 earned</div>
+                        <div id="badge-progress-text" class="text-sm font-black text-slate-700 leading-tight">0 / 13 earned</div>
                     </div>
                     <div id="badge-preview-row" class="flex items-center -space-x-2 pl-1"></div>
                     <div class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/90 text-slate-500 border border-sky-100">
@@ -228,7 +228,7 @@
         </div>
         <div class="lg:hidden flex border-t border-gray-200 bg-white overflow-x-auto nav-scroll">
             <button onclick="switchTab('zones')" id="btn-zones-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-ocean-sunlight text-ocean-sunlight flex-shrink-0"><i class="fa-solid fa-layer-group mr-1"></i> Zones</button>
-            <button onclick="switchTab('taxonomy')" id="btn-taxonomy-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Taxonomy Lab</button>
+            <button onclick="switchTab('taxonomy')" id="btn-taxonomy-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-compass-drafting mr-1"></i> Ocean Regions</button>
             <button onclick="switchTab('adaptations')" id="btn-adaptations-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-dna mr-1"></i> Adaptations</button>
             <button onclick="switchTab('migration')" id="btn-migration-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0 leading-tight"><i class="fa-solid fa-sort mr-1"></i> Diel Vertical<br>Migration</button>
             <button onclick="switchTab('gradients')" id="btn-gradients-mob" class="tab-btn-mob px-4 py-3 text-xs font-bold border-b-2 border-transparent text-gray-500 flex-shrink-0"><i class="fa-solid fa-chart-bar mr-1"></i> Gradients</button>
@@ -381,7 +381,7 @@
         let ecologyWins=[false,false,false,false,false,false];
         let zoneProgress=[0,0,0,0,0,0], zoneCompleted=[false,false,false,false,false,false];
         let adaptProgress=[0,0,0,0,0,0], adaptCompleted=[false,false,false,false,false,false];
-        let badges=window.OceanBadges ? window.OceanBadges.loadBadges() : {zones:false, adaptations:false, migration:false, gradients:false, engineer:false, physics:false, ecology:false, biocode:false, scholar:false, bathymetry:false, carbonpump:false, plankton:false};
+        let badges=window.OceanBadges ? window.OceanBadges.loadBadges() : {zones:false, adaptations:false, migration:false, gradients:false, engineer:false, physics:false, ecology:false, biocode:false, scholar:false, oceanregions:false, bathymetry:false, carbonpump:false, plankton:false};
         const BADGE_META = {
             zones:{title:'Depth Dynamo', color:'bg-amber-400', accent:'text-amber-600', ui:'from-amber-50 via-white to-yellow-100', bg:'#f59e0b', bgDeep:'#b45309', ink:'#7c2d12', symbol:'zones', earnedText:'Earned by completing every Zones quiz track in the app.', howToEarn:'Finish all six zone quiz sections in Zones.'},
             adaptations:{title:'Creature Transformer', color:'bg-teal-500', accent:'text-teal-600', ui:'from-teal-50 via-white to-cyan-100', bg:'#14b8a6', bgDeep:'#0f766e', ink:'#134e4a', symbol:'adaptations', earnedText:'Earned by clearing every Adaptations quiz section.', howToEarn:'Complete all six adaptation quiz sections in Adaptations.'},
@@ -392,6 +392,7 @@
             ecology:{title:'Food Web Wizard', color:'bg-emerald-500', accent:'text-emerald-600', ui:'from-emerald-50 via-white to-teal-100', bg:'#10b981', bgDeep:'#047857', ink:'#14532d', symbol:'ecology', earnedText:'Earned by fully completing every ecology zone.', howToEarn:'In Ecology, finish each zone’s species discoveries, food web, and crisis mission.'},
             biocode:{title:'Glow Code Boss', color:'bg-cyan-500', accent:'text-cyan-600', ui:'from-cyan-50 via-white to-sky-100', bg:'#06b6d4', bgDeep:'#155e75', ink:'#164e63', symbol:'biocode', earnedText:'Earned by clearing every Bio-Code scenario.', howToEarn:'Solve all Bio-Code programming scenarios.'},
             scholar:{title:'Knowledge Kraken', color:'bg-violet-500', accent:'text-violet-600', ui:'from-violet-50 via-white to-fuchsia-100', bg:'#8b5cf6', bgDeep:'#6d28d9', ink:'#581c87', symbol:'scholar', earnedText:'Earned by flipping through the entire study deck.', howToEarn:'Reveal all flashcards in Study.'},
+            oceanregions:{title:'Ocean Cartographer', color:'bg-sky-600', accent:'text-sky-700', ui:'from-sky-50 via-white to-teal-100', bg:'#0284c7', bgDeep:'#0f766e', ink:'#083344', symbol:'oceanregions', earnedText:'Earned by mastering the Ocean Regions journey.', howToEarn:'Complete every passport scene, clue card, and mastery question in Ocean Regions.'},
             bathymetry:{title:'Sea Floor Scout', color:'bg-sky-500', accent:'text-sky-600', ui:'from-sky-50 via-white to-cyan-100', bg:'#0ea5e9', bgDeep:'#0369a1', ink:'#164e63', symbol:'bathymetry', earnedText:'Earned by completing the bathymetry mapping mission.', howToEarn:'Win the Bathymetry game by mapping the sector before your battery runs out.'},
             carbonpump:{title:'Carbon Captain', color:'bg-emerald-600', accent:'text-emerald-700', ui:'from-emerald-50 via-white to-lime-100', bg:'#059669', bgDeep:'#166534', ink:'#14532d', symbol:'carbonpump', earnedText:'Earned by reaching the carbon sequestration goal.', howToEarn:'Hit the final carbon target in Carbon Pump.'},
             plankton:{title:'Micro Marvel', color:'bg-lime-500', accent:'text-lime-600', ui:'from-lime-50 via-white to-emerald-100', bg:'#84cc16', bgDeep:'#4d7c0f', ink:'#365314', symbol:'plankton', earnedText:'Earned by clearing the full plankton feeding migration campaign.', howToEarn:'Finish the final stage in Plankton.'}
@@ -406,6 +407,7 @@
             ecology:{tab:'foodweb', selector:'#zones-list'},
             biocode:{tab:'biocode', selector:'#bc-sequence-box'},
             scholar:{tab:'study', selector:'#deck-container'},
+            oceanregions:{tab:'taxonomy', selector:'#challenge'},
             bathymetry:{tab:'bathymetry', selector:'#game-board'},
             carbonpump:{tab:'carbonpump', selector:'#card-phyto'},
             plankton:{tab:'plankton', selector:'#game-container'}
@@ -414,7 +416,7 @@
             title:'Ocean Legend',
             subtitle:'Complete every ocean challenge',
             earnedText:'Every badge is unlocked. You mastered the full Living Ocean expedition.',
-            howToEarn:'Earn all 12 badges across the explorer.',
+            howToEarn:'Earn all 13 badges across the explorer.',
             bg:'#0f766e',
             bgDeep:'#1d4ed8',
             ink:'#fef3c7'
@@ -493,6 +495,15 @@
                         <path d="M60 39v39" stroke="#c4b5fd" stroke-width="4"/>
                         <circle cx="78" cy="31" r="9" fill="#fde68a"/>
                         <path d="M78 23v16M70 31h16" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+                    `;
+                case 'oceanregions':
+                    return `
+                        <path d="M20 78c13-10 26-10 39 0s26 10 41 0" fill="none" stroke="#e0f2fe" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M27 89c10-7 20-7 30 0s20 7 36 0" fill="none" stroke="#bae6fd" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M28 60h26l15 12 17-22 18 10v18H28z" fill="#0f766e" opacity="0.86"/>
+                        <path d="M36 36l14 9 14-9 14 9 14-9v35l-14 9-14-9-14 9-14-9z" fill="#f0f9ff" stroke="#e0f2fe" stroke-width="3" stroke-linejoin="round"/>
+                        <path d="M50 45v26M64 37v34M78 45v34" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="78" cy="45" r="6" fill="#fde68a"/>
                     `;
                 case 'bathymetry':
                     return `
