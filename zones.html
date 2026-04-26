@@ -58,6 +58,46 @@
         .tag-benthopelagic { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(167, 139, 250, 0.2); color: #d8b4fe; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(167, 139, 250, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
         .tag-multi { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(56, 189, 248, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
         .tag-pelagic { vertical-align: super; font-size: 0.6rem; padding: 0.15rem 0.3rem; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-radius: 0.25rem; margin-left: 0.25rem; font-weight: 800; letter-spacing: 0.05em; border: 1px solid rgba(59, 130, 246, 0.5); text-transform: uppercase; display: inline-block; line-height: 1; }
+        .match-shell{max-width:1120px;margin:0 auto;}
+        .match-card{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:1rem;align-items:stretch;}
+        .match-creature-panel{background:rgba(3,7,18,0.72);border:1px solid rgba(125,211,252,0.22);border-radius:1.25rem;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}
+        .match-creature-art{height:10rem;border-radius:1rem;background:radial-gradient(circle at 50% 30%,rgba(125,211,252,0.24),rgba(15,23,42,0.72) 58%,rgba(2,6,23,0.95));border:1px solid rgba(148,163,184,0.22);display:flex;align-items:center;justify-content:center;}
+        .match-token-home{min-height:5.5rem;border:1px dashed rgba(125,211,252,0.4);border-radius:1rem;display:flex;align-items:center;justify-content:center;background:rgba(14,165,233,0.08);}
+        .match-token{width:5rem;height:5rem;border-radius:999px;background:rgba(255,255,255,0.96);box-shadow:0 16px 38px rgba(0,0,0,0.35),0 0 0 2px rgba(125,211,252,0.7);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;cursor:grab;z-index:30;transition:box-shadow 0.18s ease,transform 0.18s ease;}
+        .match-token:active,.match-token.dragging{cursor:grabbing;box-shadow:0 20px 48px rgba(0,0,0,0.48),0 0 0 4px rgba(250,204,21,0.92);transform:scale(1.04);}
+        .match-token svg{width:82%;height:82%;}
+        .ocean-canvas{position:relative;min-height:620px;border-radius:1.25rem;overflow:hidden;border:1px solid rgba(125,211,252,0.28);background:linear-gradient(to bottom,#7dd3fc 0%,#0284c7 19%,#075985 34%,#1e1b4b 50%,#111827 68%,#030712 84%,#000 100%);box-shadow:inset 0 0 40px rgba(255,255,255,0.12),0 24px 50px rgba(0,0,0,0.24);}
+        .ocean-canvas::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.12),transparent 18%,transparent 82%,rgba(0,0,0,0.28)),radial-gradient(circle at 16% 8%,rgba(255,255,255,0.28),transparent 15%),radial-gradient(circle at 78% 28%,rgba(147,197,253,0.14),transparent 18%);pointer-events:none;}
+        .ocean-layer{position:absolute;left:0;right:0;border-top:1px solid rgba(255,255,255,0.22);display:grid;grid-template-columns:minmax(104px,148px) 1fr;align-items:center;padding:0.35rem 0.85rem;transition:background 0.18s ease,box-shadow 0.18s ease,outline-color 0.18s ease;outline:2px solid transparent;outline-offset:-2px;}
+        .ocean-layer:first-child{border-top:0;}
+        .ocean-layer.drop-hover{background:rgba(250,204,21,0.2);box-shadow:inset 0 0 0 2px rgba(250,204,21,0.72);}
+        .ocean-layer.correct-flash{background:rgba(34,197,94,0.24);box-shadow:inset 0 0 0 2px rgba(74,222,128,0.9);}
+        .ocean-layer.wrong-flash{background:rgba(239,68,68,0.24);box-shadow:inset 0 0 0 2px rgba(248,113,113,0.9);}
+        .layer-label{color:white;text-shadow:0 2px 8px rgba(0,0,0,0.6);font-weight:900;line-height:1.05;}
+        .layer-label small{display:block;font-size:0.68rem;color:rgba(219,234,254,0.82);font-weight:800;margin-top:0.15rem;}
+        .layer-clue{justify-self:end;max-width:62%;color:rgba(255,255,255,0.74);font-size:0.76rem;text-align:right;font-weight:700;text-shadow:0 1px 5px rgba(0,0,0,0.7);}
+        .canvas-shelf{position:absolute;left:0;right:0;top:13%;height:10%;background:linear-gradient(155deg,rgba(253,224,71,0.42),rgba(180,83,9,0.18));clip-path:polygon(0 48%,38% 62%,72% 86%,100% 100%,100% 100%,0 100%);pointer-events:none;}
+        .canvas-vent{position:absolute;left:70%;bottom:24%;width:4rem;height:6rem;background:linear-gradient(to top,rgba(107,33,168,0.85),rgba(156,163,175,0.3));clip-path:polygon(35% 100%,65% 100%,56% 20%,72% 0,45% 16%);filter:drop-shadow(0 0 12px rgba(168,85,247,0.65));pointer-events:none;}
+        .canvas-trench{position:absolute;right:0;bottom:0;width:38%;height:16%;background:linear-gradient(145deg,rgba(15,23,42,0),rgba(127,29,29,0.72));clip-path:polygon(16% 0,100% 0,100% 100%,0 100%);pointer-events:none;}
+        .drop-marker{position:absolute;inset:auto auto 1rem 1rem;padding:0.55rem 0.75rem;border-radius:0.8rem;background:rgba(2,6,23,0.68);border:1px solid rgba(148,163,184,0.28);color:#dbeafe;font-size:0.78rem;font-weight:800;backdrop-filter:blur(8px);}
+        .match-feedback{min-height:5.5rem;text-align:left;}
+        @media (max-width:900px){
+            .match-card{grid-template-columns:1fr;}
+            .match-creature-panel{display:grid;grid-template-columns:9.5rem 1fr;align-items:center;}
+            .match-creature-art{height:8.5rem;}
+            .match-token-home{min-height:5rem;}
+            .ocean-canvas{min-height:640px;}
+        }
+        @media (max-width:560px){
+            .match-creature-panel{grid-template-columns:1fr;}
+            .match-creature-art{height:8rem;}
+            .ocean-canvas{min-height:600px;border-radius:1rem;}
+            .ocean-layer{grid-template-columns:minmax(84px,112px) 1fr;padding:0.3rem 0.55rem;}
+            .layer-label{font-size:0.82rem;}
+            .layer-label small{font-size:0.6rem;}
+            .layer-clue{font-size:0.66rem;max-width:58%;}
+            .match-token{width:4.5rem;height:4.5rem;}
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased font-sans">
@@ -324,11 +364,11 @@
 
                 <!-- Creature Match Game Section -->
                 <div class="w-full mt-10 relative z-20">
-                    <div class="max-w-4xl mx-auto px-4 text-center">
+                    <div class="match-shell px-4 text-center">
                         <h2 class="text-4xl font-heading font-black text-white mb-4"><i class="fa-solid fa-gamepad text-blue-400"></i> Creature Match Game!</h2>
-                        <p class="text-gray-400 mb-10 text-lg">Test your knowledge! Can you figure out which Ocean Zone these real creatures belong to?</p>
+                        <p class="text-gray-400 mb-10 text-lg">Drag each organism into the ocean layer where it belongs. The canvas will explain wrong drops so the depth clues stick visually.</p>
 
-                        <div class="glass-card-dark p-6 md:p-8 rounded-3xl border border-blue-500/30 max-w-2xl mx-auto shadow-2xl relative overflow-hidden" id="match-game-container">
+                        <div class="glass-card-dark p-4 md:p-6 rounded-3xl border border-blue-500/30 shadow-2xl relative overflow-hidden" id="match-game-container">
                             <!-- Game Content dynamically generated by JS -->
                         </div>
                     </div>
@@ -849,6 +889,103 @@
         ];
 
         let currentMatchIndex = 0;
+        let activeMatchDrag = null;
+
+        const MATCH_ZONE_META = [
+            { label: 'Intertidal', depth: '0 m shoreline', clue: 'waves, tide pools, drying air', top: 0, height: 10 },
+            { label: 'Neritic', depth: 'continental shelf', clue: 'shallow shelf, reefs, kelp, seagrass', top: 10, height: 14 },
+            { label: 'Epipelagic', depth: '0-200 m', clue: 'sunlight, photosynthesis, fast swimmers', top: 24, height: 15 },
+            { label: 'Mesopelagic', depth: '200-1,000 m', clue: 'twilight, photophores, DVM commuters', top: 39, height: 16 },
+            { label: 'Bathypelagic', depth: '1,000-4,000 m', clue: 'midnight water, lures, scarce food', top: 55, height: 17 },
+            { label: 'Abyssopelagic', depth: '4,000-6,000 m', clue: 'abyssal plains, marine snow, soft mud', top: 72, height: 15 },
+            { label: 'Hadal', depth: '6,000-11,000 m', clue: 'trenches, crushing pressure, TMAO clues', top: 87, height: 13 }
+        ];
+
+        const MATCH_CREATURE_HINTS = {
+            limpet: 'Look for splash-zone clues: a limpet clamps to rocks when the tide drops.',
+            sculpin: 'This is a tide-pool fish, built for shallow pools that change with every tide.',
+            crab: 'Shore crabs hide under rocks where water and air take turns covering the habitat.',
+            barnacle: 'Barnacles glue to rocks and close their plates when exposed at low tide.',
+            starfish: 'Ochre sea stars are rocky-shore predators that pry open mussels in the intertidal.',
+            anemone: 'Sea anemones can close up in tide pools when air and waves become rough.',
+            mussel: 'Mussels use byssal threads to anchor in wave-battered intertidal beds.',
+            otter: 'Sea otters hunt in shallow coastal kelp forests over the continental shelf.',
+            phytoplankton: 'Photosynthesis needs sunlight, so phytoplankton belong in bright upper water.',
+            coral: 'Reef-building coral needs shallow, clear, sunlit shelf water for its symbiotic algae.',
+            kelp: 'Giant kelp grows from the seafloor up toward light in shallow coastal shelf water.',
+            clownfish: 'Clownfish live with anemones on shallow coral reefs, not the open deep ocean.',
+            parrotfish: 'Parrotfish scrape algae from coral reefs in warm neritic waters.',
+            butterflyfish: 'This flat reef fish is built for tight turns through shallow coral branches.',
+            angelfish: 'Angelfish are reef fishes, so picture coral and warm shallow shelf water.',
+            octopus: 'Most octopuses in this guide are reef or seafloor animals of coastal shelf habitats.',
+            cuttlefish: 'Cuttlefish hover and hunt over shallow coastal seafloors.',
+            seagrass: 'Seagrass is rooted in shallow coastal bottom, where enough light reaches the seafloor.',
+            diatom: 'Diatoms are photosynthetic plankton: think sunlit upper water, especially productive coastal water.',
+            manatee: 'Manatees graze seagrass in warm shallow coastal and surface waters.',
+            quahog: 'Quahogs burrow in sand or mud on shallow seafloors, sometimes close to shore.',
+            americanlobster: 'American lobsters crawl along rocky coastal and shelf seafloor shelters.',
+            longfinsquid: 'Longfin squid use the shelf and upper water column, rising at night from bottom habitat.',
+            veinedsquid: 'Veined squid are coastal shelf squids, with movements tied to shelf water temperatures.',
+            sunfish: 'Ocean sunfish bask and feed in the sunlit open ocean.',
+            mahimahi: 'Mahi-mahi are fast, bright, surface-water predators of the epipelagic.',
+            tuna: 'Bluefin tuna are streamlined open-ocean swimmers of the sunlit zone.',
+            shark: 'Great white sharks cruise the productive surface ocean and coastal surface waters.',
+            turtle: 'Sea turtles breathe air and forage mostly in sunlit surface and coastal waters.',
+            manta: 'Manta rays filter plankton in bright upper-ocean water.',
+            copepod: 'Copepods are plankton commuters: they feed near the surface at night and hide deeper by day.',
+            krill: 'Krill form swarms in upper and twilight waters and help power the carbon pump.',
+            salp: 'Salps are gelatinous plankton of the open upper ocean and twilight depths.',
+            pteropod: 'Sea butterflies are tiny swimming snails of upper open-ocean layers.',
+            bluewhale: 'Blue whales breathe at the surface and feed on krill in productive upper waters.',
+            dolphin: 'Dolphins are air-breathing hunters tied to surface and coastal waters.',
+            penguin: 'Penguins dive from the surface through cold sunlit coastal waters.',
+            moonjelly: 'Moon jellies drift in upper coastal and open waters where plankton is common.',
+            flyingfish: 'Flying fish escape predators by gliding above warm surface water.',
+            sardineherring: 'Sardines and herring school in shiny surface waters where plankton food is abundant.',
+            swordfish: 'Swordfish commonly hunt in the twilight zone and rise or dive to follow prey.',
+            ctenophore: 'Comb jellies are a rare all-depth answer: their transparent bodies can drift across many layers.',
+            lanternfish: 'Lanternfish are classic twilight-zone migrants with photophores.',
+            hatchetfish: 'Hatchetfish use belly lights and upward eyes in the twilight zone.',
+            bristlemouth: 'Bristlemouths are tiny, abundant mesopelagic fishes of the twilight ocean.',
+            barreleye: 'A transparent head and tubular eyes are twilight-zone silhouette-hunting clues.',
+            siphonophore: 'Siphonophores drift through open water at several depths, including twilight and midnight.',
+            viperfish: 'Viperfish are fangy twilight to upper-midnight predators, built for dim water.',
+            strawberrysquid: 'Strawberry squid use mismatched eyes in twilight midwater.',
+            eyeflashsquid: 'Eye-flash squid glow underneath for counterillumination in the twilight zone.',
+            dragonfish: 'Dragonfish are dark bathypelagic predators with bioluminescent lures.',
+            snipeeel: 'Snipe eels range through dim twilight and midnight waters.',
+            anglerfish: 'The glowing lure is a midnight-zone clue for rare prey in total darkness.',
+            gulper: 'A huge mouth and stretchy stomach point to scarce-food midnight water.',
+            vampire: 'Vampire squid survive low-oxygen twilight and midnight water by eating marine snow.',
+            dumbo: 'Dumbo octopuses flap near deep seafloor habitats from midnight into abyssal depths.',
+            seaspider: 'Sea spiders can be benthic from tide pools down to the deep seafloor, so many layers work.',
+            basketstar: 'Basket stars perch on deep seafloor structures in bathyal to abyssal zones.',
+            cucumber: 'Sea cucumbers are benthic deposit feeders found from shallow bottom to abyssal plains.',
+            tripod: 'Tripod fish stand above soft mud in bathyal to abyssal seafloor habitat.',
+            isopod: 'Giant isopods are deep benthic scavengers of the bathyal midnight seafloor.',
+            rattail: 'Rattails cruise just above deep bathyal and abyssal seafloors.',
+            seapig: 'Sea pigs are abyssal plain deposit feeders. Picture soft mud and falling marine snow.',
+            swimcucumber: 'Swimming sea cucumbers are deep abyssopelagic drifters, not shallow reef animals.',
+            arrowworm: 'Arrow worms are pelagic predators found through the water column, so many layers can work.',
+            foraminifera: 'Foraminifera can be planktonic or benthic, from surface water to deep sediments.',
+            snailfish: 'Mariana snailfish are hadal trench specialists with pressure adaptations.',
+            tubeworm: 'Riftia tubeworms cluster around hydrothermal vents on the deep bathyal seafloor.',
+            blobfish: 'Blobfish hover near deep bathyal to abyssal seafloors with gelatinous bodies.',
+            giantsquid: 'Giant squid hunt in dark twilight to midnight slope waters.',
+            spermwhale: 'Sperm whales breathe at the surface but dive into twilight and midnight water for squid.',
+            amphipod: 'Supergiant amphipods are deep scavengers of abyssal and trench habitats.',
+            cuskeel: 'Hadal cusk eels are trench-depth fishes.',
+            scaleworm: 'Scale worms crawl on deep seafloor habitats, including vent and trench environments.',
+            xenophyophore: 'Xenophyophores are giant single cells on abyssal and hadal seafloor sediments.'
+        };
+
+        function cleanMatchName(html) {
+            return String(html)
+                .replace(/<span[^>]*class=['"][^'"]*tag-[^'"]*['"][^>]*>[\s\S]*?<\/span>/gi, '')
+                .replace(/<[^>]+>/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
 
         function renderMatchGame() {
             const container = document.getElementById('match-game-container');
@@ -858,50 +995,191 @@
                         <div class="text-6xl mb-4">🏆</div>
                         <h3 class="text-3xl font-bold text-yellow-400 mb-2">Ocean Explorer!</h3>
                         <p class="text-gray-300">You successfully mapped all the creatures to their correct zones.</p>
-                        <button onclick="currentMatchIndex=0; MATCH_DATA.sort(() => Math.random() - 0.5); renderMatchGame();" class="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition">Play Again</button>
+                        <button onclick="resetMatchGame();" class="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition">Play Again</button>
                     </div>
                 `;
                 return;
             }
 
             const data = MATCH_DATA[currentMatchIndex];
-            const zoneLabels = ["Intertidal", "Neritic", "Epipelagic", "Mesopelagic", "Bathyal /<br>Bathypelagic", "Abyssal /<br>Abyssopelagic", "Hadal"];
-
-            let buttonsHTML = zoneLabels.map((lbl, idx) => `
-                <button onclick="checkMatch(${idx}, this)" class="bg-gray-800 hover:bg-blue-600 hover:border-blue-400 text-gray-200 border border-gray-600 rounded-lg py-4 px-2 text-sm font-semibold transition-all flex items-center justify-center text-center h-full leading-snug">
-                    ${lbl}
+            data.failedAttempt = false;
+            data.scored = false;
+            const cleanCreatureName = cleanMatchName(data.name);
+            const layersHTML = MATCH_ZONE_META.map((zone, idx) => `
+                <button type="button" class="ocean-layer" data-match-zone="${idx}" onclick="checkMatch(${idx})" style="top:${zone.top}%;height:${zone.height}%;" aria-label="Drop in ${zone.label} zone">
+                    <span class="layer-label">${zone.label}<small>${zone.depth}</small></span>
+                    <span class="layer-clue">${zone.clue}</span>
                 </button>
             `).join('');
 
             container.innerHTML = `
-                <div class="mb-4 text-left text-blue-300 font-semibold flex justify-between">
-                    <span>Creature ${currentMatchIndex + 1} of ${MATCH_DATA.length}</span>
+                <div class="mb-4 text-left text-blue-300 font-semibold flex flex-wrap justify-between gap-2">
+                    <span>Organism ${currentMatchIndex + 1} of ${MATCH_DATA.length}</span>
+                    <span class="text-cyan-100">Drag, drop, learn the layer clue</span>
                 </div>
-                <div class="h-48 md:h-80 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-blue-900 to-black mb-6 border-2 border-gray-700 relative">
-                    <div class="w-full h-full flex items-center justify-center filter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-110 transition-transform duration-300 cursor-pointer select-none">
-                        <div class="w-32 h-32 md:w-48 md:h-48">
-                            ${speciesSvg(data.svgKey)}
+                <div class="match-card">
+                    <aside class="match-creature-panel text-left">
+                        <div class="match-creature-art">
+                            <div class="w-28 h-28 md:w-36 md:h-36">${speciesSvg(data.svgKey)}</div>
                         </div>
-                    </div>
+                        <div>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-1">${data.name}</h3>
+                            <p class="text-gray-400 italic mb-3">${data.sci}</p>
+                            <p class="text-sm text-cyan-100 font-semibold mb-2">Drag the token into the best ocean layer.</p>
+                            <div class="match-token-home" id="match-token-home">
+                                <div class="match-token" id="match-token" role="button" aria-label="Drag ${cleanCreatureName}" tabindex="0">
+                                    ${speciesSvg(data.svgKey)}
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <section class="ocean-canvas" id="match-ocean-canvas" aria-label="Interactive ocean zone canvas">
+                        ${layersHTML}
+                        <div class="canvas-shelf"></div>
+                        <div class="canvas-vent"></div>
+                        <div class="canvas-trench"></div>
+                        <div class="drop-marker"><i class="fa-solid fa-hand-pointer mr-1"></i> Drop onto a layer or tap a layer</div>
+                    </section>
                 </div>
-                <h3 class="text-3xl font-bold text-white mb-1">${data.name}</h3>
-                <p class="text-gray-400 italic mb-6">${data.sci}</p>
                 
-                <p class="text-gray-300 mb-4 text-sm uppercase tracking-wider font-bold text-left">Where does it live?</p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4" id="match-buttons-container">
-                    ${buttonsHTML}
-                </div>
-                
-                <div id="match-feedback" class="hidden p-4 rounded-xl mt-4 text-center font-bold text-lg border"></div>
-                <button id="match-next-btn" onclick="currentMatchIndex++; renderMatchGame();" class="hidden w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition text-lg">Next Creature <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                <div id="match-feedback" class="match-feedback hidden p-4 rounded-xl mt-4 font-bold text-base md:text-lg border"></div>
+                <button id="match-next-btn" onclick="currentMatchIndex++; renderMatchGame();" class="hidden w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition text-lg">Next Organism <i class="fa-solid fa-arrow-right ml-2"></i></button>
             `;
+            setupMatchDrag();
         }
 
-        function checkMatch(selectedZone, btn) {
+        function resetMatchGame() {
+            currentMatchIndex = 0;
+            MATCH_DATA.forEach(d => { delete d.scored; delete d.failedAttempt; });
+            MATCH_DATA.sort(() => Math.random() - 0.5);
+            renderMatchGame();
+        }
+
+        function setupMatchDrag() {
+            const token = document.getElementById('match-token');
+            if(!token) return;
+            token.addEventListener('pointerdown', beginMatchDrag);
+            token.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const canvas = document.getElementById('match-ocean-canvas');
+                    canvas?.querySelector('.ocean-layer')?.focus();
+                }
+            });
+        }
+
+        function beginMatchDrag(e) {
+            if(e.button !== undefined && e.button !== 0) return;
+            const token = e.currentTarget;
+            const rect = token.getBoundingClientRect();
+            activeMatchDrag = {
+                token,
+                home: document.getElementById('match-token-home'),
+                offsetX: e.clientX - rect.left,
+                offsetY: e.clientY - rect.top
+            };
+            token.setPointerCapture?.(e.pointerId);
+            token.classList.add('dragging');
+            token.style.position = 'fixed';
+            token.style.left = `${rect.left}px`;
+            token.style.top = `${rect.top}px`;
+            token.style.width = `${rect.width}px`;
+            token.style.height = `${rect.height}px`;
+            token.style.margin = '0';
+            document.body.appendChild(token);
+            moveMatchToken(e.clientX, e.clientY);
+            window.addEventListener('pointermove', moveMatchDrag);
+            window.addEventListener('pointerup', endMatchDrag, { once: true });
+            window.addEventListener('pointercancel', cancelMatchDrag, { once: true });
+            e.preventDefault();
+        }
+
+        function moveMatchDrag(e) {
+            if(!activeMatchDrag) return;
+            moveMatchToken(e.clientX, e.clientY);
+            highlightDropZone(zoneFromPoint(e.clientX, e.clientY));
+        }
+
+        function moveMatchToken(x, y) {
+            const drag = activeMatchDrag;
+            if(!drag) return;
+            drag.token.style.left = `${x - drag.offsetX}px`;
+            drag.token.style.top = `${y - drag.offsetY}px`;
+        }
+
+        function endMatchDrag(e) {
+            if(!activeMatchDrag) return;
+            const zone = zoneFromPoint(e.clientX, e.clientY);
+            clearDropHighlights();
+            const token = activeMatchDrag.token;
+            token.classList.remove('dragging');
+            window.removeEventListener('pointermove', moveMatchDrag);
+            if(zone === null) {
+                restoreMatchToken();
+                showMatchFeedback(false, null, 'Drop inside the ocean canvas so the depth layers can help you.');
+            } else {
+                checkMatch(zone);
+            }
+        }
+
+        function cancelMatchDrag() {
+            clearDropHighlights();
+            window.removeEventListener('pointermove', moveMatchDrag);
+            restoreMatchToken();
+        }
+
+        function restoreMatchToken() {
+            if(!activeMatchDrag) return;
+            const { token, home } = activeMatchDrag;
+            token.removeAttribute('style');
+            home.appendChild(token);
+            activeMatchDrag = null;
+        }
+
+        function zoneFromPoint(x, y) {
+            const canvas = document.getElementById('match-ocean-canvas');
+            if(!canvas) return null;
+            const rect = canvas.getBoundingClientRect();
+            if(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return null;
+            const pct = ((y - rect.top) / rect.height) * 100;
+            const zone = MATCH_ZONE_META.findIndex(z => pct >= z.top && pct <= z.top + z.height);
+            return zone >= 0 ? zone : null;
+        }
+
+        function highlightDropZone(zone) {
+            clearDropHighlights();
+            if(zone === null) return;
+            document.querySelector(`[data-match-zone="${zone}"]`)?.classList.add('drop-hover');
+        }
+
+        function clearDropHighlights() {
+            document.querySelectorAll('.ocean-layer').forEach(el => el.classList.remove('drop-hover'));
+        }
+
+        function placeTokenInZone(zone) {
+            const token = activeMatchDrag?.token || document.getElementById('match-token');
+            const canvas = document.getElementById('match-ocean-canvas');
+            const layer = document.querySelector(`[data-match-zone="${zone}"]`);
+            if(!token || !canvas || !layer) { restoreMatchToken(); return; }
+            const canvasRect = canvas.getBoundingClientRect();
+            const layerRect = layer.getBoundingClientRect();
+            canvas.appendChild(token);
+            token.removeAttribute('style');
+            token.style.position = 'absolute';
+            token.style.left = '50%';
+            token.style.top = `${layerRect.top - canvasRect.top + (layerRect.height / 2) - 40}px`;
+            token.style.transform = 'translateX(-50%)';
+            token.style.pointerEvents = 'none';
+            activeMatchDrag = null;
+        }
+
+        function checkMatch(selectedZone) {
             const data = MATCH_DATA[currentMatchIndex];
             const feedback = document.getElementById('match-feedback');
             const nextBtn = document.getElementById('match-next-btn');
-            const allBtns = document.getElementById('match-buttons-container').querySelectorAll('button');
+            const allLayers = document.querySelectorAll('.ocean-layer');
+            const selectedLayer = document.querySelector(`[data-match-zone="${selectedZone}"]`);
 
             if(data.zones.includes(selectedZone)) {
                 // Correct Match
@@ -913,18 +1191,12 @@
                     data.scored = true;
                 }
                 
-                btn.classList.remove('bg-gray-800', 'hover:bg-blue-600', 'border-gray-600');
-                btn.classList.add('btn-correct', 'scale-105');
-                feedback.innerHTML = `<span class="text-green-400"><i class="fa-solid fa-check-circle mr-2"></i> Correct! Found primarily in the ${data.zoneNames}.</span>`;
-                feedback.classList.remove('hidden', 'bg-red-900/40', 'border-red-500/50');
-                feedback.classList.add('bg-green-900/40', 'border-green-500/50');
+                selectedLayer?.classList.add('correct-flash');
+                placeTokenInZone(selectedZone);
+                showMatchFeedback(true, selectedZone, `<i class="fa-solid fa-check-circle mr-2"></i> Correct. ${cleanMatchName(data.name)} belongs in ${data.zoneNames}. ${MATCH_CREATURE_HINTS[data.svgKey] || ''}`);
                 nextBtn.classList.remove('hidden');
                 
-                // Disable all buttons to prevent further clicking
-                allBtns.forEach(b => {
-                    b.disabled = true;
-                    b.classList.remove('hover:bg-blue-600', 'hover:border-blue-400');
-                });
+                allLayers.forEach(b => { b.disabled = true; });
                 
                 // Pop Confetti Mini
                 const c=document.getElementById('confetti-canvas');
@@ -940,17 +1212,35 @@
             } else {
                 // Incorrect Match
                 data.failedAttempt = true; // Mark as failed attempt so no point is awarded later
-                btn.classList.remove('bg-gray-800', 'border-gray-600', 'hover:bg-blue-600', 'hover:border-blue-400');
-                btn.classList.add('btn-wrong', 'anim-shake', 'opacity-75', 'cursor-not-allowed');
-                btn.disabled = true;
+                selectedLayer?.classList.add('wrong-flash', 'anim-shake');
+                if(selectedLayer) selectedLayer.disabled = true;
                 setTimeout(() => {
-                    btn.classList.remove('anim-shake');
+                    selectedLayer?.classList.remove('anim-shake');
                 }, 500);
-                
-                feedback.innerHTML = `<span class="text-red-400"><i class="fa-solid fa-times-circle mr-2"></i> Not quite! Try a different zone.</span>`;
-                feedback.classList.remove('hidden', 'bg-green-900/40', 'border-green-500/50');
-                feedback.classList.add('bg-red-900/40', 'border-red-500/50');
+                const wrongMessage = buildWrongZoneFeedback(data, selectedZone);
+                restoreMatchToken();
+                showMatchFeedback(false, selectedZone, wrongMessage);
             }
+        }
+
+        function buildWrongZoneFeedback(data, selectedZone) {
+            const selected = MATCH_ZONE_META[selectedZone];
+            const correctZones = data.zones.map(z => MATCH_ZONE_META[z].label).join(' or ');
+            const direction = selectedZone < Math.min(...data.zones)
+                ? 'too shallow and bright'
+                : selectedZone > Math.max(...data.zones)
+                    ? 'too deep or too dark'
+                    : 'close, but not the best habitat clue';
+            const hint = MATCH_CREATURE_HINTS[data.svgKey] || `Look for ${data.zoneNames}.`;
+            return `<i class="fa-solid fa-xmark-circle mr-2"></i> ${selected.label} is ${direction} for ${cleanMatchName(data.name)}. Visual clue: ${selected.clue}. Aim for ${correctZones}. ${hint}`;
+        }
+
+        function showMatchFeedback(isCorrect, selectedZone, message) {
+            const feedback = document.getElementById('match-feedback');
+            if(!feedback) return;
+            feedback.innerHTML = `<span class="${isCorrect ? 'text-green-300' : 'text-red-300'}">${message}</span>`;
+            feedback.classList.remove('hidden', 'bg-green-900/40', 'border-green-500/50', 'bg-red-900/40', 'border-red-500/50');
+            feedback.classList.add(isCorrect ? 'bg-green-900/40' : 'bg-red-900/40', isCorrect ? 'border-green-500/50' : 'border-red-500/50');
         }
 
         window.onload=()=>{
